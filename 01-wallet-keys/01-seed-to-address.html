@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>助记词、私钥与哈希雪崩 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .chain-flow { display: grid; gap: 12px; }
+    .flow-node { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+    .flow-node .f-title { font-size: 12px; color: var(--accent); margin-bottom: 4px; }
+    .flow-node .f-val { font-family: var(--mono); font-size: 13px; word-break: break-all; color: #f8fafc; }
+    .diff-char { color: #f59e0b; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 钱包、密钥与数字签名</span>
+      <h1>助记词、私钥与哈希雪崩</h1>
+      <p>没有“忘记密码”按钮，也没有客服能帮你重置。拆解区块链世界里最底层的单向数学锁。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>如果有人猜出了你的钱包地址，他能反推出你的私钥吗？</h2>
+      <p>点击按钮，模拟全球算力最强的超级计算机（每秒尝试 10 亿次）暴力破解一个 256 位以太坊私钥需要多久：</p>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">密钥空间大小：<strong>2²⁵⁶ ≈ 1.15 × 10⁷⁷</strong>（比可观测宇宙的原子总数还多）</div>
+        <button id="hook-btn" class="btn btn-primary">计算暴力破解耗时</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>所需时间：约 3.6 × 10⁶⁰ 年</strong>（宇宙目前才诞生 1.38 × 10¹⁰ 年）。<br />
+        结论：只要你的助记词不泄露，物理定律保证了世界上没有任何力量能抢走你的资产。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>单向派生链条：助记词 → 私钥 → 公钥 → 钱包地址</h2>
+      <p>很多人以为“钱存在钱包 App 里”，其实<strong>资产永远只记录在区块链账本上</strong>。钱包 App 只是一个钥匙串，它通过单向密码学函数把你的 12 个英文单词（助记词）一路推导出公开地址：</p>
+      <div class="formula-box">
+        助记词 (12 words) ──[PBKDF2]──▶ 私钥 (256-bit) ──[椭圆曲线]──▶ 公钥 ──[Keccak-256]──▶ 0x 钱包地址
+      </div>
+      <p>这个链条有两个核心特性：<strong>1. 不可逆</strong>（知道地址绝对算不出私钥）；<strong>2. 雪崩效应</strong>（哪怕只改了一个字母或空格，最终生成的私钥和地址也会面目全非）。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>实时密钥推导与哈希雪崩演示（基于浏览器原生 SHA-256）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>输入任意助记词或文本（试着只改 1 个字母）</label>
+            <textarea id="seed-input" rows="4">witch collapse practice feed shame open despair creek road again ice least</textarea>
+          </div>
+          <button id="btn-tweak" class="btn" style="width:100%;margin-bottom:8px;">微调最后一个字母（触发雪崩）</button>
+          <button id="btn-reset" class="btn" style="width:100%;">重置默认助记词</button>
+        </div>
+        <div class="chain-flow">
+          <div class="flow-node">
+            <div class="f-title">1. 推导私钥 (Private Key · 64位十六进制) — 绝对保密</div>
+            <div class="f-val" id="out-priv">计算中...</div>
+          </div>
+          <div class="flow-node">
+            <div class="f-title">2. 推导公钥指纹 (Public Key Hash)</div>
+            <div class="f-val" id="out-pub">计算中...</div>
+          </div>
+          <div class="flow-node">
+            <div class="f-title">3. 最终公开地址 (0x Address · 40位十六进制) — 可放心收款</div>
+            <div class="f-val" id="out-addr" style="color:#10b981;font-size:15px;">计算中...</div>
+          </div>
+          <div class="flow-node">
+            <div class="f-title">与上一次输出的字符差异率</div>
+            <div class="f-val" id="out-diff">首次生成</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：点击「微调最后一个字母」，观察下方私钥和 0x 地址的变化比例是否接近 90% 以上？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：在助记词末尾多敲一个空格，看看生成的地址是不是完全变成了另一个陌生钱包？</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>为什么“截图存相册”是币圈最常见的被盗原因？</h2>
+      <p>无数新手把 12 个助记词截图存在手机相册，或复制到微信收藏/云笔记里。一旦手机安装了带读取相册权限的恶意软件，木马会通过 OCR 自动扫描相册里的英文单词组合，几秒钟内就能推导出你的私钥并转空资产。</p>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 助记词<strong>绝不触网</strong>：不截图、不发微信、不存云盘，只用纸笔手抄并离线保存。<br />
+        2. 换手机或换钱包 App（如从 MetaMask 换到 Rabby），只需导入同一套助记词，你的资产会自动同步出现——因为资产在链上，不在 App 里。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "01-wallet-keys/01-seed-to-address.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "01 · 钱包与密钥" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const seedInput = document.getElementById("seed-input");
+    const defaultSeed = seedInput.value;
+    let prevPriv = "";
+
+    async function sha256Hex(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function derive() {
+      const text = seedInput.value;
+      const priv = await sha256Hex("PRIV:" + text);
+      const pub = await sha256Hex("PUB:" + priv);
+      const addr = "0x" + pub.slice(-40);
+
+      document.getElementById("out-priv").textContent = "0x" + priv;
+      document.getElementById("out-pub").textContent = "0x" + pub;
+      document.getElementById("out-addr").textContent = addr;
+
+      if (prevPriv && prevPriv !== priv) {
+        let diff = 0;
+        for (let i = 0; i < priv.length; i++) if (priv[i] !== prevPriv[i]) diff++;
+        const pct = ((diff / priv.length) * 100).toFixed(1);
+        document.getElementById("out-diff").innerHTML = `64 位十六进制中有 <span class="diff-char">${diff} 位</span> 发生剧变（差异率 ${pct}%）`;
+      }
+      prevPriv = priv;
+    }
+
+    document.getElementById("btn-tweak").addEventListener("click", () => {
+      const v = seedInput.value;
+      seedInput.value = v.endsWith("t") ? v.slice(0, -1) + "s" : v.slice(0, -1) + "t";
+      derive();
+    });
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      seedInput.value = defaultSeed;
+      derive();
+    });
+    seedInput.addEventListener("input", derive);
+    derive();
+  </script>
+</body>
+</html>

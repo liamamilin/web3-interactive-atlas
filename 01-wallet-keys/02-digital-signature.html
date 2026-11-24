@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数字签名与链上验签 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 钱包、密钥与数字签名</span>
+      <h1>数字签名与链上验签</h1>
+      <p>既然私钥绝对不能发到网上，那矿工和节点是怎么确认“这笔转走 100 USDT 的交易确实是你本人发的”？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉体验</div>
+      <h2>模拟黑客在网络传输中篡改你的交易</h2>
+      <p>假设你刚签好一笔交易：<strong>“给 Bob 转 10 USDT”</strong>。如果黑客在半路把金额改成 <strong>10,000 USDT</strong>，节点会放行吗？</p>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">原交易已由你的私钥生成防篡改数字签名 <code>0x9f3a...e71b</code></div>
+        <button id="hook-btn" class="btn btn-danger">模拟黑客篡改金额为 10,000</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>节点瞬间拒收（Invalid Signature）！</strong><br />
+        因为数字签名是“私钥 + 交易原文”共同计算出的数学封印。只要交易原文改动哪怕 1 个字节，用你的公钥验签就会立刻报错。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>私钥在本地签字，公钥在全网验真</h2>
+      <p>非对称加密（以太坊与比特币使用 ECDSA 椭圆曲线算法）把“签字”和“验真”彻底拆开了：</p>
+      <div class="formula-box">
+        本地签名：Signature = Sign(PrivateKey, TransactionData)<br/>
+        全网验签：Verify(PublicKey, TransactionData, Signature) ──▶ True / False
+      </div>
+      <p>你的私钥永远留在本地设备（或硬件钱包芯片）里，广播到全网的只有<strong>交易原文 + 签名结果</strong>。任何人都可以用你的公开地址验证这笔交易确实出自你手，但没人能从签名里反推出私钥。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>签名与防篡改验签工作台</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>1. 发送方（你的私钥种子）</label>
+            <input id="in-priv" type="text" value="my-secret-private-key-2026" />
+          </div>
+          <div class="control-group">
+            <label>2. 原始交易内容（待签名）</label>
+            <input id="in-msg" type="text" value="Transfer 50 USDT to 0xBob" />
+          </div>
+          <button id="btn-sign" class="btn btn-primary" style="width:100%;">用私钥生成数字签名</button>
+        </div>
+
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>生成的数字签名（广播到链上）</label>
+            <input id="out-sig" type="text" readonly />
+          </div>
+          <div class="control-group">
+            <label>链上节点收到的交易内容（试着在这里篡改它！）</label>
+            <input id="verify-msg" type="text" value="Transfer 50 USDT to 0xBob" />
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box">
+              <div class="m-label">节点验签结果</div>
+              <div class="m-val" id="verify-status">等待签名</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：点击「生成数字签名」，确认右侧节点验签结果为绿色通过。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把右侧「链上节点收到的交易内容」里的 50 改成 500，观察验签状态如何瞬间变红报错。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>签名本身很安全，但“盲签（Blind Signing）”非常致命</h2>
+      <p>既然签名代表你的最高授权，黑客攻不破密码学，就会选择<strong>骗你亲手签名</strong>。很多钓鱼网站会弹出一串看不懂的十六进制乱码让你点“签名（Sign）”，一旦你签了名，就等于把合法的资产转移授权书亲手交给了黑客。</p>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 钱包弹窗要求 <strong>Sign（签名）</strong> 时，不要以为“不花 Gas 费就一定安全”。<br />
+        2. 养成看懂弹窗内容的习惯：凡是看不懂的乱码，或要求签 <code>Permit</code> / <code>Seaport</code> 订单的陌生网站，一律点拒绝。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "01-wallet-keys/02-digital-signature.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "01 · 钱包与密钥" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    async function hmacSim(key, msg) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key + "::" + msg));
+      return "0x" + [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    const inPriv = document.getElementById("in-priv");
+    const inMsg = document.getElementById("in-msg");
+    const outSig = document.getElementById("out-sig");
+    const verifyMsg = document.getElementById("verify-msg");
+    const verifyStatus = document.getElementById("verify-status");
+
+    async function doSign() {
+      verifyMsg.value = inMsg.value;
+      outSig.value = await hmacSim(inPriv.value, inMsg.value);
+      doVerify();
+    }
+
+    async function doVerify() {
+      const expected = await hmacSim(inPriv.value, verifyMsg.value);
+      if (outSig.value && outSig.value === expected) {
+        verifyStatus.textContent = "✓ 验签通过 (Valid)";
+        verifyStatus.className = "m-val val-good";
+      } else {
+        verifyStatus.textContent = "✗ 验签失败：数据已被篡改！";
+        verifyStatus.className = "m-val val-bad";
+      }
+    }
+
+    document.getElementById("btn-sign").addEventListener("click", doSign);
+    verifyMsg.addEventListener("input", doVerify);
+    doSign();
+  </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMM 定价曲线与滑点实验室 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .canvas-wrap { background: #0d1320; border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+    svg#amm-chart { width: 100%; height: 300px; display: block; }
+    .preset-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .preset-row .btn { font-size: 12px; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 首次交易与 AMM 机制</span>
+      <h1>AMM 定价曲线与滑点实验室</h1>
+      <p>没有买卖盘（订单簿），去中心化交易所靠什么决定币价？为什么买小池子土狗币，一买就先亏 30%？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>假设你在链上发现一个刚发射的新币 $PEPE2，当前标价 $1.00</h2>
+      <p>你决定拿出 <strong>5,000 USDT</strong> 冲进去。按当前 $1.00 的价格，你以为自己能买到 5,000 个币。点击下方按钮执行这笔市价 Swap：</p>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">当前资金池：<strong>10,000 USDT</strong> + <strong>10,000 $PEPE2</strong>（池子总深度 $20,000）</div>
+        <button id="hook-buy-btn" class="btn btn-primary">立即用 5,000 USDT 买入</button>
+      </div>
+      <div id="hook-result" class="hook-result">
+        <strong>成交完成！但你只拿到了 3,333.33 个 $PEPE2</strong>（少了整整 1,666 个）。<br />
+        你的真实成交均价高达 <strong>$1.50</strong>，比买入前标价贵了 <strong>+50%</strong>！这就是 AMM 数学曲线带来的价格冲击（滑点）。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>一条中学数学公式，取代了华尔街的撮合引擎</h2>
+      <p>Uniswap 用 <strong>恒定乘积自动做市商（AMM）</strong> 取代了订单簿：把两种代币放进同一个资金池，无论怎么交易，保证两者数量乘积永远等于常数 <strong>k</strong>：</p>
+      <div class="formula-box">x · y = k &nbsp;&nbsp;⇒&nbsp;&nbsp; (x + Δx) · (y - Δy) = k &nbsp;&nbsp;⇒&nbsp;&nbsp; Δy = y - k / (x + Δx)</div>
+      <p>因为双曲线越往右越陡峭，<strong>你想买走池子里越大比例的币，边际价格就会呈指数级飙升</strong>。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>亲手拖动参数，观察 x · y = k 曲线与滑点爆炸</h2>
+      <div class="preset-row">
+        <button class="btn" data-preset="shallow">预设 1：浅水土狗池 ($20k)</button>
+        <button class="btn" data-preset="mid">预设 2：中型山寨池 ($200k)</button>
+        <button class="btn" data-preset="deep">预设 3：主流深水池 ($2M)</button>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>池子初始 USDT (x) <strong id="lbl-x">$10,000</strong></label>
+            <input id="sl-x" type="range" min="5000" max="1000000" step="5000" value="10000" />
+          </div>
+          <div class="control-group">
+            <label>池子初始代币 (y) <strong id="lbl-y">10,000 TOKEN</strong></label>
+            <input id="sl-y" type="range" min="5000" max="1000000" step="5000" value="10000" />
+          </div>
+          <div class="control-group">
+            <label>你的买入金额 (Δx) <strong id="lbl-dx">$2,000</strong></label>
+            <input id="sl-dx" type="range" min="100" max="50000" step="100" value="2000" />
+          </div>
+          <div class="control-group">
+            <label>交易手续费 (Fee) <strong id="lbl-fee">0.3%</strong></label>
+            <input id="sl-fee" type="range" min="0" max="1" step="0.05" value="0.3" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">常数 k = <span id="lbl-k" style="font-family:var(--mono);color:var(--text)"></span></div>
+        </div>
+        <div>
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">买入前标价</div><div class="m-val" id="m-spot">$1.000</div></div>
+            <div class="metric-box"><div class="m-label">实际成交均价</div><div class="m-val" id="m-exec">$1.204</div></div>
+            <div class="metric-box"><div class="m-label">价格冲击 (滑点)</div><div class="m-val" id="m-impact">+20.4%</div></div>
+            <div class="metric-box"><div class="m-label">实际到手代币</div><div class="m-val" id="m-out">1,662</div></div>
+          </div>
+          <div class="canvas-wrap"><svg id="amm-chart" viewBox="0 0 560 300"></svg></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：选择「浅水土狗池」，把买入金额拉到 $10,000，观察成交均价是否刚好翻倍？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：保持买入金额 $10,000 不变，切换到「主流深水池」，看价格冲击如何瞬间跌回 1% 左右。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>实操防坑清单</h2>
+      <div class="callout-warn">
+        1. 买小币种前先看 <strong>Liquidity（流动性深度）</strong>，单笔买入尽量不超过池子单边深度的 1%~2%。<br />
+        2. 主流币交易把滑点容忍度控制在 <strong>0.1% ~ 0.5%</strong>，防止被 MEV 三明治机器人夹击。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "04-first-swap-amm/01-xyk-slippage-lab.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "04 · 首次交易与 AMM" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-buy-btn").addEventListener("click", () => {
+      document.getElementById("hook-result").style.display = "block";
+    });
+
+    const slX = document.getElementById("sl-x"), slY = document.getElementById("sl-y");
+    const slDx = document.getElementById("sl-dx"), slFee = document.getElementById("sl-fee");
+    const svg = document.getElementById("amm-chart");
+    const fmt = (n, d = 0) => Number(n).toLocaleString("en-US", { maximumFractionDigits: d });
+
+    function update() {
+      const x = +slX.value, y = +slY.value, dx = +slDx.value, feeRate = +slFee.value / 100;
+      document.getElementById("lbl-x").textContent = `$${fmt(x)}`;
+      document.getElementById("lbl-y").textContent = `${fmt(y)} TOKEN`;
+      document.getElementById("lbl-dx").textContent = `$${fmt(dx)}`;
+      document.getElementById("lbl-fee").textContent = `${slFee.value}%`;
+
+      const k = x * y;
+      document.getElementById("lbl-k").textContent = k.toExponential(2);
+      const spotPrice = x / y;
+      const newX = x + dx * (1 - feeRate);
+      const newY = k / newX;
+      const dy = y - newY;
+      const execPrice = dx / dy;
+      const impact = ((execPrice - spotPrice) / spotPrice) * 100;
+
+      document.getElementById("m-spot").textContent = `$${spotPrice.toFixed(3)}`;
+      document.getElementById("m-exec").textContent = `$${execPrice.toFixed(3)}`;
+      document.getElementById("m-out").textContent = fmt(dy, 1);
+      const impactEl = document.getElementById("m-impact");
+      impactEl.textContent = `+${impact.toFixed(2)}%`;
+      impactEl.className = "m-val " + (impact > 10 ? "val-bad" : impact > 2 ? "val-warn" : "val-good");
+
+      const W = 560, H = 300, pad = 42;
+      const maxX = Math.max(newX * 1.35, x * 2.2), maxY = y * 1.6;
+      const toX = (vx) => pad + (vx / maxX) * (W - pad * 2);
+      const toY = (vy) => H - pad - (vy / maxY) * (H - pad * 2);
+      let path = "";
+      for (let i = 1; i <= 80; i++) {
+        const vx = (maxX / 80) * i, vy = k / vx;
+        if (vy > maxY * 1.05) continue;
+        path += (path ? " L " : "M ") + `${toX(vx).toFixed(1)} ${toY(vy).toFixed(1)}`;
+      }
+      const px0 = toX(x), py0 = toY(y), px1 = toX(newX), py1 = toY(newY);
+      svg.innerHTML = `
+        <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#334155" />
+        <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H - pad}" stroke="#334155" />
+        <path d="${path}" fill="none" stroke="#38bdf8" stroke-width="2.5" />
+        <line x1="${px0}" y1="${py0}" x2="${px1}" y2="${py0}" stroke="#f59e0b" stroke-dasharray="4 3" />
+        <line x1="${px1}" y1="${py0}" x2="${px1}" y2="${py1}" stroke="#10b981" stroke-dasharray="4 3" />
+        <circle cx="${px0}" cy="${py0}" r="5.5" fill="#38bdf8" />
+        <circle cx="${px1}" cy="${py1}" r="6" fill="#ef4444" />
+      `;
+    }
+
+    document.querySelectorAll("[data-preset]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.preset;
+        if (p === "shallow") { slX.value = 10000; slY.value = 10000; slDx.value = 5000; }
+        if (p === "mid") { slX.value = 100000; slY.value = 100000; slDx.value = 10000; }
+        if (p === "deep") { slX.value = 1000000; slY.value = 1000000; slDx.value = 10000; }
+        update();
+      });
+    });
+    [slX, slY, slDx, slFee].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

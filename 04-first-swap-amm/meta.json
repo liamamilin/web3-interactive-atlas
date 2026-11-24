@@ -1,0 +1,61 @@
+{
+  "id": "04-first-swap-amm",
+  "order": 4,
+  "layer": "V1: 链上生存与第一笔交易",
+  "icon": "🔄",
+  "accentColor": "#10b981",
+  "title": {
+    "zh": "首次交易与 AMM 机制",
+    "en": "First Swap & AMM Mechanics"
+  },
+  "summary": {
+    "zh": "拆解去中心化交易所如何定价、滑点从哪来，以及做市商为何会面临无常损失。",
+    "en": "How DEXs price assets, where slippage comes from, and why LPs face impermanent loss."
+  },
+  "lessons": [
+    {
+      "file": "01-xyk-slippage-lab.html",
+      "title": {
+        "zh": "AMM 定价曲线与滑点实验室",
+        "en": "AMM Curve & Slippage Lab"
+      },
+      "subtitle": {
+        "zh": "为什么买得越多，成交价越贵？亲手拉动 x·y=k 曲线看清流动性深度。",
+        "en": "Why bigger trades cost exponentially more on a constant product curve."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "AMM",
+        "x*y=k",
+        "Slippage",
+        "Liquidity Depth"
+      ],
+      "prerequisites": [
+        "02-tx-gas-multichain/01-mempool-gas-auction.html"
+      ]
+    },
+    {
+      "file": "02-impermanent-loss.html",
+      "title": {
+        "zh": "LP 做市与无常损失对比器",
+        "en": "LP & Impermanent Loss Lab"
+      },
+      "subtitle": {
+        "zh": "把币放进池子赚高年化手续费，为什么币价大涨大跌后反而跑输死拿现货？",
+        "en": "Why providing liquidity can underperform simply holding when prices move."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "LP",
+        "Impermanent Loss",
+        "Yield vs HODL",
+        "Arbitrage"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/01-xyk-slippage-lab.html"
+      ]
+    }
+  ]
+}

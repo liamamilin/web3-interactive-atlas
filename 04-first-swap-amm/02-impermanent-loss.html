@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LP 做市与无常损失对比器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 首次交易与 AMM 机制</span>
+      <h1>LP 做市与无常损失对比器</h1>
+      <p>DeFi 动辄宣传 50% 年化做市收益，为什么很多人在牛市做 LP 反而比“躺平拿现货”少赚了一大截？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>你把 1 ETH（$2,000）+ 2,000 USDT 放进池子做 LP，随后 ETH 暴涨到 $8,000（翻 4 倍）！</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">对比一下：如果当初你只是把它们原封不动放在钱包里（HODL），现在值 <strong>$10,000</strong>。</div>
+        <button id="hook-btn" class="btn btn-primary">查看你做 LP 后的真实净值</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>你的 LP 仓位只值 $8,000（比死拿现货少赚了整整 $2,000，亏损 20%）！</strong><br />
+        因为 ETH 上涨过程中，套利者不断用便宜的 USDT 买走了你池子里的 ETH，导致你手里只剩下 <strong>0.5 ETH + 4,000 USDT</strong>——这就是<strong>无常损失（Impermanent Loss）</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>无常损失公式：只要币价偏离初始值，无论涨跌都会跑输现货</h2>
+      <p>在 $x \cdot y = k$ 池子里做市，本质上是<strong>被迫在币价上涨时不断逢高卖出、在币价下跌时不断逢低接盘</strong>。设价格变化倍数为 $r$（例如涨 4 倍则 $r = 4$），无常损失比例为：</p>
+      <div class="formula-box">IL(r) = 2 · √r / (1 + r) - 1</div>
+      <p>只有当<strong>赚到的交易手续费 &gt; 无常损失</strong>时，做 LP 才是真正跑赢持币的。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>LP 做市 vs 死拿现货（HODL）净值对比器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>初始总投入（50% ETH + 50% USDT）<strong id="lbl-cap">$1,000</strong></label>
+            <input id="sl-cap" type="range" min="100" max="50000" step="100" value="1000" />
+          </div>
+          <div class="control-group">
+            <label>ETH 价格变化倍数 (r) <strong id="lbl-r">1.00x (不变)</strong></label>
+            <input id="sl-r" type="range" min="0.1" max="5" step="0.05" value="1" />
+          </div>
+          <div class="control-group">
+            <label>期间累计赚取的手续费收益 <strong id="lbl-fee">$0</strong></label>
+            <input id="sl-fee" type="range" min="0" max="5000" step="20" value="0" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">死拿现货 (HODL)</div><div class="m-val" id="m-hodl">$1,000</div></div>
+            <div class="metric-box"><div class="m-label">LP 最终净值 (含手续费)</div><div class="m-val" id="m-lp">$1,000</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">无常损失比例</div><div class="m-val" id="m-il">0.00%</div></div>
+            <div class="metric-box"><div class="m-label">LP 相对 HODL 盈亏</div><div class="m-val" id="m-diff">$0</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把价格倍数拉到 4.00x（大涨）或 0.25x（暴跌 75%），观察两者的无常损失比例是不是完全对称（都是 -20%）？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：在价格翻倍（2.00x）时，调高「累计手续费」，看看需要赚多少手续费才能覆盖无常损失。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>什么时候适合做 LP？</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. <strong>稳定币对（如 USDC/USDT）</strong> 价格几乎不偏离，无常损失趋近于 0，是最稳健的 LP 策略。<br />
+        2. 千万别被土狗池子的“1000% APY”诱惑——一旦土狗币价暴跌 90%，你的 USDT 会被全部换成归零的空气币。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "04-first-swap-amm/02-impermanent-loss.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "04 · 首次交易与 AMM" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slCap = document.getElementById("sl-cap"), slR = document.getElementById("sl-r"), slFee = document.getElementById("sl-fee");
+    function update() {
+      const cap = +slCap.value, r = +slR.value, fee = +slFee.value;
+      document.getElementById("lbl-cap").textContent = `$${cap.toLocaleString()}`;
+      document.getElementById("lbl-r").textContent = `${r.toFixed(2)}x`;
+      document.getElementById("lbl-fee").textContent = `$${fee.toLocaleString()}`;
+
+      const hodl = (cap / 2) * r + (cap / 2);
+      const ilRatio = (2 * Math.sqrt(r)) / (1 + r) - 1;
+      const lpBase = hodl * (1 + ilRatio);
+      const lpTotal = lpBase + fee;
+      const diff = lpTotal - hodl;
+
+      document.getElementById("m-hodl").textContent = `$${hodl.toFixed(0)}`;
+      document.getElementById("m-lp").textContent = `$${lpTotal.toFixed(0)}`;
+      const ilEl = document.getElementById("m-il");
+      ilEl.textContent = `${(ilRatio * 100).toFixed(2)}%`;
+      ilEl.className = "m-val " + (ilRatio < -0.05 ? "val-bad" : ilRatio < 0 ? "val-warn" : "val-good");
+
+      const diffEl = document.getElementById("m-diff");
+      diffEl.textContent = `${diff >= 0 ? "+" : ""}$${diff.toFixed(0)}`;
+      diffEl.className = "m-val " + (diff >= 0 ? "val-good" : "val-bad");
+    }
+    [slCap, slR, slFee].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

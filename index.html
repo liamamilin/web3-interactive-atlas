@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
+  <link rel="stylesheet" href="shared/theme.css" />
+  <style>
+    .hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 24px; }
+    .hero h1 { font-size: 36px; margin-bottom: 10px; }
+    .hero p { color: var(--text-muted); max-width: 680px; }
+    .toolbar {
+      max-width: 1040px; margin: 0 auto 24px; padding: 0 20px;
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    }
+    .search-input {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 14px; border-radius: 8px; width: 320px; max-width: 100%; font-size: 14px;
+    }
+    .modules-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 80px; display: grid; gap: 24px; }
+    .module-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+    }
+    .module-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; }
+    .module-head h2 { font-size: 20px; }
+    .module-layer { font-size: 12px; color: var(--accent); }
+    .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
+    .lesson-card {
+      display: block; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; color: var(--text); transition: 0.15s;
+    }
+    .lesson-card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-2px); }
+    .lesson-card.done { border-color: var(--green); }
+    .lesson-card h3 { font-size: 16px; margin-bottom: 6px; }
+    .lesson-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>Web3 Interactive Atlas</h1>
+    <p>用“第一性原理拆解 + 零风险参数沙盒”吃透链上底层机制。不谈暴富神话，只拆真实规则。</p>
+  </section>
+
+  <div class="toolbar">
+    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、滑点、Permit、Gas）..." />
+    <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
+  </div>
+
+  <main id="modules" class="modules-wrap"></main>
+
+  <script src="shared/sandbox-ui.js"></script>
+  <script src="catalog.js"></script>
+  <script>
+    const catalog = window.WEB3_ATLAS_CATALOG || { modules: [] };
+    const progress = window.AtlasUI.getProgress();
+    const wrap = document.getElementById("modules");
+    const searchEl = document.getElementById("search");
+    const summaryEl = document.getElementById("progress-summary");
+
+    function render(keyword = "") {
+      const q = keyword.trim().toLowerCase();
+      let total = 0, doneCount = 0;
+      wrap.innerHTML = "";
+
+      catalog.modules.forEach((mod) => {
+        const lessons = mod.lessons.filter((l) => {
+          if (!q) return true;
+          const hay = [mod.title.zh, l.title.zh, l.subtitle.zh, ...(l.concepts || [])].join(" ").toLowerCase();
+          return hay.includes(q);
+        });
+        if (!lessons.length) return;
+
+        const card = document.createElement("section");
+        card.className = "module-card";
+        card.innerHTML = `
+          <div class="module-head">
+            <h2>${mod.icon || "📦"} ${mod.title.zh}</h2>
+            <span class="module-layer">${mod.layer || ""}</span>
+          </div>
+          <p style="font-size:14px;color:var(--text-muted)">${mod.summary?.zh || ""}</p>
+          <div class="lesson-grid">
+            ${lessons.map((l) => {
+              total++;
+              const isDone = !!progress[l.path];
+              if (isDone) doneCount++;
+              return `
+                <a class="lesson-card ${isDone ? "done" : ""}" href="${l.path}">
+                  <h3>${isDone ? "✓ " : ""}${l.title.zh}</h3>
+                  <p>${l.subtitle.zh}</p>
+                  <div class="tag-row">
+                    ${(l.concepts || []).map((c) => `<span class="tag">${c}</span>`).join("")}
+                  </div>
+                </a>
+              `;
+            }).join("")}
+          </div>
+        `;
+        wrap.appendChild(card);
+      });
+
+      if (!wrap.children.length) {
+        wrap.innerHTML = `<p style="color:var(--text-muted)">暂无匹配课程。</p>`;
+      }
+      summaryEl.textContent = `学习进度：${doneCount} / ${total} 已掌握`;
+    }
+
+    searchEl.addEventListener("input", (e) => render(e.target.value));
+    render();
+  </script>
+</body>
+</html>

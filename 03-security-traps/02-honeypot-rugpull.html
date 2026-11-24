@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>蜜罐（貔貅盘）与撤池子拆解 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    pre.code-sim {
+      background: #0d1320; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; font-family: var(--mono); font-size: 12px; overflow-x: auto; color: #e2e8f0; line-height: 1.6;
+    }
+    .hl-bad { background: rgba(239, 68, 68, 0.25); color: #fca5a5; padding: 1px 4px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 链上安全与防盗攻防</span>
+      <h1>蜜罐（貔貅盘）与撤池子拆解</h1>
+      <p>为什么有些土狗币的 K 线永远只涨不跌？因为合约代码里藏着一行“只许买、不许卖”的后门。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒踩坑体验</div>
+      <h2>你刚花 200 USDT 买的土狗币 5 分钟翻了 4 倍，现在账面显示 800 USDT！</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">趁着高点赶紧落袋为安，点击卖出全部代币：</div>
+        <button id="hook-btn" class="btn btn-primary">一键卖出落袋 800 USDT</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>交易报错：Execution Reverted（执行被合约拒绝）！</strong><br />
+        你踩中了典型的<strong>蜜罐/貔貅盘（Honeypot）</strong>：项目方在代币合约的 <code>transfer()</code> 函数里加了白名单限制——除了项目方自己，任何散户卖出都会触发 99% 交易税或直接报错。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>土狗盘最常见的两种“合法抢劫”代码</h2>
+      <p>1. <strong>蜜罐（Honeypot / 貔貅盘）</strong>：代币的每一次买入和卖出，本质上都在调用代币合约的 <code>_transfer(from, to, amount)</code>。恶意开发者只要在里面加一句 <code>if (to == uniswapPool && from != owner) revert();</code>，就能让你永远卖不出去。</p>
+      <p>2. <strong>撤池子（Rug Pull）</strong>：如果项目方没有把流动性凭证（LP Token）锁死或销毁，等散户往池子里冲进大量 USDT 后，项目方直接调用 <code>removeLiquidity()</code> 把池子里的真钱全部抽干，币价瞬间归零。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>恶意合约排雷模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>切换代币合约类型</label>
+            <select id="sel-contract">
+              <option value="safe">正常开源代币（无后门 + LP 已销毁）</option>
+              <option value="honeypot">貔貅盘合约（禁止非白名单卖出）</option>
+              <option value="tax">高税盘合约（卖出税率被暗改 99%）</option>
+            </select>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button id="btn-sim-buy" class="btn btn-primary">测试买入 $100</button>
+            <button id="btn-sim-sell" class="btn btn-danger">测试立刻卖出</button>
+          </div>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box">
+              <div class="m-label">模拟测试结果</div>
+              <div class="m-val" id="sim-out" style="font-size:14px;">请点击测试</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">当前合约核心代码片段：</div>
+          <pre id="code-view" class="code-sim"></pre>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：切换到「貔貅盘合约」，先点买入（成功），再点卖出，观察合约哪一行拦截了你。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：切换到「高税盘合约」，测试卖出后实际到手的金额。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>买任何陌生链上代币前的“3 秒排雷法”</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 买前必查合约安全检测工具（如 <strong>GoPlus / TokenSniffer / RugCheck</strong>），看 4 个核心指标：是否开源、是否丢弃权限（Renounced）、买卖税率、LP 是否锁仓/销毁。<br />
+        2. 永远不要相信只涨不跌、全是绿柱子没有红柱子的“完美 K 线”——那 99% 是卖不出去的貔貅盘。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "03-security-traps/02-honeypot-rugpull.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "03 · 链上安全" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const sel = document.getElementById("sel-contract");
+    const codeView = document.getElementById("code-view");
+    const simOut = document.getElementById("sim-out");
+
+    const snippets = {
+      safe: `function _transfer(address from, address to, uint256 amount) internal {
+  // 标准 ERC-20 转账，无任何买卖限制
+  balances[from] -= amount;
+  balances[to] += amount;
+}`,
+      honeypot: `function _transfer(address from, address to, uint256 amount) internal {
+  <span class="hl-bad">if (to == dexPool && !isWhitelist[from]) {</span>
+  <span class="hl-bad">  revert("Transfer failed"); // 散户卖出直接报错！</span>
+  <span class="hl-bad">}</span>
+  balances[from] -= amount;
+  balances[to] += amount;
+}`,
+      tax: `function _transfer(address from, address to, uint256 amount) internal {
+  <span class="hl-bad">uint256 fee = (to == dexPool) ? amount * 99 / 100 : 0; // 暗藏 99% 卖出税</span>
+  balances[owner] += fee;
+  balances[to] += (amount - fee);
+}`
+    };
+
+    function renderCode() {
+      codeView.innerHTML = snippets[sel.value];
+      simOut.textContent = "已切换合约，点击按钮测试";
+      simOut.className = "m-val";
+    }
+    sel.addEventListener("change", renderCode);
+
+    document.getElementById("btn-sim-buy").addEventListener("click", () => {
+      simOut.textContent = "✓ 买入成功！你获得了 $100 等值代币";
+      simOut.className = "m-val val-good";
+    });
+    document.getElementById("btn-sim-sell").addEventListener("click", () => {
+      if (sel.value === "safe") {
+        simOut.textContent = "✓ 卖出成功！收回 $99.70（扣 0.3% 正常手续费）";
+        simOut.className = "m-val val-good";
+      } else if (sel.value === "honeypot") {
+        simOut.textContent = "✗ 卖出被拒：Revert! 资金被永久锁死";
+        simOut.className = "m-val val-bad";
+      } else {
+        simOut.textContent = "⚠️ 卖出成交，但被抽走 99% 税，仅收回 $1.00！";
+        simOut.className = "m-val val-bad";
+      }
+    });
+    renderCode();
+  </script>
+</body>
+</html>

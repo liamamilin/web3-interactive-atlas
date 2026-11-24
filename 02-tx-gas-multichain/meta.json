@@ -1,0 +1,60 @@
+{
+  "id": "02-tx-gas-multichain",
+  "order": 2,
+  "layer": "V1: 链上生存与第一笔交易",
+  "icon": "⛽",
+  "accentColor": "#f59e0b",
+  "title": {
+    "zh": "多链交易与费用机制",
+    "en": "Transactions, Gas & Multi-chain Fees"
+  },
+  "summary": {
+    "zh": "搞懂交易为什么会卡住（Pending）、EIP-1559 竞价逻辑，以及 ETH、Solana、TRON 三条主流链为何手续费差百倍。",
+    "en": "Why transactions get stuck, how EIP-1559 works, and how ETH, SOL, and TRON charge fees."
+  },
+  "lessons": [
+    {
+      "file": "01-mempool-gas-auction.html",
+      "title": {
+        "zh": "Mempool 排队与 Gas 竞价模拟器",
+        "en": "Mempool & EIP-1559 Gas Auction"
+      },
+      "subtitle": {
+        "zh": "为什么有时候转账 5 秒到账，有时候卡半小时？拆解区块打包与小费机制。",
+        "en": "Why some transactions confirm in seconds while others stay pending."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Mempool",
+        "EIP-1559",
+        "Base Fee",
+        "Priority Fee",
+        "Nonce"
+      ],
+      "prerequisites": [
+        "01-wallet-keys/02-digital-signature.html"
+      ]
+    },
+    {
+      "file": "02-eth-sol-tron-fees.html",
+      "title": {
+        "zh": "ETH vs Solana vs TRON 费用模型对比",
+        "en": "ETH vs Solana vs TRON Fee Models"
+      },
+      "subtitle": {
+        "zh": "同样转一笔 USDT，为什么以太坊扣 ETH、波场扣 TRX/能量、Solana 几乎不要钱？",
+        "en": "Comparing Gas, Compute Units, and Energy/Bandwidth across major chains."
+      },
+      "duration": "4 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Multi-chain",
+        "Gas",
+        "TRON Energy",
+        "Solana Compute"
+      ],
+      "prerequisites": []
+    }
+  ]
+}

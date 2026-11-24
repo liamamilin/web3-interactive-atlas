@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>授权机制与钓鱼签名攻防 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .log-box {
+      background: #0d1320; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; font-family: var(--mono); font-size: 12px; min-height: 140px; line-height: 1.7;
+    }
+    .log-bad { color: #fca5a5; }
+    .log-ok { color: #6ee7b7; }
+    .log-info { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 链上安全与防盗攻防</span>
+      <h1>授权机制与钓鱼签名攻防</h1>
+      <p>币圈 80% 的被盗案都不是因为黑客破解了私钥，而是受害者亲手签下了一张“空白支票”。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒踩坑体验</div>
+      <h2>你在推特看到一个高仿官方账号：“限时领取 500 USDT 生态空投”</h2>
+      <p>网页提示“无需支付 Gas 费，仅需钱包签名验证资格”。点击下方按钮模拟签署该 <code>Permit</code> 弹窗：</p>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">你的钱包当前余额：<strong>2,500 USDT</strong></div>
+        <button id="hook-btn" class="btn btn-danger">点击免费签名领取空投</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>资产已归零！钱包余额：0 USDT</strong><br />
+        你刚才签的根本不是“身份验证”，而是一张 <strong>ERC-20 Permit 离线授权支票</strong>。黑客拿到你的签名后，自己掏 Gas 费提交上链，合法地调用 <code>transferFrom()</code> 把你的 2,500 USDT 全部划走！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>Approve（链上授权）与 Permit（离线授权）</h2>
+      <p>在以太坊等 EVM 链上，智能合约（如 Uniswap）不能直接拿走你钱包里的 USDT，必须先由你调用代币合约的 <code>approve(spender, amount)</code> 赋予额度。为了省事，很多应用默认申请<strong>无限额度（Unlimited / 2²⁵⁶ - 1）</strong>。</p>
+      <div class="formula-box">
+        正常流程：你授权 Uniswap 合约 ──▶ Uniswap 按规则扣款并给你换币<br/>
+        被盗流程：你授权恶意地址 0xHacker ──▶ 黑客随时调用 transferFrom(你, 黑客, 全部余额)
+      </div>
+      <p>而 <strong>Permit / Permit2</strong> 更是把授权变成了“离线签名”——你不需要发交易、不需要花 Gas，只要点一下“签名”，黑客就能拿这张签名去链上提款。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>授权攻防模拟器：体验限额授权、无限授权与及时撤销（Revoke）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box">
+              <div class="m-label">你的 USDT 余额</div>
+              <div class="m-val val-good" id="m-bal">1,000</div>
+            </div>
+            <div class="metric-box">
+              <div class="m-label">合约可划转额度</div>
+              <div class="m-val val-warn" id="m-allow">0</div>
+            </div>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button id="btn-app-100" class="btn">1. 安全做法：仅授权 100 USDT</button>
+            <button id="btn-app-inf" class="btn btn-danger">2. 危险做法：无限授权 (Unlimited)</button>
+            <button id="btn-attack" class="btn btn-primary">3. 模拟该合约被黑客攻破并尝试盗币</button>
+            <button id="btn-revoke" class="btn">4. 执行 Revoke（撤销授权归零）</button>
+            <button id="btn-reset" class="btn">重置沙盒余额</button>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">链上合约执行日志：</div>
+          <div id="log-box" class="log-box"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：先点「仅授权 100 USDT」，再点「模拟黑客盗币」，观察你的损失是否被锁死在 100 USDT 内。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：重置后点「无限授权」，再点「模拟黑客盗币」，观察余额瞬间归零。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 3：重置后先点「无限授权」，在黑客攻击前点击「Revoke（撤销授权）」，再模拟攻击，验证防御成功。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>普通人最实用的 3 条钱包保命铁律</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. <strong>冷热钱包分离</strong>：大额资产放在从不连陌生网站的“金库钱包”，日常冲土狗、领空投只用装几十美元的“交互小号”。<br />
+        2. <strong>用多少授权多少</strong>：在钱包弹出 Approve 窗口时，手动把默认的“无限”改成你本次交易的实际金额。<br />
+        3. <strong>定期体检撤销</strong>：用 <strong>Revoke.cash</strong> 定期检查并撤销不再使用的旧协议授权。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "03-security-traps/01-approve-and-permit.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "03 · 链上安全" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    let bal = 1000, allow = 0;
+    const logEl = document.getElementById("log-box");
+    const balEl = document.getElementById("m-bal");
+    const allowEl = document.getElementById("m-allow");
+
+    function log(msg, cls = "log-info") {
+      logEl.innerHTML += `<div class="${cls}">&gt; ${msg}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+    function sync() {
+      balEl.textContent = bal.toLocaleString();
+      balEl.className = "m-val " + (bal === 0 ? "val-bad" : "val-good");
+      allowEl.textContent = allow === Infinity ? "∞ (无限)" : allow.toLocaleString();
+      allowEl.className = "m-val " + (allow === Infinity ? "val-bad" : allow > 0 ? "val-warn" : "val-good");
+    }
+
+    document.getElementById("btn-app-100").addEventListener("click", () => {
+      allow = 100; sync(); log("你向合约授予了 100 USDT 的有限额度。", "log-ok");
+    });
+    document.getElementById("btn-app-inf").addEventListener("click", () => {
+      allow = Infinity; sync(); log("警告：你签署了 Unlimited Approve（无限授权）！", "log-bad");
+    });
+    document.getElementById("btn-revoke").addEventListener("click", () => {
+      allow = 0; sync(); log("已执行 approve(contract, 0)，授权额度已清零。", "log-ok");
+    });
+    document.getElementById("btn-attack").addEventListener("click", () => {
+      if (allow === 0) {
+        log("黑客调用 transferFrom() 失败：Insufficient Allowance（额度为 0，资产安全！）", "log-ok");
+      } else {
+        const stolen = Math.min(bal, allow);
+        bal -= stolen;
+        if (allow !== Infinity) allow -= stolen;
+        sync();
+        log(`警报！黑客调用 transferFrom() 划走了 ${stolen} USDT！`, "log-bad");
+      }
+    });
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      bal = 1000; allow = 0; logEl.innerHTML = ""; sync(); log("沙盒已重置：余额 1,000 USDT，授权额度 0。");
+    });
+    sync(); log("沙盒就绪：尝试不同授权策略并测试黑客攻击。");
+  </script>
+</body>
+</html>

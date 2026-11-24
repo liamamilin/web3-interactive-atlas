@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETH vs Solana vs TRON 费用模型对比 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .chain-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+    .c-card { background: #0d1320; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .c-card h3 { font-size: 16px; margin-bottom: 6px; }
+    .c-fee { font-size: 26px; font-weight: 700; font-family: var(--mono); margin: 10px 0; }
+    .c-meta { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 多链交易与费用机制</span>
+      <h1>ETH vs Solana vs TRON 费用模型对比</h1>
+      <p>同样是转一笔 100 USDT，为什么不同公链的手续费相差几百倍？拆解三条主流链的底层资源计价逻辑。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>如果你手里只有 70 美元本金，去哪条链交互最容易被手续费“吃干抹净”？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">假设你要连续做 10 次转账 + 兑换（Swap）交互</div>
+        <button id="hook-btn" class="btn btn-primary">对比 10 次交互总损耗</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>以太坊主网高峰期：</strong> 10 次 Swap 可能直接花掉 $40~$100（本金归零）；<br />
+        <strong>TRON（波场）：</strong> 转账 USDT 若没质押能量，单笔可能烧掉 13~27 TRX（约 $4~$8）；<br />
+        <strong>Solana / 以太坊 L2（Base/Arbitrum）：</strong> 10 次交互总计不到 <strong>$0.05</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>三条链的三种收费哲学</h2>
+      <p>• <strong>Ethereum（以太坊主网）</strong>：按计算步数（Gas）拍卖稀缺区块空间，安全性最高，但主网寸土寸金；日常小额交互通常迁移到其 Layer 2（如 Arbitrum / Base）。</p>
+      <p>• <strong>Solana</strong>：高性能单链，区块吞吐极大，采用极低的基础费（0.000005 SOL）+ 局部优先费，适合高频交易与小额交互。</p>
+      <p>• <strong>TRON（波场）</strong>：采用<strong>带宽（Bandwidth）+ 能量（Energy）</strong>双资源模型。转原生 TRX 只耗免费带宽；但转 TRC-20 USDT 需要消耗大量能量——如果账户没质押 TRX 换取能量，就会直接燃烧 TRX 抵扣。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>多链交互成本计算器</h2>
+      <div class="lab-panel">
+        <div class="control-group">
+          <label>操作类型</label>
+          <select id="sel-op">
+            <option value="usdt">转一笔 USDT（代币合约调用）</option>
+            <option value="swap">在 DEX 做一次 Swap 兑换</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>网络拥堵程度 <strong id="lbl-cong">正常 (1x)</strong></label>
+          <input id="sl-cong" type="range" min="1" max="5" step="1" value="1" />
+        </div>
+      </div>
+
+      <div class="chain-cards" id="chain-cards"></div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：将操作类型切换为「DEX Swap」，并将拥堵度拉到 5x，对比以太坊主网与 Solana 的费用差距。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：观察 TRON 转 USDT 的扣费说明，理解为什么在波场转 U 钱包里必须留足 TRX。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>小资金练手的黄金法则：选对网络</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 提币或转账时，<strong>收款链与发送链必须完全一致</strong>（例如 TRC-20 只能转到波场地址，ERC-20 只能转到以太坊系地址）。<br />
+        2. 几十美元的小额资金练手 DeFi，优先选择 <strong>Base / Arbitrum / Solana</strong>，把 Gas 磨损压到几乎为零。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "02-tx-gas-multichain/02-eth-sol-tron-fees.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "02 · 多链与费用" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selOp = document.getElementById("sel-op");
+    const slCong = document.getElementById("sl-cong");
+    const congNames = ["", "空闲 (1x)", "正常 (2x)", "繁忙 (3x)", "拥堵 (4x)", "极度拥堵 (5x)"];
+
+    function update() {
+      const op = selOp.value;
+      const c = +slCong.value;
+      document.getElementById("lbl-cong").textContent = congNames[c];
+
+      const ethFee = (op === "usdt" ? 1.8 : 6.5) * c;
+      const l2Fee = (op === "usdt" ? 0.005 : 0.02) * c;
+      const solFee = (op === "usdt" ? 0.001 : 0.004) * (1 + (c - 1) * 0.6);
+      const tronFee = op === "usdt" ? 4.2 : 6.0;
+
+      const items = [
+        { name: "Ethereum 主网", fee: `$${ethFee.toFixed(2)}`, cls: ethFee > 5 ? "val-bad" : "val-warn", desc: "扣费币种：ETH<br/>机制：Gas 竞价，拥堵时费用飙升" },
+        { name: "Ethereum L2 (Base/Arb)", fee: `$${l2Fee.toFixed(3)}`, cls: "val-good", desc: "扣费币种：ETH (L2)<br/>机制：打包压缩回主网，极低成本" },
+        { name: "Solana", fee: `$${solFee.toFixed(4)}`, cls: "val-good", desc: "扣费币种：SOL<br/>机制：极低基础费 + 局部优先费" },
+        { name: "TRON (波场)", fee: `$${tronFee.toFixed(2)}`, cls: "val-warn", desc: "扣费币种：TRX (或质押能量)<br/>机制：无能量时直接燃烧 TRX，价格较固定" }
+      ];
+
+      document.getElementById("chain-cards").innerHTML = items.map((it) => `
+        <div class="c-card">
+          <h3>${it.name}</h3>
+          <div class="c-fee ${it.cls}">${it.fee}</div>
+          <div class="c-meta">${it.desc}</div>
+        </div>
+      `).join("");
+    }
+
+    selOp.addEventListener("change", update);
+    slCong.addEventListener("input", update);
+    update();
+  </script>
+</body>
+</html>

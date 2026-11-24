@@ -1,0 +1,59 @@
+{
+  "id": "03-security-traps",
+  "order": 3,
+  "layer": "V1: 链上生存与第一笔交易",
+  "icon": "🛡️",
+  "accentColor": "#ef4444",
+  "title": {
+    "zh": "链上安全与防盗攻防",
+    "en": "On-chain Security & Traps"
+  },
+  "summary": {
+    "zh": "拆解为什么没泄露助记词钱包依然会被转空：无限授权（Approve）、离线签名钓鱼（Permit）与蜜罐/貔貅盘。",
+    "en": "How wallets get drained without leaking seed phrases: Approve, Permit phishing, and honeypots."
+  },
+  "lessons": [
+    {
+      "file": "01-approve-and-permit.html",
+      "title": {
+        "zh": "授权机制与钓鱼签名攻防",
+        "en": "Approve & Permit Phishing Lab"
+      },
+      "subtitle": {
+        "zh": "为什么只是点了一次免费签名，钱包里的 USDT 却在几秒内被转空？",
+        "en": "Why signing one free message can drain your entire token balance."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Approve",
+        "Unlimited Allowance",
+        "Permit2",
+        "Revoke"
+      ],
+      "prerequisites": [
+        "01-wallet-keys/02-digital-signature.html"
+      ]
+    },
+    {
+      "file": "02-honeypot-rugpull.html",
+      "title": {
+        "zh": "蜜罐（貔貅盘）与撤池子拆解",
+        "en": "Honeypots & Rug Pulls"
+      },
+      "subtitle": {
+        "zh": "K 线一路暴涨 10 倍，为什么轮到你卖的时候却死活卖不出去？",
+        "en": "How malicious token contracts block sells and drain liquidity pools."
+      },
+      "duration": "4 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Honeypot",
+        "Rug Pull",
+        "LP Lock",
+        "Contract Audit"
+      ],
+      "prerequisites": []
+    }
+  ]
+}

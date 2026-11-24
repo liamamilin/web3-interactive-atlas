@@ -1,0 +1,59 @@
+{
+  "id": "01-wallet-keys",
+  "order": 1,
+  "layer": "V1: 链上生存与第一笔交易",
+  "icon": "🔑",
+  "accentColor": "#38bdf8",
+  "title": {
+    "zh": "钱包、密钥与数字签名",
+    "en": "Wallets, Keys & Signatures"
+  },
+  "summary": {
+    "zh": "理解为什么助记词即资产、哈希雪崩效应，以及签名如何在不暴露私钥的前提下证明所有权。",
+    "en": "Why seed phrases are assets and how signatures prove ownership without revealing private keys."
+  },
+  "lessons": [
+    {
+      "file": "01-seed-to-address.html",
+      "title": {
+        "zh": "助记词、私钥与哈希雪崩",
+        "en": "Seed Phrase, Private Key & Avalanche"
+      },
+      "subtitle": {
+        "zh": "改一个字母，整个钱包地址彻底面目全非。为什么丢了助记词神仙也找不回？",
+        "en": "Change one character and the entire address changes completely."
+      },
+      "duration": "4 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "BIP-39",
+        "Private Key",
+        "Hash Avalanche",
+        "Address"
+      ],
+      "prerequisites": []
+    },
+    {
+      "file": "02-digital-signature.html",
+      "title": {
+        "zh": "数字签名与链上验签",
+        "en": "Digital Signatures & Verification"
+      },
+      "subtitle": {
+        "zh": "不用把私钥发给矿工，怎么证明这笔转账确实是你本人授权的？",
+        "en": "How to prove a transaction is yours without ever exposing your private key."
+      },
+      "duration": "4 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "ECDSA",
+        "Signature",
+        "Tamper-Proof",
+        "Public Key"
+      ],
+      "prerequisites": [
+        "01-wallet-keys/01-seed-to-address.html"
+      ]
+    }
+  ]
+}
