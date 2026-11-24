@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>协议价值捕获与 veToken 锁仓博弈 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V4 · 代币经济学与抛压博弈</span>
+      <h1>协议价值捕获与 veToken 锁仓博弈</h1>
+      <p>很多顶级 DeFi 协议一年能赚上亿美元手续费，但它们的代币却常年跑输大盘。原因很简单：协议赚的钱，一分也没分给持币人。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉拆解</div>
+      <h2>假设某 DEX 一年手续费收入 $1 亿，但代币唯一用途是“参与社区投票”，没有分红也不回购</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">这就像买了一家盈利百亿公司的股票，但章程规定“永远不分红、永远不回购、解散也不分剩余资产”：</div>
+        <button id="hook-btn" class="btn btn-primary">这种代币的长期内在价值是多少？</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>在现金流模型下趋近于空气（纯 Meme 情绪定价）！</strong><br />
+        因为协议收入和代币价格之间没有<strong>价值捕获通道（Value Accrual）</strong>。好项目 ≠ 好代币，这是 Web3 投研最容易踩的认知大坑。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>Web3 代币捕获真实收入的 3 种主流引擎</h2>
+      <p>1. <strong>纯治理代币（Governance Only）</strong>：无现金流分红，仅靠投票权与叙事撑估值。<br />
+      2. <strong>回购销毁 / 费用分红（Buyback &amp; Fee Share）</strong>：协议把真实手续费按比例分给质押者（如 GMX / Hyperliquid 回购销毁），直接用真钱托底币价。<br />
+      3. <strong>veToken 锁仓模型（Curve 首创）</strong>：用户把代币锁仓 1~4 年换取 <code>veToken</code>，既享受手续费分红，又能投票决定新币激励流向哪个池子——大幅减少市场流通抛压。</p>
+      <div class="formula-box">
+        净买盘压力 = (协议年收入 × 回购/分红比例) - 年度新增代币解锁抛压
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>协议价值捕获与净买盘压力模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>协议年化真实手续费收入 <strong id="lbl-rev">$50M</strong></label>
+            <input id="sl-rev" type="range" min="5" max="200" step="5" value="50" />
+          </div>
+          <div class="control-group">
+            <label>收入回流比例 (回购/分红) <strong id="lbl-share">30%</strong></label>
+            <input id="sl-share" type="range" min="0" max="100" step="5" value="30" />
+          </div>
+          <div class="control-group">
+            <label>年度新增代币通胀抛压 <strong id="lbl-inf">$20M</strong></label>
+            <input id="sl-inf" type="range" min="0" max="100" step="5" value="20" />
+          </div>
+          <div class="control-group">
+            <label>veToken 长期锁仓率 <strong id="lbl-lock">40%</strong></label>
+            <input id="sl-lock" type="range" min="0" max="80" step="5" value="40" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">年度真实回购/分红</div><div class="m-val val-good" id="m-buy">$15.0M</div></div>
+            <div class="metric-box"><div class="m-label">年度净资金流</div><div class="m-val" id="m-net">-$5.0M</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">假设 FDV $500M 的真实收益率</div><div class="m-val" id="m-yld">3.0%</div></div>
+            <div class="metric-box"><div class="m-label">经济模型健康度</div><div class="m-val" id="m-st" style="font-size:14px;">轻度失血</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把「收入回流比例」拉到 0%（纯治理空气币），看即便协议年赚 $200M，净资金流是不是依然为负？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把收入回流调到 50% 以上且控制通胀低于回购额，观察模型进入“正净买盘通缩飞轮”。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>投研灵魂一问：“为什么别人必须买这个币？”</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 区分<strong>好产品</strong>和<strong>好资产</strong>：先查该代币有没有真实费用分红、回购销毁，或者刚性消耗场景（如公链 Gas）。<br />
+        2. 警惕高锁仓（veToken）的副作用：锁仓虽然减少了短期抛压，但如果协议本身没真实收入，锁仓到期那天就是集体踩踏出逃日。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "12-tokenomics/02-value-capture-vetoken.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "12 · 代币经济学" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slRev = document.getElementById("sl-rev"), slShare = document.getElementById("sl-share");
+    const slInf = document.getElementById("sl-inf"), slLock = document.getElementById("sl-lock");
+
+    function update() {
+      const rev = +slRev.value, share = +slShare.value, inf = +slInf.value, lock = +slLock.value;
+      document.getElementById("lbl-rev").textContent = `$${rev}M`;
+      document.getElementById("lbl-share").textContent = `${share}%`;
+      document.getElementById("lbl-inf").textContent = `$${inf}M`;
+      document.getElementById("lbl-lock").textContent = `${lock}%`;
+
+      const buyback = rev * (share / 100);
+      const effectiveSell = inf * (1 - lock * 0.005);
+      const net = buyback - effectiveSell;
+      const yld = (buyback / 500) * 100;
+
+      document.getElementById("m-buy").textContent = `$${buyback.toFixed(1)}M`;
+      const netEl = document.getElementById("m-net");
+      netEl.textContent = `${net >= 0 ? "+" : "-"}$${Math.abs(net).toFixed(1)}M`;
+      netEl.className = "m-val " + (net >= 0 ? "val-good" : "val-bad");
+
+      document.getElementById("m-yld").textContent = `${yld.toFixed(1)}%`;
+      const stEl = document.getElementById("m-st");
+      if (share === 0) { stEl.textContent = "⚠️ 无价值捕获 (纯空气)"; stEl.className = "m-val val-bad"; }
+      else if (net > 5) { stEl.textContent = "✓ 强劲净买盘飞轮"; stEl.className = "m-val val-good"; }
+      else if (net >= 0) { stEl.textContent = "✓ 供需基本平衡"; stEl.className = "m-val val-good"; }
+      else { stEl.textContent = "🚨 通胀抛压大于回购"; stEl.className = "m-val val-bad"; }
+    }
+    [slRev, slShare, slInf, slLock].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

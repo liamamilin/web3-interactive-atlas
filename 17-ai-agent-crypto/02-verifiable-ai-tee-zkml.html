@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>可验证 AI 推理：TEE 硬件飞地 vs zkML 对比器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .cmp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+    .cmp-card { background: #0d1320; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .cmp-card h3 { font-size: 15px; margin-bottom: 8px; }
+    .cmp-stat { font-family: var(--mono); font-size: 13px; margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V5 · AI + Crypto 与 Agent 经济</span>
+      <h1>可验证 AI 推理：TEE 硬件飞地 vs zkML 对比器</h1>
+      <p>如果一个链上 DeFi 协议让 AI 决定怎么调仓，或者你花钱在去中心化算力网上跑大模型，你怎么证明算力节点没有偷偷把 70B 大模型换成 1B 弱智小模型来骗你的钱？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒信任危机</div>
+      <h2>你在去中心化 GPU 市场花 $10 购买了顶级大模型的量化分析结果</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">矿工节点为了省电费，偷偷用极其廉价的本地小模型胡乱生成了一段回答交给你：</div>
+        <button id="hook-btn" class="btn btn-danger">你能光靠肉眼看出它作弊了吗？</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>几乎不可能！</strong><br />
+        AI 推理是概率性的（每次输出字眼都可能不同），你无法像校验传统代码一样简单比对结果。这就是 AI + Crypto 最硬核的技术难题——<strong>可验证推理（Verifiable Inference）</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>行业解决“AI 节点防作弊”的 3 条主流技术路线</h2>
+      <p>1. <strong>TEE（可信执行环境 / 硬件飞地）</strong>：把模型跑在 NVIDIA H100 / Intel SGX 的加密硬件黑盒里，连机房老板都看不了改不了，硬件芯片直接签发防伪证明。速度极快（仅慢 5%~15%），但需要信任芯片厂商。<br />
+      2. <strong>opML（乐观验证）</strong>：类似 Optimistic Rollup，先出结果，留出挑战期，有人举报作弊再上链重算并罚没矿工押金。<br />
+      3. <strong>zkML（零知识机器学习）</strong>：把神经网络的每一次矩阵乘法都生成零知识数学证明。无需信任任何硬件，绝对数学安全，但目前算力开销极大（比原推理慢数百到数千倍），只适合极小模型。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>不同参数规模模型在 3 种验证方案下的可行性模拟器</h2>
+      <div class="lab-panel">
+        <div class="control-group" style="margin-bottom:0;">
+          <label>选择你要验证的 AI 模型规模 <strong id="lbl-sz">中等模型 (7B 参数)</strong></label>
+          <input id="sl-sz" type="range" min="1" max="3" step="1" value="2" />
+        </div>
+      </div>
+
+      <div id="cmp-grid" class="cmp-grid"></div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把模型规模拉到「超大规模 (70B+ LLM)」，观察为什么目前几乎所有链上大模型 Agent 都优先采用 <strong>TEE</strong> 而不是 zkML。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把模型降到「极小风控模型 (&lt;1M 参数)」，观察 zkML 在 DeFi 链上自动风控/量化参数验证中的真正用武之地。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>一眼看穿白皮书里的“zkML 画大饼”</h2>
+      <div class="callout-warn">
+        <strong>投研排雷清单：</strong><br />
+        如果今天有项目在白皮书里吹牛“我们已经用纯 zkML 实现了链上实时运行并验证千亿参数大模型”，直接拉黑——物理算力账根本算不过来。务实的工程架构一定是 <strong>小模型用 zkML + 大模型用 TEE/经济博弈质押</strong> 的混合方案。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "17-ai-agent-crypto/02-verifiable-ai-tee-zkml.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "17 · AI + Crypto" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slSz = document.getElementById("sl-sz");
+    const configs = {
+      1: {
+        name: "极小风控/决策模型 (< 1M 参数)",
+        cards: [
+          { t: "🔒 TEE 硬件飞地", lat: "0.02 秒", cost: "$0.0001", trust: "信任芯片厂商", verdict: "✓ 极速可用", cls: "val-good" },
+          { t: "⚖️ opML 乐观博弈", lat: "需等挑战期", cost: "$0.001", trust: "经济质押罚没", verdict: "✓ 成本低但慢", cls: "val-warn" },
+          { t: "🧮 zkML 零知识证明", lat: "2 ~ 8 秒", cost: "$0.05", trust: "纯数学 (0 信任)", verdict: "✓ 最佳落地场景！", cls: "val-good" }
+        ]
+      },
+      2: {
+        name: "主流开源大模型 (7B ~ 14B 参数)",
+        cards: [
+          { t: "🔒 TEE 硬件飞地", lat: "1.2 秒 (+10%)", cost: "$0.002", trust: "信任芯片厂商", verdict: "✓ 工业级最优解", cls: "val-good" },
+          { t: "⚖️ opML 乐观博弈", lat: "需等挑战期", cost: "$0.005", trust: "经济质押罚没", verdict: "✓ 适合异步任务", cls: "val-warn" },
+          { t: "🧮 zkML 零知识证明", lat: "数小时以上", cost: "$50+", trust: "纯数学 (0 信任)", verdict: "✗ 算力爆炸不可用", cls: "val-bad" }
+        ]
+      },
+      3: {
+        name: "超大规模旗舰 LLM (70B+ 参数)",
+        cards: [
+          { t: "🔒 TEE 硬件飞地 (GPU)", lat: "3.5 秒 (+12%)", cost: "$0.01", trust: "信任 NVIDIA 硬件", verdict: "✓ 唯一实时可行方案", cls: "val-good" },
+          { t: "⚖️ opML 乐观博弈", lat: "长挑战期", cost: "$0.03", trust: "大额押金博弈", verdict: "⚠️ 仅限非实时场景", cls: "val-warn" },
+          { t: "🧮 zkML 零知识证明", lat: "几天到几周", cost: "$1,000+", trust: "纯数学 (0 信任)", verdict: "✗ 物理上完全不可行", cls: "val-bad" }
+        ]
+      }
+    };
+
+    function update() {
+      const cfg = configs[slSz.value];
+      document.getElementById("lbl-sz").textContent = cfg.name;
+      document.getElementById("cmp-grid").innerHTML = cfg.cards.map((c) => `
+        <div class="cmp-card">
+          <h3>${c.t}</h3>
+          <div class="cmp-stat">验证延迟：<strong>${c.lat}</strong></div>
+          <div class="cmp-stat">单次成本：<strong>${c.cost}</strong></div>
+          <div class="cmp-stat">信任假设：${c.trust}</div>
+          <div class="cmp-stat ${c.cls}" style="margin-top:10px;font-weight:700;">${c.verdict}</div>
+        </div>
+      `).join("");
+    }
+    slSz.addEventListener("input", update);
+    update();
+  </script>
+</body>
+</html>

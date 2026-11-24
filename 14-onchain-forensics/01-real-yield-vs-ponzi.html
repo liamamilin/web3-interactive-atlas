@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>真实收益 vs 通胀庞氏拆解器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V4 · 链上数据与投研排雷</span>
+      <h1>真实收益 vs 通胀庞氏拆解器</h1>
+      <p>DeFi 界有一句至理名言：“如果你不知道高额 APY 的收益从哪来，那你自己就是那个收益。”</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>某新矿池推出“质押 $FARM 代币，享 200% 超高年化收益！”</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">你花 $1,000 买了 1,000 个 $FARM 存进去。一年后，你真的领到了 3,000 个币（币本位翻 3 倍），但期间全网供应量也印了 5 倍：</div>
+        <button id="hook-btn" class="btn btn-danger">算算你一年后真正赚了多少钱</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>币价跌到了 $0.20，你手里的 3,000 个币只值 $600（血亏 -40%）！</strong><br />
+        所谓的 200% APY，本质上是协议凭空印出大量 $FARM 发给所有人——<strong>你赚了利息，但亏掉了 80% 的本金</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>拆解 APY 的两张账单：真实收益 vs 印钞补贴</h2>
+      <p>打开任何 DeFi 协议的数据看板（如 DefiLlama 的 Expenses / Revenue），把收益拆成两部分看，立刻原形毕露：</p>
+      <div class="formula-box">
+        表面 APY = 真实收益 (外部用户付的真手续费/利息) + 通胀补贴 (项目方凭空印的治理币)<br/>
+        协议净盈利 = 真实手续费收入 - 发放的代币补贴成本
+      </div>
+      <p>如果一个协议每年只赚 $100 万真实手续费，却印了 $5,000 万自家代币当挖矿奖励，它就是典型的<strong>失血型通胀盘</strong>。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>高息矿池真实回报拆解器（投入 $1,000 持有 1 年）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>来自外部用户的真实年化 (ETH/USDT) <strong id="lbl-ry">8%</strong></label>
+            <input id="sl-ry" type="range" min="0" max="50" step="1" value="8" />
+          </div>
+          <div class="control-group">
+            <label>来自印币补贴的表面年化 (治理币) <strong id="lbl-inf">150%</strong></label>
+            <input id="sl-inf" type="range" min="0" max="400" step="10" value="150" />
+          </div>
+          <div class="control-group">
+            <label>市场对印币抛压的消化率 <strong id="lbl-abs">30% (多数人挖提卖)</strong></label>
+            <input id="sl-abs" type="range" min="10" max="100" step="5" value="30" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">页面宣传总 APY</div><div class="m-val val-warn" id="m-apy">158%</div></div>
+            <div class="metric-box"><div class="m-label">1 年后币价剩余比例</div><div class="m-val" id="m-px">48%</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">$1,000 本金 1 年后真净值</div><div class="m-val" id="m-val">$1,280</div></div>
+            <div class="metric-box"><div class="m-label">项目定性</div><div class="m-val" id="m-type" style="font-size:14px;">补贴驱动</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：真实收益设为 0%，印币补贴拉到 300%，消化率 20%（典型土狗二池），看看 1 年后你的 $1,000 还剩多少？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：真实收益设为 12%，印币补贴设为 0%（纯粹赚真实手续费），体会慢即是快的复利安全性。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>老手挖矿的铁律：“挖提卖”与只看真实收益</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 永远优先看<strong>发什么币</strong>：发 USDC / ETH / SOL 的收益大概率是真实收入；发项目方自家不知名代币的，99% 是通胀印钞。<br />
+        2. 哪怕参与高补贴头矿，也尽量只质押<strong>主流资产（单币质押或稳定币）</strong>，绝对不要为了吃补贴去高位买项目方的高通胀治理币。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "14-onchain-forensics/01-real-yield-vs-ponzi.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "14 · 链上数据与投研" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slRy = document.getElementById("sl-ry"), slInf = document.getElementById("sl-inf"), slAbs = document.getElementById("sl-abs");
+    function update() {
+      const ry = +slRy.value, inf = +slInf.value, abs = +slAbs.value / 100;
+      document.getElementById("lbl-ry").textContent = `${ry}%`;
+      document.getElementById("lbl-inf").textContent = `${inf}%`;
+      document.getElementById("lbl-abs").textContent = `${slAbs.value}%`;
+
+      document.getElementById("m-apy").textContent = `${ry + inf}%`;
+
+      // 简化模型：供应量变为 1 + inf/100，新增需求仅吸收 abs 比例，其余导致币价稀释
+      const supplyMult = 1 + inf / 100;
+      const demandMult = 1 + (inf / 100) * abs * 0.6;
+      const priceRatio = Math.min(1.2, demandMult / supplyMult);
+      const finalUsd = 1000 * (1 + inf / 100) * priceRatio + 1000 * (ry / 100);
+
+      const pxEl = document.getElementById("m-px");
+      pxEl.textContent = `${(priceRatio * 100).toFixed(0)}%`;
+      pxEl.className = "m-val " + (priceRatio < 0.7 ? "val-bad" : priceRatio < 0.95 ? "val-warn" : "val-good");
+
+      const valEl = document.getElementById("m-val");
+      valEl.textContent = `$${finalUsd.toFixed(0)}`;
+      valEl.className = "m-val " + (finalUsd >= 1050 ? "val-good" : finalUsd >= 950 ? "val-warn" : "val-bad");
+
+      const tEl = document.getElementById("m-type");
+      if (ry === 0 && inf > 50) { tEl.textContent = "🚨 纯印钞庞氏盘"; tEl.className = "m-val val-bad"; }
+      else if (inf === 0 && ry > 0) { tEl.textContent = "✓ 100% 真实收益"; tEl.className = "m-val val-good"; }
+      else if (ry >= inf * 0.3) { tEl.textContent = "✓ 较健康混合收益"; tEl.className = "m-val val-good"; }
+      else { tEl.textContent = "⚠️ 高度依赖印币补贴"; tEl.className = "m-val val-warn"; }
+    }
+    [slRy, slInf, slAbs].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

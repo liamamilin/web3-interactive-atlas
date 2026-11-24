@@ -1,0 +1,59 @@
+{
+  "id": "13-oracles-real-apps",
+  "order": 13,
+  "layer": "V4: 经济模型与实战投研",
+  "icon": "🔮",
+  "accentColor": "#14b9b8",
+  "title": {
+    "zh": "预言机、预测市场与真实应用",
+    "en": "Oracles & Real-World Apps"
+  },
+  "summary": {
+    "zh": "拆解区块链如何安全获取现实世界数据（预言机防操纵），以及 Polymarket 预测市场如何用真金白银聚合群体智慧。",
+    "en": "How decentralized oracles prevent price manipulation, and how prediction markets price real-world odds."
+  },
+  "lessons": [
+    {
+      "file": "01-oracle-price-feed.html",
+      "title": {
+        "zh": "预言机（Oracle）喂价与防操纵沙盒",
+        "en": "Oracle Price Feed & Manipulation Lab"
+      },
+      "subtitle": {
+        "zh": "智能合约不能自己上网查币价！拆解单一数据源如何被闪电贷打穿，以及中位数聚合如何防御。",
+        "en": "Why smart contracts need decentralized median oracles like Chainlink instead of single spot pools."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Oracle",
+        "Chainlink",
+        "TWAP",
+        "Median Aggregation"
+      ],
+      "prerequisites": [
+        "06-lending-liquidation/02-flash-loan-arbitrage.html"
+      ]
+    },
+    {
+      "file": "02-prediction-market-odds.html",
+      "title": {
+        "zh": "预测市场（Polymarket）赔率与套利引擎",
+        "en": "Prediction Market Odds & Arbitrage"
+      },
+      "subtitle": {
+        "zh": "Yes 股 + No 股 = $1.00！拆解预测市场如何把大选/加息概率变成可交易资产。",
+        "en": "How binary outcome shares (Yes + No = $1) turn real-world probabilities into tradable markets."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Polymarket",
+        "Binary Shares",
+        "Implied Odds",
+        "Information Market"
+      ],
+      "prerequisites": []
+    }
+  ]
+}

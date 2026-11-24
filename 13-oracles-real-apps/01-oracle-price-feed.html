@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>预言机（Oracle）喂价与防操纵沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .node-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .node-box { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; font-family: var(--mono); }
+    .node-box.hacked { border-color: var(--red); background: rgba(239, 68, 68, 0.14); }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V4 · 预言机、预测市场与真实应用</span>
+      <h1>预言机（Oracle）喂价与防操纵沙盒</h1>
+      <p>智能合约运行在封闭的区块链沙盒里，它根本不知道今天 ETH 涨到了多少美元。谁来给合约报价格？报假价格会怎样？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒攻防体验</div>
+      <h2>某新手借贷协议偷懒，直接把某个小 DEX 池子的现货价当作 ETH 抵押品定价</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">黑客借来一笔闪电贷，瞬间把那个小池子的某小币价拉高 <strong>10 倍</strong>，然后立刻用它抵押借光协议里的所有 USDT：</div>
+        <button id="hook-btn" class="btn btn-danger">模拟预言机价格操纵攻击</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>协议瞬间被搬空 $1,200 万！</strong><br />
+        因为合约盲信了单一瞬时数据源，误以为黑客手里价值 $100 万的抵押品突然值 $1,000 万，直接把全池子的真 USDT 借给了黑客。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>去中心化预言机（Chainlink）如何防作恶：多节点 + 中位数（Median）</h2>
+      <p>为了不信任单一点源，头部预言机网络会雇佣几十个独立节点，同时从币安、Coinbase、OKX 等多家交易所抓价格，并取<strong>中位数（Median）</strong>上链（注意：不是算术平均数！）：</p>
+      <div class="formula-box">
+        平均数 (Mean)：[3000, 3001, 2999, 3000, <span style="color:#ef4444">99999</span>] ⇒ $22,400（1 个坏节点就彻底打穿！）<br/>
+        中位数 (Median)：[2999, 3000, <span style="color:#10b981">3000</span>, 3001, 99999] ⇒ $3,000（完美免疫极端异常值！）
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>5 节点喂价攻击实验室（对比算术平均数 vs 中位数防御）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>黑客攻破并篡改的节点数量 <strong id="lbl-hack">1 个节点</strong></label>
+            <input id="sl-hack" type="range" min="0" max="3" step="1" value="1" />
+          </div>
+          <div class="control-group">
+            <label>恶意节点谎报的假价格 <strong id="lbl-fake">$9,000</strong></label>
+            <input id="sl-fake" type="range" min="3000" max="15000" step="500" value="9000" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">真实 ETH 市场价：$3,000</div>
+        </div>
+        <div class="lab-panel">
+          <div id="nodes" class="node-grid"></div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">若用算术平均数 (脆弱)</div><div class="m-val" id="m-mean">$4,200</div></div>
+            <div class="metric-box"><div class="m-label">若用中位数 (Chainlink)</div><div class="m-val" id="m-med">$3,000</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：黑客攻破 2 个节点并谎报 $15,000，对比「算术平均数」和「中位数」的最终喂价结果。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把攻破节点数拉到 3 个（超过 50%），观察为什么预言机网络必须保证过半节点诚实。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>评估 DeFi 协议安全性的隐藏指标：看它用什么预言机</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 头部安全协议（如 Aave、Compound）核心资产全部采用 <strong>Chainlink / Pyth</strong> 多节点中位数喂价，或结合 <strong>TWAP（时间加权平均价）</strong> 防止单区块闪电贷操控。<br />
+        2. 任何自己写简易喂价、直接读取单个小 DEX 现货价的土狗借贷盘，基本都活不过一周。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "13-oracles-real-apps/01-oracle-price-feed.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "13 · 预言机与真实应用" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slHack = document.getElementById("sl-hack"), slFake = document.getElementById("sl-fake");
+    const honestPrices = [2998, 3000, 3001, 2999, 3002];
+
+    function update() {
+      const h = +slHack.value, fake = +slFake.value;
+      document.getElementById("lbl-hack").textContent = `${h} 个节点`;
+      document.getElementById("lbl-fake").textContent = `$${fake.toLocaleString()}`;
+
+      const vals = honestPrices.map((p, idx) => idx < h ? fake : p);
+      document.getElementById("nodes").innerHTML = vals.map((v, i) => `
+        <div class="node-box ${i < h ? "hacked" : ""}">
+          <div style="font-size:11px;color:var(--text-muted);">节点 #${i + 1} ${i < h ? "😈" : "✓"}</div>
+          <div style="font-size:15px;font-weight:700;margin-top:4px;">$${v.toLocaleString()}</div>
+        </div>
+      `).join("");
+
+      const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const sorted = [...vals].sort((a, b) => a - b);
+      const med = sorted[Math.floor(sorted.length / 2)];
+
+      const meanEl = document.getElementById("m-mean");
+      meanEl.textContent = `$${mean.toFixed(0)}`;
+      meanEl.className = "m-val " + (Math.abs(mean - 3000) > 100 ? "val-bad" : "val-good");
+
+      const medEl = document.getElementById("m-med");
+      medEl.textContent = `$${med.toFixed(0)}`;
+      medEl.className = "m-val " + (Math.abs(med - 3000) > 100 ? "val-bad" : "val-good");
+    }
+    [slHack, slFake].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

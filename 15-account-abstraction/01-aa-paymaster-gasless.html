@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERC-4337 与 Paymaster 免 Gas 代付沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .flow-box { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.8; min-height: 150px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V5 · 账户抽象与下一代钱包</span>
+      <h1>ERC-4337 与 Paymaster 免 Gas 代付沙盒</h1>
+      <p>Web3 劝退 99% 普通人的第一道墙：钱包里明明躺着 500 USDT，却因为没有 0.001 ETH 当油费，一分钱也转不出去。账户抽象（AA）彻底改写了这条死规则。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>新用户领到了 100 USDC 奖励，想在 DEX 里把它换成 ETH（账户里 0 ETH）</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">在传统钱包（EOA）里，你必须先去交易所买 ETH 提币当 Gas，再签一次 Approve，再签一次 Swap……</div>
+        <button id="hook-btn" class="btn btn-primary">切换为 AA 智能钱包一键执行</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>0 ETH 也能丝滑成交！只需点击 1 次指纹确认：</strong><br />
+        1. 智能账户把 <code>Approve + Swap</code> 打包成<strong>一笔原子操作（Batching）</strong>；<br />
+        2. <strong>Paymaster（代付中继）</strong>帮你向以太坊垫付了 ETH Gas 费，同时顺手从你的 USDC 里扣走 $0.20（甚至由项目方直接免费赞助）。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>从“写死的钥匙（EOA）”升级为“可编程账户（Smart Account）”</h2>
+      <p>传统外部账户（EOA，如旧版 MetaMask）的规则在协议层是写死的：<strong>必须用私钥签名、必须用原生币付 Gas、一次只能干一件事</strong>。</p>
+      <p><strong>账户抽象（ERC-4337 / EIP-7702）</strong>把你的钱包本身变成了一个智能合约。你发出的不再是底层交易，而是一份<strong>用户意图操作（UserOperation）</strong>：</p>
+      <div class="formula-box">
+        你的 UserOp (打包多步操作) ──▶ Bundler (打包器) ──▶ EntryPoint 合约 ──▶ Paymaster 代付 Gas ──▶ 执行成功
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>EOA 传统钱包 vs AA 智能钱包交互流程模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>选择钱包架构</label>
+            <select id="sel-mode">
+              <option value="eoa">传统 EOA 钱包 (仅支持 ETH 付 Gas)</option>
+              <option value="aa-usdc">AA 智能钱包 + USDC 自动扣 Gas</option>
+              <option value="aa-sponsor">AA 智能钱包 + DApp 项目方免 Gas 赞助</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>当前钱包 ETH 余额 <strong id="lbl-eth">0.000 ETH</strong></label>
+            <input id="sl-eth" type="range" min="0" max="0.01" step="0.002" value="0" />
+          </div>
+          <button id="btn-run" class="btn btn-primary" style="width:100%;">执行任务：授权 + 兑换 100 USDC</button>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">所需弹窗签名次数</div><div class="m-val" id="m-sigs">2 次</div></div>
+            <div class="metric-box"><div class="m-label">执行结果</div><div class="m-val" id="m-res" style="font-size:14px;">待测试</div></div>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">底层执行追踪：</div>
+          <div id="flow-out" class="flow-box">点击左侧按钮模拟链上执行流程...</div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：保持 ETH 余额为 0，在「传统 EOA 钱包」下点击执行，体会为什么新手总被 Gas 门神挡在门外。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：保持 0 ETH，切换为「AA + USDC 自动扣 Gas」，观察签名次数从 2 次降为 1 次且零阻力完成。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>为什么 2025–2026 年的 Web3 应用越来越像 Web2？</h2>
+      <div class="callout-warn">
+        <strong>认知升级：</strong><br />
+        Coinbase Smart Wallet、Safe、以及以太坊 <strong>EIP-7702</strong> 升级正在让普通 EOA 也能临时获得智能合约的打包与代付能力。未来普通用户甚至不需要知道“Gas 费”是什么，底层会被 <strong>链抽象（Chain Abstraction）+ Paymaster</strong> 彻底隐藏。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "15-account-abstraction/01-aa-paymaster-gasless.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "15 · 账户抽象与钱包" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selMode = document.getElementById("sel-mode"), slEth = document.getElementById("sl-eth");
+    const sigEl = document.getElementById("m-sigs"), resEl = document.getElementById("m-res"), outEl = document.getElementById("flow-out");
+
+    slEth.addEventListener("input", () => {
+      document.getElementById("lbl-eth").textContent = `${(+slEth.value).toFixed(3)} ETH`;
+    });
+
+    document.getElementById("btn-run").addEventListener("click", () => {
+      const m = selMode.value, eth = +slEth.value;
+      if (m === "eoa") {
+        sigEl.textContent = "2 次 (分离)";
+        if (eth < 0.002) {
+          resEl.textContent = "✗ 卡死：ETH 不足"; resEl.className = "m-val val-bad";
+          outEl.innerHTML = `
+            1. 尝试发起 Tx1 [Approve USDC] → <span class="val-bad">报错：Insufficient funds for gas！</span><br/>
+            2. 钱包里虽然有 100 USDC，但 EOA 拒绝用 USDC 付油费。<br/>
+            3. 用户被迫去交易所买 ETH 再提币，90% 新手在此流失。
+          `;
+        } else {
+          resEl.textContent = "✓ 成功 (繁琐)"; resEl.className = "m-val val-warn";
+          outEl.innerHTML = `
+            1. 弹窗 #1：签名 Approve 交易 → 等待上链 (耗 0.0005 ETH)<br/>
+            2. 弹窗 #2：签名 Swap 交易 → 等待上链 (耗 0.0015 ETH)<br/>
+            3. 耗时 24 秒，两笔独立交易完成。
+          `;
+        }
+      } else if (m === "aa-usdc") {
+        sigEl.textContent = "1 次 (打包)";
+        resEl.textContent = "✓ 0 ETH 丝滑成交"; resEl.className = "m-val val-good";
+        outEl.innerHTML = `
+          1. 智能账户生成单条 UserOp：[Approve + Swap] 原子打包<br/>
+          2. 仅需 <strong>1 次确认</strong>，Bundler 提交至 EntryPoint 合约<br/>
+          3. <span class="val-good">Paymaster 自动替你支付 ETH Gas，并从你的余额扣除 0.25 USDC 结算！</span>
+        `;
+      } else {
+        sigEl.textContent = "1 次 (免油费)";
+        resEl.textContent = "✓ 完全免费成交"; resEl.className = "m-val val-good";
+        outEl.innerHTML = `
+          1. 智能账户生成单条 UserOp：[Approve + Swap] 原子打包<br/>
+          2. DApp 项目的 <strong>Verifying Paymaster</strong> 验证你是活跃用户，签字全额赞助 Gas<br/>
+          3. <span class="val-good">✓ 用户 0 ETH 消耗、0 USDC 手续费，体验与 Web2 App 完全一致！</span>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

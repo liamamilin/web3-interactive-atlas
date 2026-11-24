@@ -1,0 +1,62 @@
+{
+  "id": "15-account-abstraction",
+  "order": 15,
+  "layer": "V5: 前沿叙事与下一代体验",
+  "icon": "✨",
+  "accentColor": "#38bdf8",
+  "title": {
+    "zh": "账户抽象与下一代钱包",
+    "en": "Account Abstraction & Smart Wallets"
+  },
+  "summary": {
+    "zh": "告别手抄 12 个助记词和满世界找 ETH 付 Gas：拆解 ERC-4337 智能合约钱包、Paymaster 免 Gas 代付、Passkey 与社交恢复。",
+    "en": "Smart contract wallets (ERC-4337), gasless Paymasters, Passkeys, Session Keys, and Social Recovery."
+  },
+  "lessons": [
+    {
+      "file": "01-aa-paymaster-gasless.html",
+      "title": {
+        "zh": "ERC-4337 与 Paymaster 免 Gas 代付沙盒",
+        "en": "ERC-4337 & Paymaster Gasless Lab"
+      },
+      "subtitle": {
+        "zh": "手里只有 USDT 没有 ETH 就动弹不得？体验智能合约钱包如何用任意代币付 Gas 并一键批量打包。",
+        "en": "Compare legacy EOA friction vs Smart Wallet UserOps, Paymasters, and transaction batching."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "ERC-4337",
+        "Account Abstraction",
+        "Paymaster",
+        "UserOperation",
+        "Batching"
+      ],
+      "prerequisites": [
+        "02-tx-gas-multichain/01-mempool-gas-auction.html"
+      ]
+    },
+    {
+      "file": "02-passkey-social-recovery.html",
+      "title": {
+        "zh": "无助记词时代：Passkey、社交恢复与会话密钥",
+        "en": "Passkeys, Social Recovery & Session Keys"
+      },
+      "subtitle": {
+        "zh": "手机丢了资产不丢，玩链游不用每点一下弹一次窗！拆解智能账户的权限编程。",
+        "en": "Programmable wallet security with Guardian recovery and scoped Session Keys."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Passkey",
+        "Social Recovery",
+        "Session Keys",
+        "Smart Account"
+      ],
+      "prerequisites": [
+        "15-account-abstraction/01-aa-paymaster-gasless.html"
+      ]
+    }
+  ]
+}

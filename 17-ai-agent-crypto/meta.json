@@ -1,0 +1,61 @@
+{
+  "id": "17-ai-agent-crypto",
+  "order": 17,
+  "layer": "V5: 前沿叙事与下一代体验",
+  "icon": "🤖",
+  "accentColor": "#ec4899",
+  "title": {
+    "zh": "AI + Crypto 与 Agent 经济",
+    "en": "AI + Crypto & Agentic Economy"
+  },
+  "summary": {
+    "zh": "为什么 AI Agent 天然需要加密货币而不是银行卡？拆解 HTTP 402 机器微支付，以及 TEE / zkML 如何验证云端 AI 没有偷梁换柱。",
+    "en": "Why AI Agents need crypto rails (x402 micropayments), and how TEE vs zkML verify AI inference."
+  },
+  "lessons": [
+    {
+      "file": "01-agent-wallet-micropayments.html",
+      "title": {
+        "zh": "AI Agent 钱包与 x402 机器微支付沙盒",
+        "en": "AI Agent Wallets & x402 Micropayments"
+      },
+      "subtitle": {
+        "zh": "银行不会给 AI 办信用卡，刷一笔 $0.002 的 API 费用信用卡光手续费就要 $0.30！体验机器间自主结算。",
+        "en": "Simulating HTTP 402 pay-per-call stablecoin micropayments between autonomous AI Agents."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "AI Agent",
+        "x402 Protocol",
+        "Micropayments",
+        "M2M Economy"
+      ],
+      "prerequisites": [
+        "15-account-abstraction/02-passkey-social-recovery.html"
+      ]
+    },
+    {
+      "file": "02-verifiable-ai-tee-zkml.html",
+      "title": {
+        "zh": "可验证 AI 推理：TEE 硬件飞地 vs zkML 对比器",
+        "en": "Verifiable AI: TEE vs zkML"
+      },
+      "subtitle": {
+        "zh": "你付了顶级大模型的钱，怎么证明云端节点没偷偷给你换成廉价小模型？拆解链上 AI 防作弊方案。",
+        "en": "Comparing Trusted Execution Environments (TEE), Optimistic ML, and zkML trade-offs."
+      },
+      "duration": "5 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "Verifiable AI",
+        "TEE",
+        "zkML",
+        "DePIN Compute"
+      ],
+      "prerequisites": [
+        "10-scaling-bridges/01-rollup-and-zk.html"
+      ]
+    }
+  ]
+}

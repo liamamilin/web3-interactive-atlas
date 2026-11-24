@@ -1,0 +1,61 @@
+{
+  "id": "14-onchain-forensics",
+  "order": 14,
+  "layer": "V4: 经济模型与实战投研",
+  "icon": "🔍",
+  "accentColor": "#3b82f6",
+  "title": {
+    "zh": "链上数据与投研排雷",
+    "en": "On-chain Analytics & Forensics"
+  },
+  "summary": {
+    "zh": "告别二手情绪和喊单，学会用一手链上数据做判断：拆穿虚假高年化（庞氏补贴），用 TVL、真实收入与 P/F 估值独立体检项目。",
+    "en": "Separating real yield from inflationary ponzis, and evaluating protocols with TVL, Fees, and P/F ratios."
+  },
+  "lessons": [
+    {
+      "file": "01-real-yield-vs-ponzi.html",
+      "title": {
+        "zh": "真实收益 vs 通胀庞氏拆解器",
+        "en": "Real Yield vs Inflationary Ponzi"
+      },
+      "subtitle": {
+        "zh": "看到“质押年化 300% APY”别急着冲！3 秒算清这笔收益是协议赚来的，还是印空气币发的。",
+        "en": "Dissecting whether a protocol's high APY comes from real user fees or token printing."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Real Yield",
+        "Token Incentives",
+        "Ponzi Economics",
+        "Net Profitability"
+      ],
+      "prerequisites": [
+        "12-tokenomics/02-value-capture-vetoken.html"
+      ]
+    },
+    {
+      "file": "02-onchain-metrics-dashboard.html",
+      "title": {
+        "zh": "链上投研核心指标体检台",
+        "en": "On-chain Protocol Scorecard"
+      },
+      "subtitle": {
+        "zh": "打开 DefiLlama 和 Dune 该看哪几个数？用 TVL、真实协议收入、P/F 估值给任意项目打分。",
+        "en": "Interactive valuation scorecard using TVL, Protocol Revenue, Active Users, and P/F ratio."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "DefiLlama",
+        "TVL",
+        "Protocol Revenue",
+        "P/F Ratio"
+      ],
+      "prerequisites": [
+        "14-onchain-forensics/01-real-yield-vs-ponzi.html"
+      ]
+    }
+  ]
+}

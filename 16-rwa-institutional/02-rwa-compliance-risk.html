@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RWA 的围墙花园：白名单、冻结权限与托管风险 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V5 · RWA 现实世界资产上链</span>
+      <h1>RWA 的围墙花园：白名单、冻结权限与托管风险</h1>
+      <p>普通 ERC-20 代币谁都能买、谁都能转；但很多机构级 RWA 代币（如 BUIDL）自带严格的链上合规门禁——连转给自己的另一个小号都会报错！</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>你通过 KYC 买了一批机构合规 RWA 债券代币，想把它转到你的冷钱包小号里保管</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">目标冷钱包地址 <code>0xCold...9999</code> 未做过 KYC 认证。点击尝试转账：</div>
+        <button id="hook-btn" class="btn btn-danger">尝试转账至未认证冷钱包</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>交易被合规合约直接拦截（Transfer Not Allowed）！</strong><br />
+        因为该代币采用了 <strong>ERC-3643（许可型代币标准）</strong>：每次转账前，合约都会自动查询链上身份注册表——<strong>接收方不在 KYC 白名单内，一律拒绝转账</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>原生 Crypto（抗审查） vs 机构 RWA（合规优先）的本质冲突</h2>
+      <p>监管机构要求发行债券/股票必须遵守反洗钱（AML）和合格投资者法律。因此，大多数正规 RWA 智能合约内置了三项“上帝权限”：</p>
+      <div class="formula-box">
+        1. Whitelist（白名单准入）：仅认证地址可收发<br/>
+        2. Freeze（强制冻结）：司法制裁地址资产可被一键冻结<br/>
+        3. Forced Transfer（强制划转）：若投资者私钥丢失，发行方经法律程序可销毁旧币、重发新币
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>ERC-3643 合规转账门禁模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>发送方身份状态</label>
+            <select id="sel-from">
+              <option value="kyc">已通过 KYC（非受制裁地区）</option>
+              <option value="frozen">已被司法合规冻结地址</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>接收方身份状态</label>
+            <select id="sel-to">
+              <option value="kyc">已通过 KYC 合格投资者</option>
+              <option value="anon">普通匿名散户钱包（无 KYC）</option>
+              <option value="us">受限司法管辖区地址</option>
+            </select>
+          </div>
+          <button id="btn-check" class="btn btn-primary" style="width:100%;">模拟链上合规合约校验</button>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row" style="margin-bottom:10px;">
+            <div class="metric-box"><div class="m-label">ERC-3643 门禁裁决</div><div class="m-val" id="m-res" style="font-size:15px;">待检验</div></div>
+          </div>
+          <div id="rwa-log" style="font-family:var(--mono);font-size:12px;background:#0d1320;padding:12px;border-radius:8px;min-height:110px;line-height:1.7;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：测试把资产转给「普通匿名散户钱包」，观察为什么机构 RWA 无法直接放进无许可 Uniswap 池子里自由交易。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把发送方设为「已冻结」，体会中心化托管资产（包括 USDT/USDC 与 RWA）和纯去中心化 BTC/ETH 的本质边界。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>如何看清资产的“去中心化光谱”？</h2>
+      <div class="callout-warn">
+        <strong>认知框架：</strong><br />
+        • <strong>强抗审查层</strong>：BTC / ETH（无发行方，无人能冻结你的地址）。<br />
+        • <strong>混合合规层</strong>：USDC / USDT（可自由转账，但发行方保留黑名单冻结权）。<br />
+        • <strong>强合规围墙层</strong>：机构级 RWA（收发双向白名单 + 法律强制恢复）。配置资产时，按需组合，不要把 RWA 误当成抗审查资产。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "16-rwa-institutional/02-rwa-compliance-risk.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "16 · RWA 现实资产" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selFrom = document.getElementById("sel-from"), selTo = document.getElementById("sel-to");
+    const resEl = document.getElementById("m-res"), logEl = document.getElementById("rwa-log");
+
+    document.getElementById("btn-check").addEventListener("click", () => {
+      const f = selFrom.value, t = selTo.value;
+      if (f === "frozen") {
+        resEl.textContent = "✗ 拒绝：账户已冻结"; resEl.className = "m-val val-bad";
+        logEl.innerHTML = `<span class="val-bad">&gt; REVERT: SenderAddressFrozen!<br/>&gt; 发行方已执行链上冻结指令，在解除合规审查前该地址无法转出任何代币。</span>`;
+      } else if (t === "anon") {
+        resEl.textContent = "✗ 拒绝：接收方无 KYC"; resEl.className = "m-val val-bad";
+        logEl.innerHTML = `<span class="val-bad">&gt; REVERT: ReceiverNotVerified!<br/>&gt; 接收方未在链上身份注册表（ONCHAINID）中登记，转账被拦截。</span>`;
+      } else if (t === "us") {
+        resEl.textContent = "✗ 拒绝：地区受限"; resEl.className = "m-val val-bad";
+        logEl.innerHTML = `<span class="val-bad">&gt; REVERT: JurisdictionRestricted!<br/>&gt; 根据证券发行条款，该产品禁止向受限司法管辖区居民转让。</span>`;
+      } else {
+        resEl.textContent = "✓ 合规放行"; resEl.className = "m-val val-good";
+        logEl.innerHTML = `<span class="val-good">&gt; 校验通过：双方均在合规白名单内且无冻结标记。<br/>&gt; 2 秒内完成链上原子交割，无需传统券商清算所介入！</span>`;
+      }
+    });
+  </script>
+</body>
+</html>

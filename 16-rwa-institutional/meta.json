@@ -1,0 +1,62 @@
+{
+  "id": "16-rwa-institutional",
+  "order": 16,
+  "layer": "V5: 前沿叙事与下一代体验",
+  "icon": "🏛️",
+  "accentColor": "#10b981",
+  "title": {
+    "zh": "RWA 现实世界资产上链",
+    "en": "Real-World Assets (RWA)"
+  },
+  "summary": {
+    "zh": "华尔街巨头（贝莱德等）为何把国债和基金搬上公链？拆解美债代币化收益流转，以及 RWA 背后的合规白名单与托管风险。",
+    "en": "How tokenized US Treasuries bring TradFi yield on-chain 24/7, and the legal/compliance guardrails behind them."
+  },
+  "lessons": [
+    {
+      "file": "01-tokenized-tbills.html",
+      "title": {
+        "zh": "美债上链（Tokenized T-Bills）与收益流转沙盒",
+        "en": "Tokenized T-Bills & Yield Flow Lab"
+      },
+      "subtitle": {
+        "zh": "银行周末休息、跨境汇款要 3 天，为什么链上美债代币能 7×24 小时秒级生息结算？",
+        "en": "Comparing TradFi T+2 settlement vs 24/7 on-chain tokenized Treasury yield."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "RWA",
+        "T-Bills",
+        "BUIDL / USDY",
+        "24/7 Settlement",
+        "SPV"
+      ],
+      "prerequisites": [
+        "05-stablecoins-peg/01-collateral-and-peg.html"
+      ]
+    },
+    {
+      "file": "02-rwa-compliance-risk.html",
+      "title": {
+        "zh": "RWA 的围墙花园：白名单、冻结权限与托管风险",
+        "en": "RWA Compliance, Whitelists & Custody"
+      },
+      "subtitle": {
+        "zh": "为什么你把 RWA 代币转给陌生钱包会直接报错？拆解链上资产与链下法律的桥梁。",
+        "en": "Why RWA tokens use ERC-3643 whitelists and what happens if an off-chain custodian defaults."
+      },
+      "duration": "4 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "ERC-3643",
+        "KYC Whitelist",
+        "Forced Freeze",
+        "Legal Wrapper"
+      ],
+      "prerequisites": [
+        "16-rwa-institutional/01-tokenized-tbills.html"
+      ]
+    }
+  ]
+}

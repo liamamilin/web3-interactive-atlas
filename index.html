@@ -6,23 +6,32 @@
   <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
   <link rel="stylesheet" href="shared/theme.css" />
   <style>
-    .hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 24px; }
+    .hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 20px; }
     .hero h1 { font-size: 36px; margin-bottom: 10px; }
     .hero p { color: var(--text-muted); max-width: 680px; }
     .toolbar {
-      max-width: 1040px; margin: 0 auto 24px; padding: 0 20px;
+      max-width: 1040px; margin: 0 auto 16px; padding: 0 20px;
       display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
     }
     .search-input {
       background: var(--surface); border: 1px solid var(--border); color: var(--text);
       padding: 10px 14px; border-radius: 8px; width: 320px; max-width: 100%; font-size: 14px;
     }
+    .filter-row {
+      max-width: 1040px; margin: 0 auto 24px; padding: 0 20px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); transition: 0.15s;
+    }
+    .filter-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
     .modules-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 80px; display: grid; gap: 24px; }
     .module-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 24px;
     }
-    .module-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; }
+    .module-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
     .module-head h2 { font-size: 20px; }
     .module-layer { font-size: 12px; color: var(--accent); }
     .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
@@ -45,8 +54,17 @@
   </section>
 
   <div class="toolbar">
-    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、滑点、Permit、Gas）..." />
+    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、Permit、MEV、FDV、P/F）..." />
     <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
+  </div>
+
+  <div id="filter-row" class="filter-row">
+    <button class="filter-btn active" data-layer="ALL">全部阶段 (V1–V5)</button>
+    <button class="filter-btn" data-layer="V1">V1 · 链上生存与交易</button>
+    <button class="filter-btn" data-layer="V2">V2 · DeFi 金融引擎</button>
+    <button class="filter-btn" data-layer="V3">V3 · 底层基建与 MEV</button>
+    <button class="filter-btn" data-layer="V4">V4 · 经济模型与投研</button>
+    <button class="filter-btn" data-layer="V5">V5 · 前沿叙事与下一代体验</button>
   </div>
 
   <main id="modules" class="modules-wrap"></main>
@@ -59,13 +77,20 @@
     const wrap = document.getElementById("modules");
     const searchEl = document.getElementById("search");
     const summaryEl = document.getElementById("progress-summary");
+    let activeLayer = "ALL";
 
-    function render(keyword = "") {
-      const q = keyword.trim().toLowerCase();
-      let total = 0, doneCount = 0;
+    function render() {
+      const q = searchEl.value.trim().toLowerCase();
+      let totalAll = 0, doneAll = 0;
+      catalog.modules.forEach((m) => m.lessons.forEach((l) => {
+        totalAll++;
+        if (progress[l.path]) doneAll++;
+      }));
+      summaryEl.textContent = `总学习进度：${doneAll} / ${totalAll} 已掌握`;
+
       wrap.innerHTML = "";
-
       catalog.modules.forEach((mod) => {
+        if (activeLayer !== "ALL" && !(mod.layer || "").startsWith(activeLayer)) return;
         const lessons = mod.lessons.filter((l) => {
           if (!q) return true;
           const hay = [mod.title.zh, l.title.zh, l.subtitle.zh, ...(l.concepts || [])].join(" ").toLowerCase();
@@ -83,9 +108,7 @@
           <p style="font-size:14px;color:var(--text-muted)">${mod.summary?.zh || ""}</p>
           <div class="lesson-grid">
             ${lessons.map((l) => {
-              total++;
               const isDone = !!progress[l.path];
-              if (isDone) doneCount++;
               return `
                 <a class="lesson-card ${isDone ? "done" : ""}" href="${l.path}">
                   <h3>${isDone ? "✓ " : ""}${l.title.zh}</h3>
@@ -104,10 +127,17 @@
       if (!wrap.children.length) {
         wrap.innerHTML = `<p style="color:var(--text-muted)">暂无匹配课程。</p>`;
       }
-      summaryEl.textContent = `学习进度：${doneCount} / ${total} 已掌握`;
     }
 
-    searchEl.addEventListener("input", (e) => render(e.target.value));
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeLayer = btn.dataset.layer;
+        render();
+      });
+    });
+    searchEl.addEventListener("input", render);
     render();
   </script>
 </body>

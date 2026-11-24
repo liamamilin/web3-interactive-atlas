@@ -1,0 +1,61 @@
+{
+  "id": "12-tokenomics",
+  "order": 12,
+  "layer": "V4: 经济模型与实战投研",
+  "icon": "🪙",
+  "accentColor": "#eab308",
+  "title": {
+    "zh": "代币经济学与抛压博弈",
+    "en": "Tokenomics & Unlock Dynamics"
+  },
+  "summary": {
+    "zh": "拆解“低流通、高 FDV”VC 币为何上线即巅峰，以及协议如何通过回购销毁与 veToken 锁仓实现真实价值捕获。",
+    "en": "Why low-float high-FDV tokens bleed on unlocks, and how buybacks & veTokenomics capture value."
+  },
+  "lessons": [
+    {
+      "file": "01-fdv-unlock-cliff.html",
+      "title": {
+        "zh": "低流通高 FDV 与解锁悬崖模拟器",
+        "en": "Low-Float High-FDV & Unlock Cliff Lab"
+      },
+      "subtitle": {
+        "zh": "流通市值看着很便宜，为什么买进去一年币价却阴跌 80%？亲手拉动代币解锁时间轴。",
+        "en": "Simulate how VC and team token unlocks dilute retail holders over 36 months."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "FDV",
+        "MCap",
+        "Cliff & Vesting",
+        "Token Dilution"
+      ],
+      "prerequisites": [
+        "08-bonding-curves/02-early-vs-late-dump.html"
+      ]
+    },
+    {
+      "file": "02-value-capture-vetoken.html",
+      "title": {
+        "zh": "协议价值捕获与 veToken 锁仓博弈",
+        "en": "Value Capture & veTokenomics"
+      },
+      "subtitle": {
+        "zh": "协议一年赚 1 亿美元手续费，为什么它的治理代币却一文不值？拆解费用开关与锁仓飞轮。",
+        "en": "Comparing useless governance tokens vs fee-sharing, buyback-and-burn, and veToken models."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Value Capture",
+        "Fee Switch",
+        "Buyback & Burn",
+        "veToken"
+      ],
+      "prerequisites": [
+        "12-tokenomics/01-fdv-unlock-cliff.html"
+      ]
+    }
+  ]
+}

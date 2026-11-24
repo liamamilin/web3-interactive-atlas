@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Agent 钱包与 x402 机器微支付沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .m2m-log { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 12px; min-height: 150px; line-height: 1.75; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V5 · AI + Crypto 与 Agent 经济</span>
+      <h1>AI Agent 钱包与 x402 机器微支付沙盒</h1>
+      <p>当数以亿计的 AI Agent 开始替人类查数据、买算力、调用外部工具时，它们怎么付钱？银行体系只认自然人身份证，但区块链天生无许可。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒经济账对比</div>
+      <h2>你的调研 Agent 需要临时向一个陌生气象 API 购买 1 次数据，报价 $0.005（半美分）</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">用传统信用卡/Stripe 结算 vs 用链上稳定币（L2 / Solana + x402 协议）按次结算：</div>
+        <button id="hook-btn" class="btn btn-primary">对比两种支付通道的荒谬差距</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>传统信用卡彻底瘫痪！</strong><br />
+        Stripe 单笔固定手续费高达 <strong>$0.30 + 2.9%</strong>（比商品本身贵 60 倍），且 AI 无法自己注册账号绑卡；<br />
+        而在 <strong>HTTP 402 (x402) + 稳定币</strong> 轨道上，Agent 自动签名支付 <strong>$0.005 USDC</strong>（Gas 费 $0.0005），1 秒内拿到数据，全程零人工干预、零订阅废话！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>HTTP 402 Payment Required：沉睡 30 年的互联网原生付费协议被 Crypto 唤醒</h2>
+      <p>早在 1990 年代 HTTP 标准就预留了 <code>402 Payment Required</code> 状态码，但因为当时没有无需账号、极低成本的全球数字现金，它沉睡了 30 年。如今 AI Agent + 稳定币让它真正跑通：</p>
+      <div class="formula-box">
+        1. Agent 请求 API ──▶ 2. 服务器返回 HTTP 402 (报价: 0.005 USDC)<br/>
+        3. Agent 用限额子钱包自动签名付款 ──▶ 4. 服务器链上核验到账，瞬间返回 JSON 数据
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>机器微支付经济性对比器（Stripe 信用卡 vs 链上 x402 稳定币）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>单次 API 调用定价 <strong id="lbl-p">$0.010</strong></label>
+            <input id="sl-p" type="range" min="0.001" max="0.50" step="0.005" value="0.01" />
+          </div>
+          <div class="control-group">
+            <label>Agent 每日调用次数 <strong id="lbl-cnt">500 次</strong></label>
+            <input id="sl-cnt" type="range" min="10" max="5000" step="10" value="500" />
+          </div>
+          <div class="metrics-row" style="margin-top:12px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">传统信用卡总成本</div><div class="m-val val-bad" id="m-trad">$155.15</div></div>
+            <div class="metric-box"><div class="m-label">链上 x402 总成本</div><div class="m-val val-good" id="m-x402">$5.25</div></div>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">实时成本与手续费磨损分析：</div>
+          <div id="m2m-log" class="m2m-log"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把单次 API 定价拉低到 $0.001（高频微支付），看看传统支付通道的手续费占比有多离谱。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：结合前面学过的「Session Key 限额钱包」，理解人类如何放心把 $20 预算交给 AI Agent 自主花钱而不怕被刷爆。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>区分“真 AI + Crypto 基建”与“套壳 AI Meme 币”</h2>
+      <div class="callout-warn">
+        <strong>投研排雷清单：</strong><br />
+        1. 市场上 95% 的 AI 代币只是给聊天机器人发了个空气 Meme 币，代币本身没有任何刚性消耗。<br />
+        2. 真正有长期护城河的 AI + Crypto 方向集中在三个刚需：<strong>Agent 自主支付轨道（稳定币/x402）</strong>、<strong>智能钱包权限护栏（Session Keys）</strong> 和 <strong>可验证计算/去中心化数据确权</strong>。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "17-ai-agent-crypto/01-agent-wallet-micropayments.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "17 · AI + Crypto" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slP = document.getElementById("sl-p"), slCnt = document.getElementById("sl-cnt");
+    function update() {
+      const p = +slP.value, cnt = +slCnt.value;
+      document.getElementById("lbl-p").textContent = `$${p.toFixed(3)}`;
+      document.getElementById("lbl-cnt").textContent = `${cnt.toLocaleString()} 次`;
+
+      const goods = p * cnt;
+      const tradFee = cnt * (0.30 + p * 0.029);
+      const x402Fee = cnt * 0.0005; // Base/Solana 级极低 Gas
+      const tradTotal = goods + tradFee;
+      const x402Total = goods + x402Fee;
+
+      document.getElementById("m-trad").textContent = `$${tradTotal.toFixed(2)}`;
+      document.getElementById("m-x402").textContent = `$${x402Total.toFixed(2)}`;
+
+      const tradOverhead = (tradFee / goods) * 100;
+      const x402Overhead = (x402Fee / goods) * 100;
+
+      document.getElementById("m2m-log").innerHTML = `
+        &gt; 纯 API 数据本身价值：<strong>$${goods.toFixed(2)}</strong><br/>
+        &gt; 传统信用卡通道手续费：<span class="val-bad">$${tradFee.toFixed(2)}（附加磨损 +${tradOverhead.toFixed(0)}%）</span><br/>
+        &gt; 链上 L2/SOL x402 费用：<span class="val-good">$${x402Fee.toFixed(2)}（附加磨损 +${x402Overhead.toFixed(1)}%）</span><br/>
+        <br/>
+        &gt; 结论：${tradOverhead > 50 ? '<span class="val-good">微支付场景下传统银行卡在数学上不可行，加密稳定币是唯一解！</span>' : '单笔金额较高时，两者通道成本差距缩小，但加密钱包仍具备无需人类 KYC 与 24/7 编程结算优势。'}
+      `;
+    }
+    [slP, slCnt].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

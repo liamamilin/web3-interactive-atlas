@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>低流通高 FDV 与解锁悬崖模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .bar-track { height: 22px; background: #0d1320; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: flex; margin: 10px 0; }
+    .bar-retail { background: #38bdf8; height: 100%; transition: 0.2s; }
+    .bar-vc { background: #ef4444; height: 100%; transition: 0.2s; }
+    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V4 · 代币经济学与抛压博弈</span>
+      <h1>低流通高 FDV 与解锁悬崖模拟器</h1>
+      <p>为什么很多明星新币上线时“流通市值”看起来只有 1 亿美元，但你拿了一年、项目方也在认真做事，币价却跌去了 80%？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>某顶级明星公链上线：当前币价 $1.00，流通量仅占总量的 10%（其余 90% 锁在 VC 和团队手里）</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">假设未来一年市场对该项目的总买盘资金（流通市值）<strong>一分没少，保持恒定</strong>，但第 12 个月迎来大额解锁，流通量翻倍到 50%：</div>
+        <button id="hook-btn" class="btn btn-danger">查看你手里代币的真实价格</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>币价暴跌至 $0.20（直接腰斩再腰斩，亏损 -80%）！</strong><br />
+        因为<strong>价格 = 流通市值 / 流通量</strong>。盘子里的真钱没变，筹码却暴增了 5 倍。这就是“低流通、高 FDV（全稀释估值）”最隐蔽的慢性抽血陷阱。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>看懂两个核心数字：MCap（流通市值）vs FDV（全稀释估值）</h2>
+      <p>• <strong>MCap（Market Cap）</strong> = 当前币价 × 当前市场上流通的代币数量。<br />
+      • <strong>FDV（Fully Diluted Valuation）</strong> = 当前币价 × 未来所有代币全部解锁后的总供应量。</p>
+      <div class="formula-box">
+        未来币价 = (当前 MCap × 新增资金倍数) / 解锁后的总流通量
+      </div>
+      <p>当一个项目 <strong>MCap / FDV &lt; 15%</strong> 时，意味着未来 2~3 年内将有 85% 的低成本筹码（VC 成本往往只有散户的 1/20）源源不断地解锁砸向市场。项目方必须吸引 <strong>6 倍以上的新增真金白银</strong>，才能仅仅维持币价不跌！</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>代币解锁悬崖（Cliff &amp; Vesting）稀释模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>初始流通比例 (TGE Float) <strong id="lbl-init">10%</strong></label>
+            <input id="sl-init" type="range" min="5" max="80" step="5" value="10" />
+          </div>
+          <div class="control-group">
+            <label>持有时间（第几个月）<strong id="lbl-mo">12 个月 (悬崖解锁)</strong></label>
+            <input id="sl-mo" type="range" min="0" max="36" step="1" value="12" />
+          </div>
+          <div class="control-group">
+            <label>期间市场总买盘资金增长 <strong id="lbl-dem">1.5x (+50%)</strong></label>
+            <input id="sl-dem" type="range" min="0.5" max="5" step="0.1" value="1.5" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">假设上线币价 $1.00，第 12 个月为 1 年悬崖（Cliff），之后 24 个月线性解锁完毕。</div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);">当前市场流通筹码结构：</div>
+          <div class="bar-track">
+            <div id="bar-retail" class="bar-retail"></div>
+            <div id="bar-vc" class="bar-vc"></div>
+          </div>
+          <div class="legend">
+            <span><i class="dot" style="background:#38bdf8;"></i>初始流通盘</span>
+            <span><i class="dot" style="background:#ef4444;"></i>新解锁筹码 (VC/团队)</span>
+          </div>
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">当前总流通比例</div><div class="m-val" id="m-circ">32.5%</div></div>
+            <div class="metric-box"><div class="m-label">模拟币价 (初始 $1)</div><div class="m-val" id="m-price">$0.46</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">相对上线涨跌幅</div><div class="m-val" id="m-chg">-53.8%</div></div>
+            <div class="metric-box"><div class="m-label">通胀稀释倍数</div><div class="m-val val-warn" id="m-dil">3.25x</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：初始流通设为 10%，把时间拉到第 24 个月，哪怕市场买盘资金翻倍（2.0x），看看你的币价是不是依然大亏？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把初始流通提高到 70%（类似全流通老币/公平发射），再拉动时间轴，对比抗稀释能力。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>买任何山寨币前，必查 <code>TokenUnlocks</code> 解锁日历</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 买币前先算 <strong>流通率 = MCap / FDV</strong>。如果流通率低于 20% 且 FDV 已经高达几十亿美元，意味着你在用极高的估值给 VC 接盘。<br />
+        2. 避开<strong>大额悬崖解锁（Cliff Unlock）</strong>前后的窗口期——尤其是单次解锁量超过当前流通盘 10% 的时间节点。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "12-tokenomics/01-fdv-unlock-cliff.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "12 · 代币经济学" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slInit = document.getElementById("sl-init"), slMo = document.getElementById("sl-mo"), slDem = document.getElementById("sl-dem");
+    function update() {
+      const initPct = +slInit.value;
+      const mo = +slMo.value;
+      const dem = +slDem.value;
+
+      document.getElementById("lbl-init").textContent = `${initPct}%`;
+      document.getElementById("lbl-mo").textContent = mo === 12 ? "12 个月 (悬崖解锁)" : `${mo} 个月`;
+      document.getElementById("lbl-dem").textContent = `${dem.toFixed(1)}x`;
+
+      const locked = 100 - initPct;
+      let unlockedExtra = 0;
+      if (mo >= 12) {
+        // 第12个月悬崖释放25%锁仓，随后24个月线性释放剩余75%
+        const cliff = locked * 0.25;
+        const linear = locked * 0.75 * Math.min(1, (mo - 12) / 24);
+        unlockedExtra = cliff + linear;
+      }
+      const circ = initPct + unlockedExtra;
+      const dil = circ / initPct;
+      const price = dem / dil;
+      const chg = (price - 1) * 100;
+
+      document.getElementById("bar-retail").style.width = `${initPct}%`;
+      document.getElementById("bar-vc").style.width = `${unlockedExtra}%`;
+      document.getElementById("m-circ").textContent = `${circ.toFixed(1)}%`;
+      document.getElementById("m-dil").textContent = `${dil.toFixed(2)}x`;
+
+      const pEl = document.getElementById("m-price");
+      pEl.textContent = `$${price.toFixed(2)}`;
+      pEl.className = "m-val " + (price >= 1 ? "val-good" : price >= 0.6 ? "val-warn" : "val-bad");
+
+      const cEl = document.getElementById("m-chg");
+      cEl.textContent = `${chg >= 0 ? "+" : ""}${chg.toFixed(1)}%`;
+      cEl.className = "m-val " + (chg >= 0 ? "val-good" : "val-bad");
+    }
+    [slInit, slMo, slDem].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

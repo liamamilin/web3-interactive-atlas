@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>链上投研核心指标体检台 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .preset-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .preset-row .btn { font-size: 12px; padding: 6px 10px; }
+    .score-ring { font-size: 38px; font-weight: 800; font-family: var(--mono); }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V4 · 链上数据与投研排雷</span>
+      <h1>链上投研核心指标体检台</h1>
+      <p>当你不再听推特 KOL 喊单，而是打开 DefiLlama、TokenTerminal 和 Dune 看一手链上数据时，你才真正跨进了 Web3 的内圈。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>项目 A 融资 1 亿美元但日活只有 200 人；项目 B 没融过资但每天真实手续费收入 $50 万</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">在传统股市，财务数据要等季度财报还可能造假；但在区块链上，<strong>每一笔真实手续费和锁仓资金都是全网实时公开的</strong>：</div>
+        <button id="hook-btn" class="btn btn-primary">为什么链上数据是散户最大的武器？</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>因为链上真金白银很难长期伪造！</strong><br />
+        刷假交易量要交真实手续费，刷假 TVL 要锁真资产。只要学会看 <strong>FDV、TVL、真实年收入（Fees/Revenue）和流通率</strong> 这 4 个数，3 分钟就能筛掉市场上 95% 的空气项目。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>Web3 协议估值的 3 把核心标尺</h2>
+      <p>• <strong>P/F（全稀释估值 / 年化手续费收入）</strong>：类似股市市销率（P/S）。头部印钞机协议（如 Uniswap / Aave / Hyperliquid）的 P/F 通常在 <strong>5x ~ 30x</strong>；而空气项目往往高达 <strong>500x 甚至无穷大</strong>。<br />
+      • <strong>MCap / TVL</strong>：衡量协议市值相对锁仓资金的溢价倍数（DeFi 协议一般 &lt; 0.5 偏低估，&gt; 2 偏泡沫）。<br />
+      • <strong>流通率（MCap / FDV）</strong>：衡量未来抛压大小（越高越安全）。</p>
+      <div class="formula-box">
+        P/F 估值倍数 = FDV / 年化协议真实收入 &nbsp;&nbsp;|&nbsp;&nbsp; 资金效率 = 年化收入 / TVL
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>任意 Web3 项目 1 分钟投研体检台</h2>
+      <div class="preset-row">
+        <button class="btn" data-p="cashcow">样本 1：顶级现金牛 DeFi</button>
+        <button class="btn" data-p="vc">样本 2：高估值低流通 VC 空气链</button>
+        <button class="btn" data-p="early">样本 3：早期高增长黑马协议</button>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>全稀释估值 (FDV) <strong id="lbl-fdv">$500M</strong></label>
+            <input id="sl-fdv" type="range" min="10" max="5000" step="10" value="500" />
+          </div>
+          <div class="control-group">
+            <label>当前流通率 (MCap/FDV) <strong id="lbl-fl">60%</strong></label>
+            <input id="sl-fl" type="range" min="5" max="100" step="5" value="60" />
+          </div>
+          <div class="control-group">
+            <label>总锁仓价值 (TVL) <strong id="lbl-tvl">$800M</strong></label>
+            <input id="sl-tvl" type="range" min="10" max="5000" step="10" value="800" />
+          </div>
+          <div class="control-group">
+            <label>年化真实协议收入 (Revenue) <strong id="lbl-rev">$30M</strong></label>
+            <input id="sl-rev" type="range" min="1" max="500" step="1" value="30" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">P/F 估值倍数 (越低越便宜)</div><div class="m-val" id="m-pf">16.7x</div></div>
+            <div class="metric-box"><div class="m-label">MCap / TVL</div><div class="m-val" id="m-mt">0.38x</div></div>
+          </div>
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">综合投研体检分</div><div class="score-ring" id="m-score">84</div></div>
+            <div class="metric-box"><div class="m-label">投研诊断结论</div><div class="m-val" id="m-verdict" style="font-size:14px;">基本面扎实</div></div>
+          </div>
+          <div id="diag-note" style="font-size:12px;color:var(--text-muted);line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：依次点击上方 3 个行业样本预设，对比「顶级现金牛」与「高估值 VC 空气链」在 P/F 和体检分上的巨大差距。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：打开 <strong>defillama.com</strong>，随便挑一个你听说过的币，把它的真实数据填进滑块里做一次实战体检！</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>你的 4 个一手链上投研常用书签</h2>
+      <div class="callout-warn">
+        <strong>工具箱清单（戒掉二手噪音）：</strong><br />
+        1. <strong>DefiLlama</strong>：查各公链与 DeFi 协议的真实 TVL、手续费（Fees）和协议收入（Revenue）。<br />
+        2. <strong>Dune Analytics</strong>：查社区分析师写的精细 SQL 链上看板（留存率、真实交易量、大户流向）。<br />
+        3. <strong>TokenUnlocks / CryptoRank</strong>：查代币分配比例与未来大额解锁时间表。<br />
+        4. <strong>Etherscan / Solscan / Arkham</strong>：追踪聪明钱与项目方国库钱包的真实动向。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "14-onchain-forensics/02-onchain-metrics-dashboard.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "14 · 链上数据与投研" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slFdv = document.getElementById("sl-fdv"), slFl = document.getElementById("sl-fl");
+    const slTvl = document.getElementById("sl-tvl"), slRev = document.getElementById("sl-rev");
+
+    function update() {
+      const fdv = +slFdv.value, fl = +slFl.value, tvl = +slTvl.value, rev = +slRev.value;
+      document.getElementById("lbl-fdv").textContent = `$${fdv}M`;
+      document.getElementById("lbl-fl").textContent = `${fl}%`;
+      document.getElementById("lbl-tvl").textContent = `$${tvl}M`;
+      document.getElementById("lbl-rev").textContent = `$${rev}M`;
+
+      const mcap = fdv * (fl / 100);
+      const pf = fdv / rev;
+      const mt = mcap / tvl;
+
+      let score = 0;
+      // 1. P/F 评分 (满分 45)
+      if (pf <= 15) score += 45;
+      else if (pf <= 40) score += 32;
+      else if (pf <= 100) score += 16;
+      else score += 4;
+      // 2. 流通率评分 (满分 30)
+      if (fl >= 70) score += 30;
+      else if (fl >= 40) score += 20;
+      else if (fl >= 20) score += 10;
+      else score += 2;
+      // 3. MCap/TVL 评分 (满分 25)
+      if (mt <= 0.5) score += 25;
+      else if (mt <= 1.5) score += 16;
+      else if (mt <= 3) score += 8;
+      else score += 2;
+
+      const pfEl = document.getElementById("m-pf");
+      pfEl.textContent = `${pf.toFixed(1)}x`;
+      pfEl.className = "m-val " + (pf <= 25 ? "val-good" : pf <= 80 ? "val-warn" : "val-bad");
+
+      document.getElementById("m-mt").textContent = `${mt.toFixed(2)}x`;
+      const scEl = document.getElementById("m-score");
+      scEl.textContent = score;
+      scEl.className = "score-ring " + (score >= 75 ? "val-good" : score >= 45 ? "val-warn" : "val-bad");
+
+      const vEl = document.getElementById("m-verdict");
+      const notes = [];
+      if (pf > 80) notes.push("⚠️ P/F 估值极高，收入难以支撑当前市值");
+      if (fl < 25) notes.push("⚠️ 流通率过低，未来存在巨大解锁抛压");
+      if (mt > 2.5) notes.push("⚠️ 市值相对锁仓资金溢价过高");
+      if (!notes.length) notes.push("✓ 各项链上基本面指标均衡健康，具备长期研究价值。");
+
+      if (score >= 75) { vEl.textContent = "✓ 优质现金牛 / 低估"; vEl.className = "m-val val-good"; }
+      else if (score >= 45) { vEl.textContent = "⚖️ 估值偏贵 / 需谨慎"; vEl.className = "m-val val-warn"; }
+      else { vEl.textContent = "🚨 高泡沫 / 排雷预警"; vEl.className = "m-val val-bad"; }
+      document.getElementById("diag-note").innerHTML = notes.join("<br/>");
+    }
+
+    document.querySelectorAll("[data-p]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.p;
+        if (p === "cashcow") { slFdv.value = 1200; slFl.value = 85; slTvl.value = 3500; slRev.value = 120; }
+        if (p === "vc") { slFdv.value = 4000; slFl.value = 10; slTvl.value = 80; slRev.value = 5; }
+        if (p === "early") { slFdv.value = 150; slFl.value = 50; slTvl.value = 260; slRev.value = 18; }
+        update();
+      });
+    });
+    [slFdv, slFl, slTvl, slRev].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

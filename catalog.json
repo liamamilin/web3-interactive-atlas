@@ -689,6 +689,384 @@
           "path": "11-mev-dark-forest/02-private-rpc-protection.html"
         }
       ]
+    },
+    {
+      "id": "12-tokenomics",
+      "order": 12,
+      "layer": "V4: 经济模型与实战投研",
+      "icon": "🪙",
+      "accentColor": "#eab308",
+      "title": {
+        "zh": "代币经济学与抛压博弈",
+        "en": "Tokenomics & Unlock Dynamics"
+      },
+      "summary": {
+        "zh": "拆解“低流通、高 FDV”VC 币为何上线即巅峰，以及协议如何通过回购销毁与 veToken 锁仓实现真实价值捕获。",
+        "en": "Why low-float high-FDV tokens bleed on unlocks, and how buybacks & veTokenomics capture value."
+      },
+      "lessons": [
+        {
+          "file": "01-fdv-unlock-cliff.html",
+          "title": {
+            "zh": "低流通高 FDV 与解锁悬崖模拟器",
+            "en": "Low-Float High-FDV & Unlock Cliff Lab"
+          },
+          "subtitle": {
+            "zh": "流通市值看着很便宜，为什么买进去一年币价却阴跌 80%？亲手拉动代币解锁时间轴。",
+            "en": "Simulate how VC and team token unlocks dilute retail holders over 36 months."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "FDV",
+            "MCap",
+            "Cliff & Vesting",
+            "Token Dilution"
+          ],
+          "prerequisites": [
+            "08-bonding-curves/02-early-vs-late-dump.html"
+          ],
+          "path": "12-tokenomics/01-fdv-unlock-cliff.html"
+        },
+        {
+          "file": "02-value-capture-vetoken.html",
+          "title": {
+            "zh": "协议价值捕获与 veToken 锁仓博弈",
+            "en": "Value Capture & veTokenomics"
+          },
+          "subtitle": {
+            "zh": "协议一年赚 1 亿美元手续费，为什么它的治理代币却一文不值？拆解费用开关与锁仓飞轮。",
+            "en": "Comparing useless governance tokens vs fee-sharing, buyback-and-burn, and veToken models."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Value Capture",
+            "Fee Switch",
+            "Buyback & Burn",
+            "veToken"
+          ],
+          "prerequisites": [
+            "12-tokenomics/01-fdv-unlock-cliff.html"
+          ],
+          "path": "12-tokenomics/02-value-capture-vetoken.html"
+        }
+      ]
+    },
+    {
+      "id": "13-oracles-real-apps",
+      "order": 13,
+      "layer": "V4: 经济模型与实战投研",
+      "icon": "🔮",
+      "accentColor": "#14b9b8",
+      "title": {
+        "zh": "预言机、预测市场与真实应用",
+        "en": "Oracles & Real-World Apps"
+      },
+      "summary": {
+        "zh": "拆解区块链如何安全获取现实世界数据（预言机防操纵），以及 Polymarket 预测市场如何用真金白银聚合群体智慧。",
+        "en": "How decentralized oracles prevent price manipulation, and how prediction markets price real-world odds."
+      },
+      "lessons": [
+        {
+          "file": "01-oracle-price-feed.html",
+          "title": {
+            "zh": "预言机（Oracle）喂价与防操纵沙盒",
+            "en": "Oracle Price Feed & Manipulation Lab"
+          },
+          "subtitle": {
+            "zh": "智能合约不能自己上网查币价！拆解单一数据源如何被闪电贷打穿，以及中位数聚合如何防御。",
+            "en": "Why smart contracts need decentralized median oracles like Chainlink instead of single spot pools."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Oracle",
+            "Chainlink",
+            "TWAP",
+            "Median Aggregation"
+          ],
+          "prerequisites": [
+            "06-lending-liquidation/02-flash-loan-arbitrage.html"
+          ],
+          "path": "13-oracles-real-apps/01-oracle-price-feed.html"
+        },
+        {
+          "file": "02-prediction-market-odds.html",
+          "title": {
+            "zh": "预测市场（Polymarket）赔率与套利引擎",
+            "en": "Prediction Market Odds & Arbitrage"
+          },
+          "subtitle": {
+            "zh": "Yes 股 + No 股 = $1.00！拆解预测市场如何把大选/加息概率变成可交易资产。",
+            "en": "How binary outcome shares (Yes + No = $1) turn real-world probabilities into tradable markets."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Polymarket",
+            "Binary Shares",
+            "Implied Odds",
+            "Information Market"
+          ],
+          "prerequisites": [],
+          "path": "13-oracles-real-apps/02-prediction-market-odds.html"
+        }
+      ]
+    },
+    {
+      "id": "14-onchain-forensics",
+      "order": 14,
+      "layer": "V4: 经济模型与实战投研",
+      "icon": "🔍",
+      "accentColor": "#3b82f6",
+      "title": {
+        "zh": "链上数据与投研排雷",
+        "en": "On-chain Analytics & Forensics"
+      },
+      "summary": {
+        "zh": "告别二手情绪和喊单，学会用一手链上数据做判断：拆穿虚假高年化（庞氏补贴），用 TVL、真实收入与 P/F 估值独立体检项目。",
+        "en": "Separating real yield from inflationary ponzis, and evaluating protocols with TVL, Fees, and P/F ratios."
+      },
+      "lessons": [
+        {
+          "file": "01-real-yield-vs-ponzi.html",
+          "title": {
+            "zh": "真实收益 vs 通胀庞氏拆解器",
+            "en": "Real Yield vs Inflationary Ponzi"
+          },
+          "subtitle": {
+            "zh": "看到“质押年化 300% APY”别急着冲！3 秒算清这笔收益是协议赚来的，还是印空气币发的。",
+            "en": "Dissecting whether a protocol's high APY comes from real user fees or token printing."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Real Yield",
+            "Token Incentives",
+            "Ponzi Economics",
+            "Net Profitability"
+          ],
+          "prerequisites": [
+            "12-tokenomics/02-value-capture-vetoken.html"
+          ],
+          "path": "14-onchain-forensics/01-real-yield-vs-ponzi.html"
+        },
+        {
+          "file": "02-onchain-metrics-dashboard.html",
+          "title": {
+            "zh": "链上投研核心指标体检台",
+            "en": "On-chain Protocol Scorecard"
+          },
+          "subtitle": {
+            "zh": "打开 DefiLlama 和 Dune 该看哪几个数？用 TVL、真实协议收入、P/F 估值给任意项目打分。",
+            "en": "Interactive valuation scorecard using TVL, Protocol Revenue, Active Users, and P/F ratio."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "DefiLlama",
+            "TVL",
+            "Protocol Revenue",
+            "P/F Ratio"
+          ],
+          "prerequisites": [
+            "14-onchain-forensics/01-real-yield-vs-ponzi.html"
+          ],
+          "path": "14-onchain-forensics/02-onchain-metrics-dashboard.html"
+        }
+      ]
+    },
+    {
+      "id": "15-account-abstraction",
+      "order": 15,
+      "layer": "V5: 前沿叙事与下一代体验",
+      "icon": "✨",
+      "accentColor": "#38bdf8",
+      "title": {
+        "zh": "账户抽象与下一代钱包",
+        "en": "Account Abstraction & Smart Wallets"
+      },
+      "summary": {
+        "zh": "告别手抄 12 个助记词和满世界找 ETH 付 Gas：拆解 ERC-4337 智能合约钱包、Paymaster 免 Gas 代付、Passkey 与社交恢复。",
+        "en": "Smart contract wallets (ERC-4337), gasless Paymasters, Passkeys, Session Keys, and Social Recovery."
+      },
+      "lessons": [
+        {
+          "file": "01-aa-paymaster-gasless.html",
+          "title": {
+            "zh": "ERC-4337 与 Paymaster 免 Gas 代付沙盒",
+            "en": "ERC-4337 & Paymaster Gasless Lab"
+          },
+          "subtitle": {
+            "zh": "手里只有 USDT 没有 ETH 就动弹不得？体验智能合约钱包如何用任意代币付 Gas 并一键批量打包。",
+            "en": "Compare legacy EOA friction vs Smart Wallet UserOps, Paymasters, and transaction batching."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "ERC-4337",
+            "Account Abstraction",
+            "Paymaster",
+            "UserOperation",
+            "Batching"
+          ],
+          "prerequisites": [
+            "02-tx-gas-multichain/01-mempool-gas-auction.html"
+          ],
+          "path": "15-account-abstraction/01-aa-paymaster-gasless.html"
+        },
+        {
+          "file": "02-passkey-social-recovery.html",
+          "title": {
+            "zh": "无助记词时代：Passkey、社交恢复与会话密钥",
+            "en": "Passkeys, Social Recovery & Session Keys"
+          },
+          "subtitle": {
+            "zh": "手机丢了资产不丢，玩链游不用每点一下弹一次窗！拆解智能账户的权限编程。",
+            "en": "Programmable wallet security with Guardian recovery and scoped Session Keys."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Passkey",
+            "Social Recovery",
+            "Session Keys",
+            "Smart Account"
+          ],
+          "prerequisites": [
+            "15-account-abstraction/01-aa-paymaster-gasless.html"
+          ],
+          "path": "15-account-abstraction/02-passkey-social-recovery.html"
+        }
+      ]
+    },
+    {
+      "id": "16-rwa-institutional",
+      "order": 16,
+      "layer": "V5: 前沿叙事与下一代体验",
+      "icon": "🏛️",
+      "accentColor": "#10b981",
+      "title": {
+        "zh": "RWA 现实世界资产上链",
+        "en": "Real-World Assets (RWA)"
+      },
+      "summary": {
+        "zh": "华尔街巨头（贝莱德等）为何把国债和基金搬上公链？拆解美债代币化收益流转，以及 RWA 背后的合规白名单与托管风险。",
+        "en": "How tokenized US Treasuries bring TradFi yield on-chain 24/7, and the legal/compliance guardrails behind them."
+      },
+      "lessons": [
+        {
+          "file": "01-tokenized-tbills.html",
+          "title": {
+            "zh": "美债上链（Tokenized T-Bills）与收益流转沙盒",
+            "en": "Tokenized T-Bills & Yield Flow Lab"
+          },
+          "subtitle": {
+            "zh": "银行周末休息、跨境汇款要 3 天，为什么链上美债代币能 7×24 小时秒级生息结算？",
+            "en": "Comparing TradFi T+2 settlement vs 24/7 on-chain tokenized Treasury yield."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "RWA",
+            "T-Bills",
+            "BUIDL / USDY",
+            "24/7 Settlement",
+            "SPV"
+          ],
+          "prerequisites": [
+            "05-stablecoins-peg/01-collateral-and-peg.html"
+          ],
+          "path": "16-rwa-institutional/01-tokenized-tbills.html"
+        },
+        {
+          "file": "02-rwa-compliance-risk.html",
+          "title": {
+            "zh": "RWA 的围墙花园：白名单、冻结权限与托管风险",
+            "en": "RWA Compliance, Whitelists & Custody"
+          },
+          "subtitle": {
+            "zh": "为什么你把 RWA 代币转给陌生钱包会直接报错？拆解链上资产与链下法律的桥梁。",
+            "en": "Why RWA tokens use ERC-3643 whitelists and what happens if an off-chain custodian defaults."
+          },
+          "duration": "4 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "ERC-3643",
+            "KYC Whitelist",
+            "Forced Freeze",
+            "Legal Wrapper"
+          ],
+          "prerequisites": [
+            "16-rwa-institutional/01-tokenized-tbills.html"
+          ],
+          "path": "16-rwa-institutional/02-rwa-compliance-risk.html"
+        }
+      ]
+    },
+    {
+      "id": "17-ai-agent-crypto",
+      "order": 17,
+      "layer": "V5: 前沿叙事与下一代体验",
+      "icon": "🤖",
+      "accentColor": "#ec4899",
+      "title": {
+        "zh": "AI + Crypto 与 Agent 经济",
+        "en": "AI + Crypto & Agentic Economy"
+      },
+      "summary": {
+        "zh": "为什么 AI Agent 天然需要加密货币而不是银行卡？拆解 HTTP 402 机器微支付，以及 TEE / zkML 如何验证云端 AI 没有偷梁换柱。",
+        "en": "Why AI Agents need crypto rails (x402 micropayments), and how TEE vs zkML verify AI inference."
+      },
+      "lessons": [
+        {
+          "file": "01-agent-wallet-micropayments.html",
+          "title": {
+            "zh": "AI Agent 钱包与 x402 机器微支付沙盒",
+            "en": "AI Agent Wallets & x402 Micropayments"
+          },
+          "subtitle": {
+            "zh": "银行不会给 AI 办信用卡，刷一笔 $0.002 的 API 费用信用卡光手续费就要 $0.30！体验机器间自主结算。",
+            "en": "Simulating HTTP 402 pay-per-call stablecoin micropayments between autonomous AI Agents."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "AI Agent",
+            "x402 Protocol",
+            "Micropayments",
+            "M2M Economy"
+          ],
+          "prerequisites": [
+            "15-account-abstraction/02-passkey-social-recovery.html"
+          ],
+          "path": "17-ai-agent-crypto/01-agent-wallet-micropayments.html"
+        },
+        {
+          "file": "02-verifiable-ai-tee-zkml.html",
+          "title": {
+            "zh": "可验证 AI 推理：TEE 硬件飞地 vs zkML 对比器",
+            "en": "Verifiable AI: TEE vs zkML"
+          },
+          "subtitle": {
+            "zh": "你付了顶级大模型的钱，怎么证明云端节点没偷偷给你换成廉价小模型？拆解链上 AI 防作弊方案。",
+            "en": "Comparing Trusted Execution Environments (TEE), Optimistic ML, and zkML trade-offs."
+          },
+          "duration": "5 min",
+          "sandboxType": "visualizer",
+          "concepts": [
+            "Verifiable AI",
+            "TEE",
+            "zkML",
+            "DePIN Compute"
+          ],
+          "prerequisites": [
+            "10-scaling-bridges/01-rollup-and-zk.html"
+          ],
+          "path": "17-ai-agent-crypto/02-verifiable-ai-tee-zkml.html"
+        }
+      ]
     }
   ]
 }
