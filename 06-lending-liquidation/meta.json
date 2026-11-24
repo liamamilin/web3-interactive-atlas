@@ -1,0 +1,61 @@
+{
+  "id": "06-lending-liquidation",
+  "order": 6,
+  "layer": "V2: DeFi 金融引擎与市场博弈",
+  "icon": "🏦",
+  "accentColor": "#8b5cf6",
+  "title": {
+    "zh": "DeFi 借贷与清算引擎",
+    "en": "DeFi Lending & Liquidations"
+  },
+  "summary": {
+    "zh": "拆解 Aave / Compound 如何在没有征信的情况下放贷：健康系数、清算机器人博弈与闪电贷。",
+    "en": "How permissionless lending works via Health Factors, liquidation bots, and Flash Loans."
+  },
+  "lessons": [
+    {
+      "file": "01-health-factor-liquidation.html",
+      "title": {
+        "zh": "健康系数与链上清算模拟器",
+        "en": "Health Factor & Liquidation Lab"
+      },
+      "subtitle": {
+        "zh": "抵押 ETH 借出 USDT，币价跌到多少会被清算机器人瞬间没收抵押品？",
+        "en": "Drag collateral prices to see when Health Factor drops below 1.0 and triggers liquidation."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Aave",
+        "Health Factor",
+        "LTV",
+        "Liquidation Penalty"
+      ],
+      "prerequisites": [
+        "05-stablecoins-peg/01-collateral-and-peg.html"
+      ]
+    },
+    {
+      "file": "02-flash-loan-arbitrage.html",
+      "title": {
+        "zh": "闪电贷（Flash Loan）原子套利演示",
+        "en": "Flash Loan Atomic Arbitrage"
+      },
+      "subtitle": {
+        "zh": "零抵押凭空借出 1,000 万美元！拆解“同一个区块内借还”的区块链独有魔法。",
+        "en": "Borrowing millions with zero collateral using atomic transaction reverts."
+      },
+      "duration": "4 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "Flash Loan",
+        "Atomic Transaction",
+        "Revert",
+        "Arbitrage"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/01-xyk-slippage-lab.html"
+      ]
+    }
+  ]
+}

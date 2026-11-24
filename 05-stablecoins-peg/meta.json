@@ -1,0 +1,61 @@
+{
+  "id": "05-stablecoins-peg",
+  "order": 5,
+  "layer": "V2: DeFi 金融引擎与市场博弈",
+  "icon": "💵",
+  "accentColor": "#22c55e",
+  "title": {
+    "zh": "稳定币与脱锚机制",
+    "en": "Stablecoins & De-pegging"
+  },
+  "summary": {
+    "zh": "拆解 USDT、DAI 如何死守 1 美元锚定，以及算法稳定币（UST/LUNA）为何会陷入死亡螺旋。",
+    "en": "How USDT and DAI maintain their $1 peg, and why algorithmic stablecoins enter death spirals."
+  },
+  "lessons": [
+    {
+      "file": "01-collateral-and-peg.html",
+      "title": {
+        "zh": "稳定币锚定与套利修复沙盒",
+        "en": "Stablecoin Peg & Arbitrage Lab"
+      },
+      "subtitle": {
+        "zh": "没有央行托底，稳定币跌到 $0.96 时凭什么能自动涨回 $1.00？",
+        "en": "How arbitrageurs restore a $1 peg when a stablecoin deviates."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "USDT/USDC",
+        "DAI",
+        "Over-collateralization",
+        "Peg Arbitrage"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/01-xyk-slippage-lab.html"
+      ]
+    },
+    {
+      "file": "02-death-spiral.html",
+      "title": {
+        "zh": "算法稳定币与死亡螺旋模拟器",
+        "en": "Algorithmic Stablecoin Death Spiral"
+      },
+      "subtitle": {
+        "zh": "复盘 400 亿美元 UST/LUNA 崩盘：为什么双币铸造销毁机制在恐慌时会瞬间归零？",
+        "en": "Simulating how panic triggers hyperinflation in mint-and-burn algorithmic stablecoins."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Algo Stablecoin",
+        "Death Spiral",
+        "Bank Run",
+        "Mint & Burn"
+      ],
+      "prerequisites": [
+        "05-stablecoins-peg/01-collateral-and-peg.html"
+      ]
+    }
+  ]
+}

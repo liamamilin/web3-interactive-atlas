@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>联合曲线（Bonding Curve）发射实验室 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .prog-wrap { height: 16px; background: #0d1320; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #ec4899); transition: 0.2s; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 联合曲线与新币发射</span>
+      <h1>联合曲线（Bonding Curve）发射实验室</h1>
+      <p>以前发币需要项目方先掏几万美元建流动性池；如今在 Pump.fun 上，任何人花 2 美元就能零启动资金发币。秘密全在“联合曲线”里。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉体验</div>
+      <h2>项目方一分钱池子都没加，第一笔买单的钱去哪了？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">点击模拟：随着全网散户往内盘曲线里不断投入 SOL，进度条达到 100%（约 85 SOL）时会发生什么？</div>
+        <button id="hook-btn" class="btn btn-primary">触发 100% 满盘“毕业”</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>自动打满毕业（Graduation）！</strong><br />
+        智能合约自动把内盘筹集到的真 SOL 和剩余代币，一次性注入外盘 DEX（如 Raydium）建立正式流动性池，并<strong>立刻销毁 LP 凭证</strong>——既解决了冷启动资金问题，又从机制上杜绝了项目方“撤池子（Rug Pull）”。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>虚拟池子公式：价格随累计买入量严格单调递增</h2>
+      <p>联合曲线本质上是一个<strong>带虚拟初始储备的 AMM</strong>：哪怕池子里一分真钱都没有，合约也会假定里面有“虚拟 30 SOL”，从而给出初始价格。每有人买入，真实 SOL 进池、代币出池，价格沿曲线平滑上涨：</p>
+      <div class="formula-box">
+        (虚拟 30 SOL + 真实买入 SOL) × 剩余代币 = 常数 k
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>拖动内盘累计买入 SOL，观察进度条、市值与价格曲线</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>内盘累计注入真钱 <strong id="lbl-sol">10 SOL</strong></label>
+            <input id="sl-sol" type="range" min="0" max="85" step="1" value="10" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">毕业门槛：85 SOL · 假设 1 SOL = $150 · 总供应量 10 亿枚</div>
+          <div class="prog-wrap"><div id="prog-fill" class="prog-fill"></div></div>
+          <div style="font-size:13px;font-family:var(--mono);" id="prog-txt">内盘进度：11.8%</div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">当前币价倍数</div><div class="m-val" id="m-mult">1.78x</div></div>
+            <div class="metric-box"><div class="m-label">账面总市值 (MCap)</div><div class="m-val" id="m-mc">$8,000</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">池内真实真钱 (SOL)</div><div class="m-val val-warn" id="m-real">$1,500</div></div>
+            <div class="metric-box"><div class="m-label">市值 / 真钱 杠杆比</div><div class="m-val val-bad" id="m-ratio">5.3x</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把注入 SOL 拉到 85 SOL（100% 毕业），对比此时“账面总市值（约 $66k）”和池子里真实存在的真钱（$12.75k），看清市值泡沫有多大。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：对比 0 SOL 进场和 85 SOL 毕业时进场的币价倍数（高达约 14 倍！）。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>杜绝了“撤池子”，但并没有杜绝“庄家砸盘”</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 联合曲线虽然销毁了 LP，但发币者可以在第 1 秒用几十个小号抢跑买走 50% 筹码，等散户冲到毕业时集体砸盘。<br />
+        2. 看 Meme 币永远不要只看“市值（Market Cap）”，要看<strong>真实池子深度</strong>和<strong>前 10 大持仓（Top 10 Holders）集中度</strong>。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "08-bonding-curves/01-bonding-curve-launch.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "08 · 联合曲线与发射" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slSol = document.getElementById("sl-sol");
+    function update() {
+      const realSol = +slSol.value;
+      const vSol0 = 30;
+      const vSol = vSol0 + realSol;
+      // 价格与 (vSol / vSol0)^2 成正比
+      const mult = Math.pow(vSol / vSol0, 2);
+      const initMc = 4500; // $4.5k 初始市值
+      const mc = initMc * mult;
+      const realUsd = realSol * 150;
+      const pct = (realSol / 85) * 100;
+
+      document.getElementById("lbl-sol").textContent = `${realSol} SOL`;
+      document.getElementById("prog-fill").style.width = `${pct}%`;
+      document.getElementById("prog-txt").textContent = realSol >= 85 ? "🎓 已打满 100% 毕业上外盘 DEX！" : `内盘进度：${pct.toFixed(1)}%`;
+
+      document.getElementById("m-mult").textContent = `${mult.toFixed(2)}x`;
+      document.getElementById("m-mc").textContent = `$${mc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      document.getElementById("m-real").textContent = `$${realUsd.toLocaleString()}`;
+      document.getElementById("m-ratio").textContent = realUsd > 0 ? `${(mc / realUsd).toFixed(1)}x` : "∞";
+    }
+    slSol.addEventListener("input", update);
+    update();
+  </script>
+</body>
+</html>

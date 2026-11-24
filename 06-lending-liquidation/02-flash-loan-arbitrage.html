@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>闪电贷（Flash Loan）原子套利演示 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .step-list { display: grid; gap: 10px; }
+    .step-box { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; }
+    .step-box.ok { border-left: 4px solid var(--green); }
+    .step-box.fail { border-left: 4px solid var(--red); }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · DeFi 借贷与清算引擎</span>
+      <h1>闪电贷（Flash Loan）原子套利演示</h1>
+      <p>现实世界里，没抵押品银行绝不会借给你 1,000 万美元。但在区块链上，任何人都可以零抵押借出巨款——只要你在同一笔交易里还回去。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>如果我用闪电贷借出 100 万 USDT 后，直接把钱转进自己钱包跑路，会怎样？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">点击模拟：借出 1,000,000 USDT，然后拒绝归还。</div>
+        <button id="hook-btn" class="btn btn-danger">尝试卷款跑路</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>时光倒流（Transaction Reverted）！</strong><br />
+        智能合约在交易最后一行检查发现你没还钱，立刻触发 <code>revert()</code>——<strong>整笔交易在区块链上就像从未发生过一样全部回滚</strong>，你不仅一分钱没卷走，还白白亏了 Gas 费。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>原子性（Atomicity）：要么全部成功，要么全部回滚</h2>
+      <p>区块链上的单笔交易可以打包执行几十步合约调用，并且具有<strong>原子性</strong>。闪电贷正是利用了这一点：</p>
+      <div class="formula-box">
+        单笔交易内：1. 零抵押借出 100万 U → 2. 在 DEX A 低价买入 → 3. 在 DEX B 高价卖出 → 4. 归还 100万 U + 0.05% 手续费 → 5. 利润归你
+      </div>
+      <p>如果中间任何一步导致最后还不起本息，整笔交易自动撤销，借贷协议<strong>零坏账风险</strong>。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>无本套利模拟器（调节两个交易所的价差）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>闪电贷借款金额 <strong id="lbl-loan">$100,000</strong></label>
+            <input id="sl-loan" type="range" min="10000" max="1000000" step="10000" value="100000" />
+          </div>
+          <div class="control-group">
+            <label>DEX A 买入价 (ETH) <strong id="lbl-pa">$3,000</strong></label>
+            <input id="sl-pa" type="range" min="2900" max="3100" step="5" value="3000" />
+          </div>
+          <div class="control-group">
+            <label>DEX B 卖出价 (ETH) <strong id="lbl-pb">$3,030</strong></label>
+            <input id="sl-pb" type="range" min="2900" max="3100" step="5" value="3030" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">闪电贷费率：0.05% · 交易滑点与 Gas 估算：$40</div>
+        </div>
+
+        <div class="lab-panel">
+          <div id="steps" class="step-list"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把 DEX B 卖出价调低到 $3,000（无价差），观察交易如何在最后一步触发回滚（Revert）。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：制造 1% 价差（如 $3,000 vs $3,030），观察零本金如何在一笔交易内净赚数百美元。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>闪电贷是双刃剑：既是套利工具，也是黑客的“核武器”</h2>
+      <div class="callout-warn">
+        <strong>认知升级：</strong><br />
+        以前黑客想操纵某个小协议的预言机价格需要几千万美元本金；有了闪电贷后，任何懂代码的黑客都能零成本撬动几千万资金去攻击漏洞协议。因此，评估一个 DeFi 协议是否安全，<strong>能否抵御闪电贷攻击</strong>是核心红线。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "06-lending-liquidation/02-flash-loan-arbitrage.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "06 · DeFi 借贷与清算" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slLoan = document.getElementById("sl-loan"), slPa = document.getElementById("sl-pa"), slPb = document.getElementById("sl-pb");
+    function update() {
+      const loan = +slLoan.value, pa = +slPa.value, pb = +slPb.value;
+      document.getElementById("lbl-loan").textContent = `$${loan.toLocaleString()}`;
+      document.getElementById("lbl-pa").textContent = `$${pa}`;
+      document.getElementById("lbl-pb").textContent = `$${pb}`;
+
+      const ethBought = loan / pa;
+      const usdtOut = ethBought * pb;
+      const repay = loan * 1.0005;
+      const net = usdtOut - repay - 40;
+      const ok = usdtOut >= repay;
+
+      document.getElementById("steps").innerHTML = `
+        <div class="step-box ok"><strong>Step 1 · 零抵押借出：</strong> 从 Aave 借入 $${loan.toLocaleString()} USDT</div>
+        <div class="step-box ok"><strong>Step 2 · DEX A 买入：</strong> 按 $${pa} 买入 ${ethBought.toFixed(3)} ETH</div>
+        <div class="step-box ok"><strong>Step 3 · DEX B 卖出：</strong> 按 $${pb} 卖出，收回 $${usdtOut.toFixed(0)} USDT</div>
+        <div class="step-box ${ok ? "ok" : "fail"}">
+          <strong>Step 4 · 归还本息 ($${repay.toFixed(0)})：</strong>
+          ${ok
+            ? `<span class="val-good">✓ 还款成功！扣除 Gas 净赚 ${net >= 0 ? "+" : ""}$${net.toFixed(0)}</span>`
+            : `<span class="val-bad">✗ 余额不足还款！触发 Revert，整笔交易原子回滚（仅损 Gas）</span>`}
+        </div>
+      `;
+    }
+    [slLoan, slPa, slPb].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

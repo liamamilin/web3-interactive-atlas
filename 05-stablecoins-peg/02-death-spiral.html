@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>算法稳定币与死亡螺旋模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .spiral-log { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 12px; max-height: 220px; overflow-y: auto; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 稳定币与脱锚机制</span>
+      <h1>算法稳定币与死亡螺旋模拟器</h1>
+      <p>2022 年 5 月，市值 400 亿美元的 Terra (UST/LUNA) 在 72 小时内几乎归零。亲手点击按钮，体验“左脚踩右脚”是如何崩塌的。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉体验</div>
+      <h2>没有美元储备，纯靠算法约定：1 UST 永远可以销毁并铸造价值 $1 的 LUNA</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">假设 UST 突然跌到 $0.90，套利者立刻用 $0.90 买 UST → 销毁换出 $1 的 LUNA → 立刻砸盘卖掉 LUNA 赚 $0.10。</div>
+        <button id="hook-btn" class="btn btn-danger">如果全网同时挤兑 10 亿 UST 会怎样？</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>LUNA 供应量天量增发 → 币价雪崩 → 市场更恐慌 → 更多人抛售 UST 换 LUNA！</strong><br />
+        这就是币圈史上最著名的<strong>死亡螺旋（Death Spiral）</strong>：LUNA 从 $80 跌到 $0.0001，增发了数万亿枚。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>为什么“内生抵押品”扛不住挤兑？</h2>
+      <p>UST 背后没有美元、也没有 ETH，它的信用完全建立在同生态代币 LUNA 的市值上。当市场处于牛市时，大家买 UST 存进协议赚 20% 年化，LUNA 不断被销毁通缩、币价暴涨（正向螺旋）；</p>
+      <div class="formula-box">
+        单次赎回增发量 ΔLUNA = 赎回的 UST 数量 / 当前 LUNA 价格
+      </div>
+      <p>一旦逆转，LUNA 价格越低，每赎回 1 个 UST 就需要增发越多的 LUNA，抛压呈<strong>指数级放大</strong>，最终彻底摧毁信用。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>UST / LUNA 挤兑与死亡螺旋模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">UST 价格</div><div class="m-val val-good" id="m-ust">$1.00</div></div>
+            <div class="metric-box"><div class="m-label">LUNA 价格</div><div class="m-val val-good" id="m-luna">$80.00</div></div>
+          </div>
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">LUNA 流通量</div><div class="m-val" id="m-sup" style="font-size:15px;">3.5 亿</div></div>
+            <div class="metric-box"><div class="m-label">恐慌轮次</div><div class="m-val" id="m-round">0</div></div>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button id="btn-run" class="btn btn-danger">触发一轮 10 亿 UST 挤兑赎回</button>
+            <button id="btn-reset" class="btn">重置至崩盘前 ($80)</button>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">链上铸造与砸盘日志：</div>
+          <div id="spiral-log" class="spiral-log"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：连续点击 5 次「触发挤兑赎回」，观察第 1 次和第 5 次增发的 LUNA 数量差了多少倍？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：看清为什么在 LUNA 跌破 $5 后，哪怕只赎回少量 UST 也会让供应量瞬间爆炸。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>一眼识别“左脚踩右脚”庞氏模型</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 凡是<strong>用自己发行的空气币/治理币作为核心抵押品</strong>的稳定币或高息协议，在熊市挤兑面前毫无例外都会崩盘。<br />
+        2. 真正的稳定币必须由<strong>外部独立资产</strong>（法币/美债/ETH/BTC）足额背书。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "05-stablecoins-peg/02-death-spiral.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "05 · 稳定币与脱锚" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    let ust = 1.0, luna = 80.0, sup = 3.5e8, round = 0;
+    const logEl = document.getElementById("spiral-log");
+
+    function fmtSup(n) {
+      if (n >= 1e12) return (n / 1e12).toFixed(2) + " 万亿";
+      if (n >= 1e8) return (n / 1e8).toFixed(2) + " 亿";
+      return n.toLocaleString();
+    }
+    function sync() {
+      const ustEl = document.getElementById("m-ust");
+      ustEl.textContent = `$${ust.toFixed(3)}`;
+      ustEl.className = "m-val " + (ust < 0.7 ? "val-bad" : ust < 0.98 ? "val-warn" : "val-good");
+
+      const lunaEl = document.getElementById("m-luna");
+      lunaEl.textContent = luna >= 0.01 ? `$${luna.toFixed(2)}` : `$${luna.toExponential(2)}`;
+      lunaEl.className = "m-val " + (luna < 10 ? "val-bad" : luna < 50 ? "val-warn" : "val-good");
+
+      document.getElementById("m-sup").textContent = fmtSup(sup);
+      document.getElementById("m-round").textContent = round;
+    }
+
+    document.getElementById("btn-run").addEventListener("click", () => {
+      round++;
+      const redeemUsd = 1e9; // 10亿 UST
+      const minted = redeemUsd / luna;
+      const oldSup = sup;
+      sup += minted;
+      // 稀释 + 恐慌砸盘效应
+      luna = luna * (oldSup / sup) * 0.55;
+      ust = Math.max(0.02, ust * (0.85 - Math.min(0.4, round * 0.05)));
+      logEl.innerHTML += `<div>[第 ${round} 轮] 挤兑 10 亿 UST → 增发 <span class="val-bad">${fmtSup(minted)}</span> LUNA → LUNA 暴跌至 ${luna >= 0.01 ? "$"+luna.toFixed(2) : "$"+luna.toExponential(1)}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+      sync();
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      ust = 1.0; luna = 80.0; sup = 3.5e8; round = 0;
+      logEl.innerHTML = "<div>系统已重置：1 UST = $1.00，LUNA = $80.00，流通量 3.5 亿。</div>";
+      sync();
+    });
+    logEl.innerHTML = "<div>系统就绪：点击左侧按钮触发挤兑，观察死亡螺旋。</div>";
+    sync();
+  </script>
+</body>
+</html>

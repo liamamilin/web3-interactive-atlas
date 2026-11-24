@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>稳定币锚定与套利修复沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 稳定币与脱锚机制</span>
+      <h1>稳定币锚定与套利修复沙盒</h1>
+      <p>币圈所有交易几乎都以 USDT/USDC 计价。但它们并不是真的美元——拆解 1 美元锚定背后的储备与套利机器。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>假设市场突发恐慌，某足额抵押稳定币在二级市场被砸到了 $0.95</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">前提：发行方银行账户里确实 1:1 存着真美元，且允许机构随时按 $1.00 赎回。</div>
+        <button id="hook-btn" class="btn btn-primary">如果你是套利机构，你会怎么做？</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>疯狂扫货！</strong><br />
+        你用 $0.95 在市场上买进稳定币，立刻拿去发行方 1:1 赎回 $1.00 真美元，净赚 5% 无风险利润。随着无数套利者涌入扫货，买盘会把价格迅速推回 <strong>$1.00</strong>——这就是锚定的核心动力。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>主流稳定币的两大底层支柱</h2>
+      <p>1. <strong>法币储备型（USDT / USDC）</strong>：每发行 1 个代币，发行方在现实银行/美债里存 1 美元。优点是资本效率 100%；风险在于<strong>中心化托管与银行暴雷</strong>（如 2023 年硅谷银行倒闭导致 USDC 短暂脱锚至 $0.87）。</p>
+      <p>2. <strong>超额抵押型（DAI / USDS）</strong>：链上透明无银行。你想借出 $100 DAI，必须在智能合约里抵押价值 $150 以上的 ETH。一旦 ETH 暴跌接近警戒线，合约自动拍卖你的 ETH 偿还债务，保证每 1 DAI 背后都有足额资产。</p>
+      <div class="formula-box">抵押率 (CR) = 抵押品市值 / 铸造稳定币总量 &nbsp;（通常要求 ≥ 150%）</div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>脱锚冲击与套利修复模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>底层储备充足率 <strong id="lbl-res">100% (足额)</strong></label>
+            <input id="sl-res" type="range" min="60" max="120" step="2" value="100" />
+          </div>
+          <div class="control-group">
+            <label>二级市场抛压恐慌度 <strong id="lbl-panic">20%</strong></label>
+            <input id="sl-panic" type="range" min="0" max="100" step="5" value="20" />
+          </div>
+          <div class="control-group">
+            <label>套利者介入意愿 <strong id="lbl-arb">80%</strong></label>
+            <input id="sl-arb" type="range" min="0" max="100" step="5" value="80" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">真实内在价值</div><div class="m-val" id="m-nav">$1.000</div></div>
+            <div class="metric-box"><div class="m-label">当前市场交易价</div><div class="m-val" id="m-mkt">$0.996</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">套利者单笔无风险利润</div><div class="m-val" id="m-prof">+0.4%</div></div>
+            <div class="metric-box"><div class="m-label">锚定状态判断</div><div class="m-val" id="m-state" style="font-size:15px;">稳健锚定</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：保持储备 100%，把恐慌度拉到 90% 但套利意愿为 0%，看市场价暴跌；再拉高套利意愿，看价格如何被拉回 $1.00。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把储备充足率降到 80%（模拟托管银行暴雷出现坏账），观察即便套利者全速介入，价格上限也被锁死在哪里？</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>2023 年 USDC 硅谷银行脱锚事件</h2>
+      <p>2023 年 3 月，Circle 披露有 33 亿美元（约占总储备 8%）存放在倒闭的硅谷银行。市场瞬间恐慌，USDC 跌至 $0.87。但理性套利者算出即便 8% 全亏，内在价值也有 $0.92，于是疯狂抄底；随后美联储兜底，USDC 迅速恢复 $1.00。</p>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 稳定币不是绝对无风险，大额资金建议分散持有（如 USDT + USDC + DAI）。<br />
+        2. 任何承诺“20% 以上无风险年化”的稳定币理财，你必须问一句：<strong>收益从哪来？如果找不到真实借款人，那你就是收益本身。</strong>
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "05-stablecoins-peg/01-collateral-and-peg.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "05 · 稳定币与脱锚" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slRes = document.getElementById("sl-res"), slPanic = document.getElementById("sl-panic"), slArb = document.getElementById("sl-arb");
+    function update() {
+      const res = +slRes.value, panic = +slPanic.value, arb = +slArb.value;
+      document.getElementById("lbl-res").textContent = `${res}%`;
+      document.getElementById("lbl-panic").textContent = `${panic}%`;
+      document.getElementById("lbl-arb").textContent = `${arb}%`;
+
+      const nav = Math.min(1.0, res / 100);
+      const shock = (panic / 100) * 0.25;
+      const recovery = shock * (arb / 100) * 0.92;
+      const mkt = Math.max(0.05, nav - shock + recovery);
+      const prof = ((nav - mkt) / mkt) * 100;
+
+      document.getElementById("m-nav").textContent = `$${nav.toFixed(3)}`;
+      const mktEl = document.getElementById("m-mkt");
+      mktEl.textContent = `$${mkt.toFixed(3)}`;
+      mktEl.className = "m-val " + (mkt < 0.95 ? "val-bad" : mkt < 0.99 ? "val-warn" : "val-good");
+
+      document.getElementById("m-prof").textContent = `${prof >= 0 ? "+" : ""}${prof.toFixed(2)}%`;
+      const stEl = document.getElementById("m-state");
+      if (res < 100) { stEl.textContent = "储备缺口 · 永久折价"; stEl.className = "m-val val-bad"; }
+      else if (mkt < 0.97) { stEl.textContent = "严重脱锚 · 套利机会"; stEl.className = "m-val val-warn"; }
+      else { stEl.textContent = "稳健锚定 $1.00"; stEl.className = "m-val val-good"; }
+    }
+    [slRes, slPanic, slArb].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

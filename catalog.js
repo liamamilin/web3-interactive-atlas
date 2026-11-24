@@ -247,6 +247,256 @@ window.WEB3_ATLAS_CATALOG = {
           "path": "04-first-swap-amm/02-impermanent-loss.html"
         }
       ]
+    },
+    {
+      "id": "05-stablecoins-peg",
+      "order": 5,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "💵",
+      "accentColor": "#22c55e",
+      "title": {
+        "zh": "稳定币与脱锚机制",
+        "en": "Stablecoins & De-pegging"
+      },
+      "summary": {
+        "zh": "拆解 USDT、DAI 如何死守 1 美元锚定，以及算法稳定币（UST/LUNA）为何会陷入死亡螺旋。",
+        "en": "How USDT and DAI maintain their $1 peg, and why algorithmic stablecoins enter death spirals."
+      },
+      "lessons": [
+        {
+          "file": "01-collateral-and-peg.html",
+          "title": {
+            "zh": "稳定币锚定与套利修复沙盒",
+            "en": "Stablecoin Peg & Arbitrage Lab"
+          },
+          "subtitle": {
+            "zh": "没有央行托底，稳定币跌到 $0.96 时凭什么能自动涨回 $1.00？",
+            "en": "How arbitrageurs restore a $1 peg when a stablecoin deviates."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "USDT/USDC",
+            "DAI",
+            "Over-collateralization",
+            "Peg Arbitrage"
+          ],
+          "prerequisites": [
+            "04-first-swap-amm/01-xyk-slippage-lab.html"
+          ],
+          "path": "05-stablecoins-peg/01-collateral-and-peg.html"
+        },
+        {
+          "file": "02-death-spiral.html",
+          "title": {
+            "zh": "算法稳定币与死亡螺旋模拟器",
+            "en": "Algorithmic Stablecoin Death Spiral"
+          },
+          "subtitle": {
+            "zh": "复盘 400 亿美元 UST/LUNA 崩盘：为什么双币铸造销毁机制在恐慌时会瞬间归零？",
+            "en": "Simulating how panic triggers hyperinflation in mint-and-burn algorithmic stablecoins."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Algo Stablecoin",
+            "Death Spiral",
+            "Bank Run",
+            "Mint & Burn"
+          ],
+          "prerequisites": [
+            "05-stablecoins-peg/01-collateral-and-peg.html"
+          ],
+          "path": "05-stablecoins-peg/02-death-spiral.html"
+        }
+      ]
+    },
+    {
+      "id": "06-lending-liquidation",
+      "order": 6,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "🏦",
+      "accentColor": "#8b5cf6",
+      "title": {
+        "zh": "DeFi 借贷与清算引擎",
+        "en": "DeFi Lending & Liquidations"
+      },
+      "summary": {
+        "zh": "拆解 Aave / Compound 如何在没有征信的情况下放贷：健康系数、清算机器人博弈与闪电贷。",
+        "en": "How permissionless lending works via Health Factors, liquidation bots, and Flash Loans."
+      },
+      "lessons": [
+        {
+          "file": "01-health-factor-liquidation.html",
+          "title": {
+            "zh": "健康系数与链上清算模拟器",
+            "en": "Health Factor & Liquidation Lab"
+          },
+          "subtitle": {
+            "zh": "抵押 ETH 借出 USDT，币价跌到多少会被清算机器人瞬间没收抵押品？",
+            "en": "Drag collateral prices to see when Health Factor drops below 1.0 and triggers liquidation."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Aave",
+            "Health Factor",
+            "LTV",
+            "Liquidation Penalty"
+          ],
+          "prerequisites": [
+            "05-stablecoins-peg/01-collateral-and-peg.html"
+          ],
+          "path": "06-lending-liquidation/01-health-factor-liquidation.html"
+        },
+        {
+          "file": "02-flash-loan-arbitrage.html",
+          "title": {
+            "zh": "闪电贷（Flash Loan）原子套利演示",
+            "en": "Flash Loan Atomic Arbitrage"
+          },
+          "subtitle": {
+            "zh": "零抵押凭空借出 1,000 万美元！拆解“同一个区块内借还”的区块链独有魔法。",
+            "en": "Borrowing millions with zero collateral using atomic transaction reverts."
+          },
+          "duration": "4 min",
+          "sandboxType": "visualizer",
+          "concepts": [
+            "Flash Loan",
+            "Atomic Transaction",
+            "Revert",
+            "Arbitrage"
+          ],
+          "prerequisites": [
+            "04-first-swap-amm/01-xyk-slippage-lab.html"
+          ],
+          "path": "06-lending-liquidation/02-flash-loan-arbitrage.html"
+        }
+      ]
+    },
+    {
+      "id": "07-perps-leverage",
+      "order": 7,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "📈",
+      "accentColor": "#f97316",
+      "title": {
+        "zh": "永续合约与杠杆博弈",
+        "en": "Perpetual Futures & Leverage"
+      },
+      "summary": {
+        "zh": "拆解币圈交易量最大的衍生品：永续合约如何靠资金费率锚定现货，以及高倍杠杆为何极易插针爆仓。",
+        "en": "How perpetuals peg to spot via funding rates, and how leverage compresses your liquidation distance."
+      },
+      "lessons": [
+        {
+          "file": "01-funding-rate-engine.html",
+          "title": {
+            "zh": "资金费率（Funding Rate）锚定引擎",
+            "en": "Funding Rate Engine"
+          },
+          "subtitle": {
+            "zh": "永续合约永不交割，凭什么合约价格不会彻底脱离现货价格？",
+            "en": "How periodic payments between longs and shorts keep perp prices anchored to spot."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Perp DEX",
+            "Funding Rate",
+            "Spot-Perp Basis",
+            "Delta Neutral"
+          ],
+          "prerequisites": [],
+          "path": "07-perps-leverage/01-funding-rate-engine.html"
+        },
+        {
+          "file": "02-liquidation-heatmap.html",
+          "title": {
+            "zh": "杠杆倍数与插针爆仓模拟器",
+            "en": "Leverage & Liquidation Simulator"
+          },
+          "subtitle": {
+            "zh": "开 50 倍杠杆做多，币价只需要反向波动 2% 你的本金就会瞬间归零。",
+            "en": "See how increasing leverage shrinks your margin for error to a razor-thin line."
+          },
+          "duration": "4 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Leverage",
+            "Liquidation Price",
+            "Margin",
+            "Wick Hunt"
+          ],
+          "prerequisites": [
+            "07-perps-leverage/01-funding-rate-engine.html"
+          ],
+          "path": "07-perps-leverage/02-liquidation-heatmap.html"
+        }
+      ]
+    },
+    {
+      "id": "08-bonding-curves",
+      "order": 8,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "🚀",
+      "accentColor": "#ec4899",
+      "title": {
+        "zh": "联合曲线与新币发射",
+        "en": "Bonding Curves & Token Launches"
+      },
+      "summary": {
+        "zh": "拆解 Pump.fun 等现代 Meme 发射平台的底层数学：联合曲线定价、外盘毕业机制与早鸟砸盘博弈。",
+        "en": "How Pump.fun-style bonding curves price new tokens and why late buyers become exit liquidity."
+      },
+      "lessons": [
+        {
+          "file": "01-bonding-curve-launch.html",
+          "title": {
+            "zh": "联合曲线（Bonding Curve）发射实验室",
+            "en": "Bonding Curve Launchpad Lab"
+          },
+          "subtitle": {
+            "zh": "花 2 美元就能发一个新币！拆解内盘联合曲线如何自动定价并“毕业”上外盘 DEX。",
+            "en": "How virtual AMM bonding curves price tokens from zero to DEX graduation."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Bonding Curve",
+            "Pump.fun",
+            "Virtual Liquidity",
+            "Graduation"
+          ],
+          "prerequisites": [
+            "04-first-swap-amm/01-xyk-slippage-lab.html"
+          ],
+          "path": "08-bonding-curves/01-bonding-curve-launch.html"
+        },
+        {
+          "file": "02-early-vs-late-dump.html",
+          "title": {
+            "zh": "早鸟筹码与砸盘数学模拟器",
+            "en": "Early Bird vs Late Exit Liquidity"
+          },
+          "subtitle": {
+            "zh": "为什么榜一大哥只花 1 SOL 买的币，涨 10 倍砸盘就能瞬间抽干后面 100 个散户的钱？",
+            "en": "The brutal PvP math of asymmetric entry prices in meme coin launches."
+          },
+          "duration": "4 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "PvP Math",
+            "Exit Liquidity",
+            "Market Cap Illusion",
+            "Token Distribution"
+          ],
+          "prerequisites": [
+            "08-bonding-curves/01-bonding-curve-launch.html"
+          ],
+          "path": "08-bonding-curves/02-early-vs-late-dump.html"
+        }
+      ]
     }
   ]
 };

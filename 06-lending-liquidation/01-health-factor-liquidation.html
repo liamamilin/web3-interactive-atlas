@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>健康系数与链上清算模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .hf-bar-wrap { height: 14px; background: #0d1320; border-radius: 999px; overflow: hidden; border: 1px solid var(--border); margin: 12px 0; }
+    .hf-bar { height: 100%; transition: 0.2s; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · DeFi 借贷与清算引擎</span>
+      <h1>健康系数与链上清算模拟器</h1>
+      <p>区块链上是匿名的，没有身份证也没有催收。Aave 凭什么敢把几百亿美元借给陌生钱包？全靠冷酷无情的“健康系数”与清算机器人。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>你抵押了 1 ETH（当时 $3,000），借出 2,000 USDT 去抄底别的币</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">协议清算阈值（Liquidation Threshold）：<strong>80%</strong>。夜里 ETH 突然暴跌到 <strong>$2,400</strong>：</div>
+        <button id="hook-btn" class="btn btn-danger">查看你醒来后的仓位状态</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>已被清算机器人强制平仓！</strong><br />
+        因为你的健康系数跌破了 <strong>1.0</strong>（2400 × 80% / 2000 = 0.96）。机器人瞬间帮协议还掉你的部分债务，并按 <strong>5%~10% 的折价惩罚</strong> 拿走了你的 ETH！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>健康系数（Health Factor）公式</h2>
+      <p>在 DeFi 借贷协议中，你的仓位安全与否只看一个数字——<strong>健康系数（HF）</strong>：</p>
+      <div class="formula-box">
+        Health Factor = (抵押品市值 × 清算阈值) / 借款总额
+      </div>
+      <p>只要 <strong>HF &gt; 1</strong>，仓位安全；一旦 <strong>HF &lt; 1</strong>，全网任何人（实际上是 24 小时盯盘的 MEV 清算机器人）都可以立刻调用清算函数，代你还款并赚取 5%~10% 的清算罚金奖励。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>拖动 ETH 价格，实时监控健康系数与清算红线</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>抵押 ETH 数量 <strong id="lbl-eth">2.0 ETH</strong></label>
+            <input id="sl-eth" type="range" min="1" max="10" step="0.5" value="2" />
+          </div>
+          <div class="control-group">
+            <label>当前 ETH 市场价 <strong id="lbl-price">$3,000</strong></label>
+            <input id="sl-price" type="range" min="800" max="5000" step="50" value="3000" />
+          </div>
+          <div class="control-group">
+            <label>借出 USDT 总额 <strong id="lbl-debt">$3,000</strong></label>
+            <input id="sl-debt" type="range" min="500" max="10000" step="100" value="3000" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">清算阈值固定为 80% · 清算罚金 5%</div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">抵押品总值</div><div class="m-val" id="m-col">$6,000</div></div>
+            <div class="metric-box"><div class="m-label">健康系数 (HF)</div><div class="m-val" id="m-hf">1.60</div></div>
+          </div>
+          <div class="hf-bar-wrap"><div id="hf-bar" class="hf-bar"></div></div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">强平触发价 (ETH)</div><div class="m-val val-warn" id="m-liq">$1,875</div></div>
+            <div class="metric-box"><div class="m-label">当前状态</div><div class="m-val" id="m-st" style="font-size:15px;">安全</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：慢慢向左拖动「ETH 市场价」，观察价格跌破强平触发价的瞬间，健康系数是否刚好跌破 1.00？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把借款额拉高，体会为什么“借太满”时哪怕市场正常回调 15% 也会让你血本无归。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>链上借贷的安全边际</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 永远不要把健康系数压在 1.2 以下，建议日常保持在 <strong>2.0 以上</strong>（能扛住 50% 暴跌）。<br />
+        2. 极端暴跌时以太坊 Gas 费会飙升，你可能根本来不及手动补仓，提前留足安全垫才是唯一解。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "06-lending-liquidation/01-health-factor-liquidation.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "06 · DeFi 借贷与清算" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slEth = document.getElementById("sl-eth"), slPrice = document.getElementById("sl-price"), slDebt = document.getElementById("sl-debt");
+    function update() {
+      const eth = +slEth.value, price = +slPrice.value, debt = +slDebt.value;
+      const lt = 0.8;
+      document.getElementById("lbl-eth").textContent = `${eth.toFixed(1)} ETH`;
+      document.getElementById("lbl-price").textContent = `$${price.toLocaleString()}`;
+      document.getElementById("lbl-debt").textContent = `$${debt.toLocaleString()}`;
+
+      const col = eth * price;
+      const hf = (col * lt) / debt;
+      const liqPrice = debt / (eth * lt);
+
+      document.getElementById("m-col").textContent = `$${col.toLocaleString()}`;
+      document.getElementById("m-liq").textContent = `$${liqPrice.toFixed(0)}`;
+
+      const hfEl = document.getElementById("m-hf");
+      hfEl.textContent = hf.toFixed(2);
+      const bar = document.getElementById("hf-bar");
+      const pct = Math.min(100, (hf / 2.5) * 100);
+      bar.style.width = `${pct}%`;
+
+      const stEl = document.getElementById("m-st");
+      if (hf < 1) {
+        hfEl.className = "m-val val-bad"; bar.style.background = "#ef4444";
+        stEl.textContent = "🚨 触发清算！已被平仓"; stEl.className = "m-val val-bad";
+      } else if (hf < 1.3) {
+        hfEl.className = "m-val val-warn"; bar.style.background = "#f59e0b";
+        stEl.textContent = "⚠️ 极度危险，需立刻补仓"; stEl.className = "m-val val-warn";
+      } else {
+        hfEl.className = "m-val val-good"; bar.style.background = "#10b981";
+        stEl.textContent = "✓ 仓位健康"; stEl.className = "m-val val-good";
+      }
+    }
+    [slEth, slPrice, slDebt].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

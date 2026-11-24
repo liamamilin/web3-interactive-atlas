@@ -1,0 +1,61 @@
+{
+  "id": "08-bonding-curves",
+  "order": 8,
+  "layer": "V2: DeFi 金融引擎与市场博弈",
+  "icon": "🚀",
+  "accentColor": "#ec4899",
+  "title": {
+    "zh": "联合曲线与新币发射",
+    "en": "Bonding Curves & Token Launches"
+  },
+  "summary": {
+    "zh": "拆解 Pump.fun 等现代 Meme 发射平台的底层数学：联合曲线定价、外盘毕业机制与早鸟砸盘博弈。",
+    "en": "How Pump.fun-style bonding curves price new tokens and why late buyers become exit liquidity."
+  },
+  "lessons": [
+    {
+      "file": "01-bonding-curve-launch.html",
+      "title": {
+        "zh": "联合曲线（Bonding Curve）发射实验室",
+        "en": "Bonding Curve Launchpad Lab"
+      },
+      "subtitle": {
+        "zh": "花 2 美元就能发一个新币！拆解内盘联合曲线如何自动定价并“毕业”上外盘 DEX。",
+        "en": "How virtual AMM bonding curves price tokens from zero to DEX graduation."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Bonding Curve",
+        "Pump.fun",
+        "Virtual Liquidity",
+        "Graduation"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/01-xyk-slippage-lab.html"
+      ]
+    },
+    {
+      "file": "02-early-vs-late-dump.html",
+      "title": {
+        "zh": "早鸟筹码与砸盘数学模拟器",
+        "en": "Early Bird vs Late Exit Liquidity"
+      },
+      "subtitle": {
+        "zh": "为什么榜一大哥只花 1 SOL 买的币，涨 10 倍砸盘就能瞬间抽干后面 100 个散户的钱？",
+        "en": "The brutal PvP math of asymmetric entry prices in meme coin launches."
+      },
+      "duration": "4 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "PvP Math",
+        "Exit Liquidity",
+        "Market Cap Illusion",
+        "Token Distribution"
+      ],
+      "prerequisites": [
+        "08-bonding-curves/01-bonding-curve-launch.html"
+      ]
+    }
+  ]
+}

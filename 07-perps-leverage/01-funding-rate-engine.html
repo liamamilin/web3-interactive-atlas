@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>资金费率（Funding Rate）锚定引擎 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 永续合约与杠杆博弈</span>
+      <h1>资金费率（Funding Rate）锚定引擎</h1>
+      <p>传统期货有到期交割日，到期必须按现货价结算。币圈发明的“永续合约”没有到期日，它靠什么防止合约价和现货价越走越远？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>大牛市来了，全网散户都在疯狂开多 BTC 永续合约，把合约价买到了 $105,000（现货仅 $100,000）</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">合约比现货贵了 5%。协议启动了<strong>正资金费率</strong>机制：</div>
+        <button id="hook-btn" class="btn btn-primary">看协议如何把价格拉回来</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>多头每 8 小时必须向空头交“保护费”！</strong><br />
+        做多的人要不断付钱，做空的人躺着收钱。于是套利机构立刻<strong>“买现货 + 开空合约”</strong>（零风险吃资金费率），巨量空单把合约价格迅速砸回现货 $100,000 附近！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>多空之间的动态补贴（不是交给交易所！）</h2>
+      <p>资金费率是<strong>多头和空头直接互相转账</strong>的费用（通常每 8 小时结算一次）：</p>
+      <div class="formula-box">
+        合约价 &gt; 现货价 ⇒ 资金费率为正 (+) ⇒ 多头付钱给空头<br/>
+        合约价 &lt; 现货价 ⇒ 资金费率为负 (-) ⇒ 空头付钱给多头
+      </div>
+      <p>单次结算金额 = <strong>你的仓位名义价值（本金 × 杠杆）× 资金费率</strong>。注意：是按“放大后的仓位”收，不是按你的本金收！</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>资金费率与持仓成本计算器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>你的开仓方向</label>
+            <select id="sel-side">
+              <option value="long">做多 (Long)</option>
+              <option value="short">做空 (Short)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>投入保证金（本金）<strong id="lbl-margin">$1,000</strong></label>
+            <input id="sl-margin" type="range" min="100" max="10000" step="100" value="1000" />
+          </div>
+          <div class="control-group">
+            <label>杠杆倍数 <strong id="lbl-lev">10x</strong></label>
+            <input id="sl-lev" type="range" min="1" max="50" step="1" value="10" />
+          </div>
+          <div class="control-group">
+            <label>当前每 8 小时资金费率 <strong id="lbl-rate">+0.05%</strong></label>
+            <input id="sl-rate" type="range" min="-0.15" max="0.15" step="0.01" value="0.05" />
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">实际名义仓位</div><div class="m-val" id="m-pos">$10,000</div></div>
+            <div class="metric-box"><div class="m-label">每 8 小时收/支</div><div class="m-val" id="m-8h">-$5.00</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">每日收/支 (3次)</div><div class="m-val" id="m-day">-$15.00</div></div>
+            <div class="metric-box"><div class="m-label">折合本金年化 (APR)</div><div class="m-val" id="m-apr">-547%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：做多 + 10x 杠杆 + 费率 +0.05%（牛市常见狂热费率），看看哪怕币价横盘不动，你每天要白交多少美元？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把方向切换为「做空」，理解 Ethena (USDe) 等协议是如何靠“买现货 + 1x 开空”赚取高额无风险年化的。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>资金费率是最好的市场情绪温度计</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 当全网资金费率飙升到 <strong>+0.05% ~ +0.1%</strong> 时，说明多头极度拥挤，往往是短线见顶或剧烈洗盘（多杀多）的前兆。<br />
+        2. 长期拿高倍杠杆单边做多，光资金费率就能在几个月内把你的本金磨光。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "07-perps-leverage/01-funding-rate-engine.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "07 · 永续合约与杠杆" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selSide = document.getElementById("sel-side"), slMargin = document.getElementById("sl-margin");
+    const slLev = document.getElementById("sl-lev"), slRate = document.getElementById("sl-rate");
+
+    function update() {
+      const side = selSide.value, margin = +slMargin.value, lev = +slLev.value, ratePct = +slRate.value;
+      document.getElementById("lbl-margin").textContent = `$${margin.toLocaleString()}`;
+      document.getElementById("lbl-lev").textContent = `${lev}x`;
+      document.getElementById("lbl-rate").textContent = `${ratePct >= 0 ? "+" : ""}${ratePct.toFixed(2)}%`;
+
+      const pos = margin * lev;
+      // 正费率：多头付钱(-)，空头收钱(+)
+      const sign = side === "long" ? -1 : 1;
+      const pay8h = pos * (ratePct / 100) * sign;
+      const payDay = pay8h * 3;
+      const apr = (payDay * 365 / margin) * 100;
+
+      document.getElementById("m-pos").textContent = `$${pos.toLocaleString()}`;
+      const cls = pay8h >= 0 ? "val-good" : "val-bad";
+      const fmtSigned = (v, d = 2) => `${v >= 0 ? "+" : "-"}$${Math.abs(v).toFixed(d)}`;
+
+      const e8 = document.getElementById("m-8h"); e8.textContent = fmtSigned(pay8h); e8.className = "m-val " + cls;
+      const ed = document.getElementById("m-day"); ed.textContent = fmtSigned(payDay); ed.className = "m-val " + cls;
+      const ea = document.getElementById("m-apr"); ea.textContent = `${apr >= 0 ? "+" : ""}${apr.toFixed(0)}%`; ea.className = "m-val " + cls;
+    }
+    [selSide, slMargin, slLev, slRate].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

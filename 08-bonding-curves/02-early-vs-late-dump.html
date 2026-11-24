@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>早鸟筹码与砸盘数学模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 联合曲线与新币发射</span>
+      <h1>早鸟筹码与砸盘数学模拟器</h1>
+      <p>没有外部收入的 Meme 币是一场纯粹的零和（甚至是负和）PvP 博弈。用数学看清为什么“追高进场”在赔率上几乎必败。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>一个新币刚翻了 10 倍，社群里都在喊“冲向 1 亿市值！”，你决定现在跟进 $500</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">此时开盘第 1 分钟花 $1,000 买入的“早鸟狙击手”，账面已经变成 <strong>$10,000</strong>。他点了一键清仓：</div>
+        <button id="hook-btn" class="btn btn-danger">模拟早鸟一键砸盘</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>币价瞬间腰斩再腰斩（-80%）！</strong><br />
+        他当初只掏了 $1,000，但因为买在底部拿走了大量廉价筹码，他一个人清仓就需要后面 <strong>10 个像你一样的散户</strong> 拿真钱去接盘。你成了他的 <strong>Exit Liquidity（退出流动性）</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>市值幻觉：账面 100 万市值，池子里可能只有 5 万真钱</h2>
+      <p>所有人都看“市值 = 当前币价 × 总发行量”，但这只是一个虚幻的数字。如果所有持币人同时卖出，大家能分到的真钱总额，<strong>永远不可能超过流动性池里现有的真 USDT/SOL 数量</strong>。</p>
+      <div class="formula-box">
+        所有人能套现的真钱上限 ≤ 池内真钱储备（先跑的人拿走大头，后跑的人归零）
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>早鸟砸盘冲击模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>当前池内真钱储备 (USDT) <strong id="lbl-pool">$50,000</strong></label>
+            <input id="sl-pool" type="range" min="10000" max="200000" step="10000" value="50000" />
+          </div>
+          <div class="control-group">
+            <label>早鸟大户持仓占比 <strong id="lbl-hold">15%</strong></label>
+            <input id="sl-hold" type="range" min="2" max="50" step="1" value="15" />
+          </div>
+          <div class="control-group">
+            <label>大户一次性砸盘比例 <strong id="lbl-dump">100% (清仓)</strong></label>
+            <input id="sl-dump" type="range" min="10" max="100" step="10" value="100" />
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">大户抽走真钱</div><div class="m-val val-warn" id="m-take">$23,077</div></div>
+            <div class="metric-box"><div class="m-label">砸盘后币价暴跌</div><div class="m-val val-bad" id="m-drop">-53.8%</div></div>
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">池内剩余真钱</div><div class="m-val" id="m-left">$26,923</div></div>
+            <div class="metric-box"><div class="m-label">后排散户账面剩余</div><div class="m-val val-bad" id="m-ret">46.2%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把大户持仓占比拉到 30% 并 100% 清仓，观察池子里的真钱被瞬间抽干了多少？</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：体会为什么在链上分析中，<strong>筹码分布分散（无巨鲸控盘）</strong>比任何故事和喊单都重要。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>如何避免成为别人的“退出流动性”？</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 看到推特/群里铺天盖地都在喊单某个已经暴涨 5~10 倍的土狗时，大概率已经到了早鸟派发筹码的尾声。<br />
+        2. 永远先查区块浏览器或 Bubblemaps（气泡图），如果前 10 个钱包彼此有转账关联且合计控盘超过 30%，直接绕道。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "08-bonding-curves/02-early-vs-late-dump.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "08 · 联合曲线与发射" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slPool = document.getElementById("sl-pool"), slHold = document.getElementById("sl-hold"), slDump = document.getElementById("sl-dump");
+    function update() {
+      const poolU = +slPool.value, holdPct = +slHold.value / 100, dumpPct = +slDump.value / 100;
+      document.getElementById("lbl-pool").textContent = `$${poolU.toLocaleString()}`;
+      document.getElementById("lbl-hold").textContent = `${slHold.value}%`;
+      document.getElementById("lbl-dump").textContent = `${slDump.value}%`;
+
+      // 假设池内代币占总供应 20%，大户砸出供应量 dy 进池
+      const poolTok = 0.20;
+      const dy = holdPct * dumpPct;
+      const newTok = poolTok + dy;
+      const newU = (poolU * poolTok) / newTok;
+      const taken = poolU - newU;
+      const newPriceRatio = (newU / newTok) / (poolU / poolTok);
+      const drop = (1 - newPriceRatio) * 100;
+
+      document.getElementById("m-take").textContent = `$${taken.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      document.getElementById("m-drop").textContent = `-${drop.toFixed(1)}%`;
+      document.getElementById("m-left").textContent = `$${newU.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      document.getElementById("m-ret").textContent = `${(newPriceRatio * 100).toFixed(1)}%`;
+    }
+    [slPool, slHold, slDump].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>
