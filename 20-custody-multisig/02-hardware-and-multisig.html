@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>硬件冷签名与多签钱包（Safe M-of-N）攻防模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .signer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+    .signer-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; cursor: pointer; transition: 0.15s; text-align: center; font-size: 13px;
+    }
+    .signer-card.signed { border-color: var(--green); background: rgba(16, 185, 129, 0.12); }
+    .signer-card.compromised { border-color: var(--red); background: rgba(239, 68, 68, 0.14); }
+    .signer-card.lost { border-color: var(--amber); background: rgba(245, 158, 11, 0.12); opacity: 0.75; }
+    .preset-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V1 · 托管边界、冷钱包与多签安全</span>
+      <h1>硬件冷签名与多签钱包（Safe M-of-N）攻防模拟器</h1>
+      <p>单私钥钱包天生存在“单点故障（Single Point of Failure）”：私钥被盗一秒归零，私钥弄丢永久锁死。机构与大户如何用硬件钱包 + 多签（Safe）彻底消除单点风险？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒攻防对比</div>
+      <h2>你的主力电脑不小心中了剪贴板/屏幕木马，黑客已经完全接管了你的浏览器</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">对比普通浏览器热钱包、单硬件冷钱包、与 2-of-3 多签金库（Safe）的存活结果：</div>
+        <button id="hook-btn" class="btn btn-primary">模拟黑客入侵电脑后的结果</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>物理隔离 + 阈值共识 = 彻底粉碎单点盗币！</strong><br />
+        • <strong>浏览器热钱包</strong>：私钥存在电脑硬盘加密文件里，木马记录你的解锁密码后直接提取私钥，<strong>3 秒转空</strong>。<br />
+        • <strong>硬件冷钱包（Ledger / Trezor / Keystone）</strong>：私钥焊死在独立安全芯片（SE）里，永远不出芯片；电脑只能把“待签交易”传给硬件，只要你不在硬件物理屏幕上核对并按下确认键，黑客毫无办法。<br />
+        • <strong>Safe 2-of-3 多签钱包</strong>：就算黑客连偷带骗拿下了你 1 把私钥，没有第 2 把独立设备配合签名，链上合约直接拒绝转账！同时你弄丢任意 1 把私钥，另外 2 把依然能安全取回资产。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>M-of-N 多签的核心权衡：防盗能力（M） vs 防丢失容错（N - M）</h2>
+      <p>多签钱包本质是一个部署在链上的智能合约（如 Safe）。它指定 <strong>N 个管理员地址</strong>，任何转账必须凑齐至少 <strong>M 个有效签名</strong> 才会执行：</p>
+      <div class="formula-box">
+        防黑客阈值 = M（黑客必须同时攻破至少 M 台独立设备才能盗走资金）<br/>
+        防丢失容错 = N - M（最多允许同时弄丢 N - M 把私钥，仍可正常恢复资金）<br/>
+        黄金配置：个人大额常用 2-of-3（容忍丢 1 把，防盗需破 2 把）；团队财库常用 3-of-5
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>Safe 多签攻防与灾难容错模拟器（点击下方签名者卡片切换状态）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>总签名人数 (N) <strong id="lbl-n">3 人</strong></label>
+            <input id="sl-n" type="range" min="2" max="5" step="1" value="3" />
+          </div>
+          <div class="control-group">
+            <label>生效所需最少签名数 (M) <strong id="lbl-m">2 票</strong></label>
+            <input id="sl-m" type="range" min="1" max="5" step="1" value="2" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin:10px 0 6px;">一键模拟真实攻击/意外场景：</div>
+          <div class="preset-row">
+            <button class="btn" id="btn-reset">重置全部正常</button>
+            <button class="btn btn-danger" id="btn-hack1">黑客攻破 1 把私钥</button>
+            <button class="btn" id="btn-lose1">遗失 1 把私钥</button>
+            <button class="btn btn-danger" id="btn-hack2">2 把私钥被攻破</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:0;">你也可以直接点击右侧卡片，在「正常可用 → 已同意签名 → 被黑客盗取 → 永久遗失」间循环切换。</p>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">当前配置</div><div class="m-val" id="m-cfg">2-of-3</div></div>
+            <div class="metric-box"><div class="m-label">容错能力</div><div class="m-val val-good" id="m-tol">可丢 1 把</div></div>
+            <div class="metric-box"><div class="m-label">金库当前状态</div><div class="m-val val-good" id="m-state">资产安全</div></div>
+          </div>
+
+          <div class="signer-grid" id="signer-grid"></div>
+          <div id="sim-msg" style="font-size:13px;padding:12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);line-height:1.65;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：设为 2-of-3，分别点击「黑客攻破 1 把私钥」和「遗失 1 把私钥」，验证为什么 2-of-3 同时具备“防单点被盗”和“防单点丢失”双重优势。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把配置改成 3-of-3（全员同意），再点击「遗失 1 把私钥」，看看容错归零后会发生什么灾难（资金永久锁死）。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>多签也怕“盲签”：2025 年 Bybit 15 亿美元多签被盗教训</h2>
+      <div class="callout-warn">
+        <strong>最高级别安全忠告（所见即所签）：</strong><br />
+        • <strong>前端界面可以被劫持</strong>：2025 年 2 月，黑客篡改了 Safe 多签的前端显示界面，让多位高管误以为自己在签一笔普通冷转热转账，实际上底层签名的是一笔“修改 Safe 逻辑合约”的恶意交易。<br />
+        • <strong>唯一铁律</strong>：无论单签还是多签，在硬件钱包上按下物理确认键前，必须<strong>核对硬件小屏幕上的目标地址、金额和合约调用摘要</strong>，不要盲目相信电脑网页上的弹窗文字！
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "20-custody-multisig/02-hardware-and-multisig.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "20 · 托管与多签安全" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slN = document.getElementById("sl-n");
+    const slM = document.getElementById("sl-m");
+    const STATES = ["ready", "signed", "compromised", "lost"];
+    const STATE_LABEL = { ready: "🟢 正常可用", signed: "✅ 已签字", compromised: "🔴 已被黑客控制", lost: "🟡 永久遗失" };
+    const ROLES = ["硬件钱包 A（常用）", "硬件钱包 B（保险箱）", "手机/冷备设备 C", "联合托管方 D", "备用硬件 E"];
+
+    let signers = ["ready", "ready", "ready"];
+
+    function syncLength() {
+      const n = +slN.value;
+      if (+slM.value > n) slM.value = n;
+      slM.max = n;
+      while (signers.length < n) signers.push("ready");
+      if (signers.length > n) signers = signers.slice(0, n);
+    }
+
+    function render() {
+      syncLength();
+      const n = +slN.value;
+      const m = +slM.value;
+      document.getElementById("lbl-n").textContent = `${n} 人`;
+      document.getElementById("lbl-m").textContent = `${m} 票`;
+      document.getElementById("m-cfg").textContent = `${m}-of-${n}`;
+
+      const tol = n - m;
+      const mTol = document.getElementById("m-tol");
+      mTol.textContent = tol === 0 ? "0 容错（极危）" : `可丢 ${tol} 把`;
+      mTol.className = `m-val ${tol === 0 ? "val-bad" : "val-good"}`;
+
+      const count = { ready: 0, signed: 0, compromised: 0, lost: 0 };
+      signers.forEach((s) => count[s]++);
+      const honestAlive = count.ready + count.signed;
+
+      const grid = document.getElementById("signer-grid");
+      grid.innerHTML = signers.map((st, idx) => `
+        <div class="signer-card ${st === "ready" ? "" : st}" data-idx="${idx}">
+          <div style="font-weight:700;margin-bottom:4px;">签名者 #${idx + 1}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${ROLES[idx]}</div>
+          <div>${STATE_LABEL[st]}</div>
+        </div>
+      `).join("");
+
+      grid.querySelectorAll(".signer-card").forEach((el) => {
+        el.addEventListener("click", () => {
+          const i = +el.dataset.idx;
+          const nextIdx = (STATES.indexOf(signers[i]) + 1) % STATES.length;
+          signers[i] = STATES[nextIdx];
+          render();
+        });
+      });
+
+      const mState = document.getElementById("m-state");
+      const msg = document.getElementById("sim-msg");
+
+      if (count.compromised >= m) {
+        mState.textContent = "🚨 资金已被盗空";
+        mState.className = "m-val val-bad";
+        msg.innerHTML = `<strong class="val-bad">黑客凑齐了 ${count.compromised}/${m} 票！</strong>攻击者已经达到多签门槛，可以直接构造恶意交易转走金库里的全部资产。`;
+      } else if (honestAlive < m) {
+        mState.textContent = "🔒 资产永久锁死";
+        mState.className = "m-val val-bad";
+        msg.innerHTML = `<strong class="val-bad">可用诚实私钥仅剩 ${honestAlive} 把（低于门槛 ${m} 把）！</strong>虽然黑客也拿不走，但你自己也永远凑不齐足够签名，链上资产彻底永久冻结。`;
+      } else if (count.signed >= m) {
+        mState.textContent = "✅ 交易合法执行";
+        mState.className = "m-val val-good";
+        msg.innerHTML = `<strong class="val-good">已收集 ${count.signed}/${m} 个诚实签名！</strong>Safe 合约校验通过，转账已安全上链执行。`;
+      } else if (count.compromised > 0 || count.lost > 0) {
+        mState.textContent = "🛡️ 顶住攻击/损毁";
+        mState.className = "m-val val-good";
+        msg.innerHTML = `<strong class="val-good">防线稳固！</strong>尽管有 ${count.compromised} 把私钥泄露、${count.lost} 把遗失，但黑客凑不够 ${m} 票无法盗币，而你手中仍有 ${honestAlive} 把诚实私钥，可随时发起交易把资产转移到新金库！`;
+      } else {
+        mState.textContent = "🛡️ 资产安全";
+        mState.className = "m-val val-good";
+        msg.innerHTML = `全部 ${n} 把独立设备完好。如需动用资金，需至少 <strong>${m} 把</strong>设备独立签名确认；点击上方卡片可模拟签字、被盗或丢失。`;
+      }
+    }
+
+    slN.addEventListener("input", render);
+    slM.addEventListener("input", render);
+    document.getElementById("btn-reset").addEventListener("click", () => { signers = signers.map(() => "ready"); render(); });
+    document.getElementById("btn-hack1").addEventListener("click", () => { signers = signers.map((_, i) => i === 0 ? "compromised" : "ready"); render(); });
+    document.getElementById("btn-lose1").addEventListener("click", () => { signers = signers.map((_, i) => i === 0 ? "lost" : "ready"); render(); });
+    document.getElementById("btn-hack2").addEventListener("click", () => { signers = signers.map((_, i) => i < 2 ? "compromised" : "ready"); render(); });
+    render();
+  </script>
+</body>
+</html>

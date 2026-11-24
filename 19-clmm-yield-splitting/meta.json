@@ -1,0 +1,61 @@
+{
+  "id": "19-clmm-yield-splitting",
+  "order": 19,
+  "layer": "V2: DeFi 金融引擎与市场博弈",
+  "icon": "🎯",
+  "accentColor": "#0ea5e9",
+  "title": {
+    "zh": "集中流动性与收益拆分",
+    "en": "Concentrated Liquidity & Yield Splitting"
+  },
+  "summary": {
+    "zh": "进阶 DeFi 两大核心引擎：拆解 Uniswap v3 区间做市（CLMM）为何手续费翻倍却极易“出区间变砖”，以及 Pendle 如何把收益拆成固定利率（PT）与杠杆积分（YT）。",
+    "en": "Master Uniswap v3 concentrated liquidity ranges and Pendle PT/YT fixed-yield vs leveraged-yield tokenization."
+  },
+  "lessons": [
+    {
+      "file": "01-uniswap-v3-clmm.html",
+      "title": {
+        "zh": "集中流动性（Uniswap v3 CLMM）区间做市沙盒",
+        "en": "Uniswap v3 Concentrated Liquidity Lab"
+      },
+      "subtitle": {
+        "zh": "把资金集中到 ±10% 区间，手续费效率暴涨 10 倍，但为什么币价一跌出区间，你手里的 U 全变成了跌价币？",
+        "en": "Explore how narrow LP ranges amplify both fee capital efficiency and impermanent loss."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "CLMM",
+        "Uniswap v3",
+        "Capital Efficiency",
+        "Out of Range"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/02-impermanent-loss.html"
+      ]
+    },
+    {
+      "file": "02-pendle-pt-yt.html",
+      "title": {
+        "zh": "收益代币化（Pendle PT / YT）固定利率与积分杠杆",
+        "en": "Pendle PT & YT Yield Splitting Lab"
+      },
+      "subtitle": {
+        "zh": "1 个生息资产 = 1 PT（本金）+ 1 YT（收益）。为什么买 PT 能锁定固定年化，买 YT 却可能归零也可能暴赚？",
+        "en": "Simulate fixed-rate PT convergence vs leveraged YT yield and points speculation."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Pendle",
+        "PT / YT",
+        "Implied APY",
+        "Yield Leverage"
+      ],
+      "prerequisites": [
+        "18-staking-restaking/01-staking-lst-yield.html"
+      ]
+    }
+  ]
+}

@@ -120,3 +120,37 @@ input[type="text"], textarea, select {
 .val-bad { color: var(--red); }
 .val-warn { color: var(--amber); }
 .val-good { color: var(--green); }
+
+/* Auto-injected bottom lesson navigation */
+.lesson-footer-nav {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 14px;
+}
+.lesson-prereq-bar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  font-size: 13px; color: var(--text-muted);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+}
+.lesson-prereq-bar a {
+  padding: 2px 9px; border-radius: 999px; font-size: 12px;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+}
+.lesson-prereq-bar a.met { border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7; }
+.lesson-prereq-bar a:hover { border-color: var(--accent); text-decoration: none; }
+.lesson-prev-next {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+@media (max-width: 680px) { .lesson-prev-next { grid-template-columns: 1fr; } }
+.nav-card {
+  display: block; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; color: var(--text); transition: 0.15s;
+}
+.nav-card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+.nav-card.next { text-align: right; }
+.nav-card .nc-dir { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.nav-card .nc-title { font-size: 15px; font-weight: 700; color: var(--accent); }
+.nav-card .nc-mod { font-size: 12px; color: var(--text-muted); margin-top: 2px; }

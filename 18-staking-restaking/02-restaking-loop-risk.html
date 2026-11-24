@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LST 循环贷与再质押（Restaking）连环清算模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .hf-bar { height: 14px; border-radius: 999px; background: #0d1320; overflow: hidden; margin: 10px 0 6px; border: 1px solid var(--border); }
+    .hf-fill { height: 100%; transition: width 0.2s, background 0.2s; }
+    .status-banner { padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.65; margin-top: 12px; border: 1px solid var(--border); background: var(--surface); }
+    .status-banner.safe { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+    .status-banner.warn { border-color: var(--amber); background: rgba(245, 158, 11, 0.1); }
+    .status-banner.dead { border-color: var(--red); background: rgba(239, 68, 68, 0.14); }
+    .check-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); margin-top: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 质押、流动性质押与再质押</span>
+      <h1>LST 循环贷与再质押（Restaking）连环清算模拟器</h1>
+      <p>既然 stETH 能赚 3.8% 利息，而去 Aave 借 ETH 只要 2.5%，那我抵押 stETH → 借 ETH → 再换成 stETH → 再抵押……套娃 8 倍不就能无风险赚 13% 年化了吗？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒致命诱惑</div>
+      <h2>用 10 ETH 开启 8 倍 stETH/ETH 循环贷：市场平静时每天都在稳稳印钱，直到……</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">某巨鲸在 Curve 池子集中砸盘，stETH/ETH 汇率短暂脱锚 6%（跌到 0.94 ETH）：</div>
+        <button id="hook-btn" class="btn btn-danger">模拟 6% 脱锚瞬间发生了什么</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>8 倍循环贷瞬间穿仓清算！</strong><br />
+        你只投入了 10 ETH，但仓位里有 <strong>80 stETH 抵押品</strong> 和 <strong>70 ETH 债务</strong>（LTV = 87.5%，E-Mode 清算阈值 93%）。<br />
+        当 stETH 仅仅折价 <strong>6%</strong>，你的抵押品瞬间缩水至 75.2 ETH，健康系数直接跌破 <strong>1.00</strong>，清算机器人直接没收你的 stETH 并在市场砸盘还债——哪怕第二天 stETH 涨回 1.00，你的本金也已经被永久清零！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>循环贷的杠杆数学 + Restaking 的“叠层风险”</h2>
+      <p>循环贷之所以危险，是因为你同时背负了<strong>汇率脱锚风险</strong>、<strong>借款利率倒挂风险</strong>，如果再叠加 <strong>Restaking（EigenLayer 等再质押）</strong>，还要多背一层多个 AVS 服务的罚没（Slashing）风险：</p>
+      <div class="formula-box">
+        净年化 Net APY = 杠杆倍数 L × 质押年化 - (L - 1) × 借币年化<br/>
+        脱锚后健康系数 HF = [ L × (1 - 脱锚率 d - 罚没率 s) × 清算阈值 LT ] ÷ (L - 1)
+      </div>
+      <p style="font-size:13px;color:var(--text-muted)">当 <strong>HF &lt; 1.0</strong> 时触发链上强制清算；哪怕没有脱锚，一旦借 ETH 的利率飙升超过质押收益，高倍循环贷就会立刻变成“每天倒贴高额负利息”。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>循环贷压力测试仪（脱锚 + 利率倒挂 + 再质押罚没）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>初始本金 <strong id="lbl-cap">10 ETH</strong></label>
+            <input id="sl-cap" type="range" min="1" max="100" step="1" value="10" />
+          </div>
+          <div class="control-group">
+            <label>循环贷总杠杆倍数 (L) <strong id="lbl-lev">5.0x</strong></label>
+            <input id="sl-lev" type="range" min="1.0" max="10.0" step="0.5" value="5.0" />
+          </div>
+          <div class="control-group">
+            <label>质押/再质押综合收益 <strong id="lbl-stake">4.2%</strong></label>
+            <input id="sl-stake" type="range" min="2.0" max="10.0" step="0.2" value="4.2" />
+          </div>
+          <div class="control-group">
+            <label>借贷池 ETH 借款利率 <strong id="lbl-borrow">2.6%</strong></label>
+            <input id="sl-borrow" type="range" min="1.0" max="12.0" step="0.2" value="2.6" />
+          </div>
+          <div class="control-group">
+            <label>极端行情 LST/ETH 脱锚幅度 <strong id="lbl-depeg">0.0%</strong></label>
+            <input id="sl-depeg" type="range" min="0" max="15" step="0.5" value="0" />
+          </div>
+          <label class="check-row">
+            <input id="chk-slash" type="checkbox" /> 触发 Restaking AVS 联动罚没事件（-5% 本金）
+          </label>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">净预期年化</div><div class="m-val val-good" id="m-apy">10.6%</div></div>
+            <div class="metric-box"><div class="m-label">健康系数 (HF)</div><div class="m-val val-good" id="m-hf">1.16</div></div>
+            <div class="metric-box"><div class="m-label">当前剩余净值</div><div class="m-val" id="m-eq">10.00 ETH</div></div>
+          </div>
+
+          <div style="font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>仓位结构：<strong id="pos-desc" style="color:var(--text)">50 LST 抵押 / 40 ETH 债务</strong></span>
+            <span>E-Mode 清算阈值：93%</span>
+          </div>
+          <div class="hf-bar"><div id="hf-fill" class="hf-fill"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>0.80 (爆仓)</span><span>1.00 (清算红线)</span><span>1.50+ (安全)</span>
+          </div>
+
+          <div id="status-box" class="status-banner safe"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把杠杆拉到 8.0x，然后把「LST 脱锚幅度」拖到 6%，观察健康系数跌破 1.00 后你的 10 ETH 本金缩水了多少。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把脱锚归零，但把「ETH 借款利率」拉高到 6.0%（模拟全网抢借 ETH 打新/套利），看看高杠杆净年化如何瞬间变成巨额负值。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 3：勾选「Restaking AVS 联动罚没事件」，理解为什么同一份 ETH 抵押给越多协议，黑天鹅叠加时的安全垫就越薄。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>2022 年 stETH 脱锚惨案与再质押套娃警示</h2>
+      <div class="callout-warn">
+        <strong>链上历史复盘：</strong><br />
+        • <strong>2022 年 6 月 stETH 脱锚事件</strong>：彼时以太坊尚未开放质押提款，三箭资本（3AC）与 Celsius 等机构高倍做多 stETH/ETH 循环贷。市场流动性枯竭导致 stETH 一度折价至 <strong>0.93 ETH</strong>，引发链上连环清算，即使底层 ETH 本身 1 枚没少，加杠杆的人全部倒在了黎明前。<br />
+        • <strong>Restaking（再质押）避坑原则</strong>：EigenLayer 等协议通过一份 ETH 同时保护多个外部服务（AVS）来提高资本效率，但收益每多一层，风险也按乘法叠加（合约风险 × 脱锚风险 × 罚没风险）。看不懂底层罚没条款时，不要盲目上高倍循环贷。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "18-staking-restaking/02-restaking-loop-risk.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "18 · 质押与再质押" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const LT = 0.93; // Aave E-Mode liquidation threshold
+    const slCap = document.getElementById("sl-cap");
+    const slLev = document.getElementById("sl-lev");
+    const slStake = document.getElementById("sl-stake");
+    const slBorrow = document.getElementById("sl-borrow");
+    const slDepeg = document.getElementById("sl-depeg");
+    const chkSlash = document.getElementById("chk-slash");
+
+    function update() {
+      const cap = +slCap.value;
+      const L = +slLev.value;
+      const rStake = +slStake.value / 100;
+      const rBorrow = +slBorrow.value / 100;
+      const depeg = +slDepeg.value / 100;
+      const slash = chkSlash.checked ? 0.05 : 0;
+
+      document.getElementById("lbl-cap").textContent = `${cap} ETH`;
+      document.getElementById("lbl-lev").textContent = `${L.toFixed(1)}x`;
+      document.getElementById("lbl-stake").textContent = `${(rStake * 100).toFixed(1)}%`;
+      document.getElementById("lbl-borrow").textContent = `${(rBorrow * 100).toFixed(1)}%`;
+      document.getElementById("lbl-depeg").textContent = `${(depeg * 100).toFixed(1)}%`;
+
+      const collateralNominal = cap * L;
+      const debt = cap * (L - 1);
+      const effectiveHaircut = Math.min(0.95, depeg + slash);
+      const collateralValue = collateralNominal * (1 - effectiveHaircut);
+      const equity = Math.max(0, collateralValue - debt);
+      const netApy = L * rStake - (L - 1) * rBorrow;
+      const hf = debt <= 0.0001 ? 99 : (collateralValue * LT) / debt;
+
+      document.getElementById("pos-desc").textContent = `${collateralNominal.toFixed(1)} LST 抵押 / ${debt.toFixed(1)} ETH 债务`;
+
+      const mApy = document.getElementById("m-apy");
+      mApy.textContent = `${(netApy * 100).toFixed(1)}%`;
+      mApy.className = `m-val ${netApy >= 0 ? "val-good" : "val-bad"}`;
+
+      const mHf = document.getElementById("m-hf");
+      mHf.textContent = debt <= 0.0001 ? "∞ (无杠杆)" : hf.toFixed(2);
+      mHf.className = `m-val ${hf >= 1.15 ? "val-good" : hf >= 1.0 ? "val-warn" : "val-bad"}`;
+
+      const mEq = document.getElementById("m-eq");
+      mEq.textContent = `${equity.toFixed(2)} ETH`;
+      mEq.className = `m-val ${equity >= cap * 0.8 ? "" : equity > cap * 0.4 ? "val-warn" : "val-bad"}`;
+
+      const fillPct = debt <= 0.0001 ? 100 : Math.max(4, Math.min(100, ((hf - 0.8) / 0.8) * 100));
+      const fillEl = document.getElementById("hf-fill");
+      fillEl.style.width = `${fillPct}%`;
+      fillEl.style.background = hf >= 1.15 ? "var(--green)" : hf >= 1.0 ? "var(--amber)" : "var(--red)";
+
+      const box = document.getElementById("status-box");
+      if (debt <= 0.0001) {
+        box.className = "status-banner safe";
+        box.innerHTML = `<strong>纯现货质押（1.0x）：</strong>没有借贷债务，永远不会被强制清算。即便二级市场短期脱锚 ${(depeg * 100).toFixed(1)}%，你也能耐心等协议 1:1 赎回。`;
+      } else if (hf < 1.0) {
+        const lossPct = ((cap - equity) / cap) * 100;
+        box.className = "status-banner dead";
+        box.innerHTML = `<strong>🚨 触发链上强制清算（HF = ${hf.toFixed(2)} &lt; 1.00）！</strong><br/>清算机器人将直接没收你的 LST 抵押品并收取清算罚金。即便未算清算罚金，你的净值已从 ${cap} ETH 暴跌至 <strong>${equity.toFixed(2)} ETH（亏损 ${lossPct.toFixed(0)}%）</strong>！`;
+      } else if (netApy < 0) {
+        box.className = "status-banner warn";
+        box.innerHTML = `<strong>⚠️ 利率倒挂警告！</strong>虽然尚未清算（HF = ${hf.toFixed(2)}），但借币利率已高于质押收益，你在以 <strong>${(netApy * 100).toFixed(1)}%</strong> 的年化速度持续流血。`;
+      } else if (hf < 1.12) {
+        box.className = "status-banner warn";
+        box.innerHTML = `<strong>⚠️ 濒临清算边缘（HF = ${hf.toFixed(2)}）：</strong>只需再多发生 <strong>${Math.max(0.5, ((hf - 1.0) / hf) * 100).toFixed(1)}%</strong> 的脱锚或罚没，仓位就会被瞬间打穿！`;
+      } else {
+        box.className = "status-banner safe";
+        box.innerHTML = `<strong>✅ 当前仓位安全（HF = ${hf.toFixed(2)}）：</strong>预计每年净赚 <strong>+${(cap * netApy).toFixed(2)} ETH</strong>。但请记住，可承受的最大联合脱锚+罚没缓冲仅约 <strong>${(((hf - 1.0) / hf) * 100).toFixed(1)}%</strong>。`;
+      }
+    }
+
+    [slCap, slLev, slStake, slBorrow, slDepeg, chkSlash].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

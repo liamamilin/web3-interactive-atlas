@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>收益代币化（Pendle PT / YT）固定利率与积分杠杆 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .split-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+    @media (max-width: 720px) { .split-grid { grid-template-columns: 1fr; } }
+    .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .split-card h3 { font-size: 15px; margin-bottom: 6px; }
+    .split-card .big-num { font-size: 22px; font-weight: 700; font-family: var(--mono); margin: 6px 0; }
+    .split-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 集中流动性与收益拆分</span>
+      <h1>收益代币化（Pendle PT / YT）固定利率与积分杠杆</h1>
+      <p>DeFi 利率天天暴涨暴跌，保守派想要固定收益，激进派想要加杠杆博空投积分。Pendle 把生息资产一刀劈成 PT 和 YT，同时满足两类人。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒拆解魔法</div>
+      <h2>把 1 枚生息资产（1 年到期，市场隐含年化 10%）劈成 1 PT + 1 YT</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">同样拿出 $10,000，分别全买 PT（本金代币）还是全买 YT（收益代币）？</div>
+        <button id="hook-btn" class="btn btn-primary">看清两者的极端收益分叉</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>一个像“打折国债”，一个像“高倍看涨期权”！</strong><br />
+        • <strong>买 PT（单价约 $0.909）</strong>：花 $10,000 买到 <strong>11.0 枚 PT</strong>。到期日每枚 PT 必能 1:1 换回本金，稳稳锁定 <strong>+10% 固定收益</strong>，不管中间市场利率跌成什么样！<br />
+        • <strong>买 YT（单价约 $0.091）</strong>：花 $10,000 买到 <strong>110 枚 YT（11 倍收益与积分杠杆）</strong>！到期日 YT 价格必然<strong>归零</strong>，你赚还是亏，完全取决于到期前实际产生的收益/空投总和能不能超过你花出去的 $10,000。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>恒等式：1 SY = 1 PT + 1 YT</h2>
+      <p>在到期日（Maturity）之前的任意时刻，一份生息资产（SY，如 stETH、sUSDe）都可以无损拆分或合并为 1 份本金代币（PT）和 1 份收益代币（YT）：</p>
+      <div class="formula-box">
+        价格恒等式：Price(PT) + Price(YT) = 1.00 标的资产<br/>
+        市场隐含年化 (Implied APY)：PT 折价隐含的“市场平均预期收益率”<br/>
+        YT 盈亏临界点：只有当【实际平均 APY &gt; 买入时的 Implied APY】时，买 YT 才赚钱！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>PT 固定利率 vs YT 杠杆博弈盈亏模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>投入本金 <strong id="lbl-inv">$10,000</strong></label>
+            <input id="sl-inv" type="range" min="1000" max="50000" step="1000" value="10000" />
+          </div>
+          <div class="control-group">
+            <label>距离到期天数 <strong id="lbl-days">180 天</strong></label>
+            <input id="sl-days" type="range" min="30" max="365" step="15" value="180" />
+          </div>
+          <div class="control-group">
+            <label>买入时市场隐含年化 (Implied APY) <strong id="lbl-imp">12%</strong></label>
+            <input id="sl-imp" type="range" min="2" max="35" step="1" value="12" />
+          </div>
+          <div class="control-group">
+            <label>到期前实际实现年化 (Underlying APY) <strong id="lbl-act">15%</strong></label>
+            <input id="sl-act" type="range" min="0" max="40" step="1" value="15" />
+          </div>
+          <div class="metrics-row" style="margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">PT 单价</div><div class="m-val" id="m-ptp">$0.946</div></div>
+            <div class="metric-box"><div class="m-label">YT 单价 / 杠杆</div><div class="m-val val-warn" id="m-ytp">$0.054 (18.5x)</div></div>
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted)">持有至到期日的三种策略最终结果对比：</div>
+          <div class="split-grid" id="split-grid"></div>
+          <div id="verdict" style="font-size:13px;color:#d1d5db;margin-top:14px;padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);line-height:1.65;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：保持 Implied APY = 12%，把「实际实现年化」拖低到 6%（模拟项目降温），观察买 PT 依然稳赚不赔，而买 YT 瞬间腰斩亏损 -50%！</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把「距离到期天数」拉短到 30 天，看看 YT 的名义杠杆倍数飙升到多高——提醒自己为什么临近到期冲 YT 极易归零。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>YT 玩家最常踩的三个大坑</h2>
+      <div class="callout-warn">
+        <strong>利率衍生品避坑指南：</strong><br />
+        1. <strong>YT 到期必归零（时间衰减）</strong>：很多新手看到 YT 价格天天跌以为是“超跌抄底”，其实 YT 就像末日期权，随着到期日临近，剩余可领取的利息天数越来越少，价格归零是数学必然。<br />
+        2. <strong>隐含年化已被空投预期透支</strong>：热门积分项目上线 Pendle 时，Implied APY 经常被 FOMO 炒到 40%–80%。如果你在这个位置买 YT，相当于默认空投折算年化必须超过 80% 才能回本，反而是卖方（买 PT 的人）白捡了 40%+ 的无风险固定收益！<br />
+        3. <strong>底层资产脱锚风险</strong>：PT 锁定的是“标的币本位”固定收益，如果底层稳定币或生息协议本身暴雷脱锚，PT 同样会受损。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "19-clmm-yield-splitting/02-pendle-pt-yt.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "19 · 集中流动性与收益拆分" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slInv = document.getElementById("sl-inv");
+    const slDays = document.getElementById("sl-days");
+    const slImp = document.getElementById("sl-imp");
+    const slAct = document.getElementById("sl-act");
+
+    function update() {
+      const inv = +slInv.value;
+      const days = +slDays.value;
+      const imp = +slImp.value / 100;
+      const act = +slAct.value / 100;
+      const t = days / 365;
+
+      document.getElementById("lbl-inv").textContent = `$${inv.toLocaleString()}`;
+      document.getElementById("lbl-days").textContent = `${days} 天`;
+      document.getElementById("lbl-imp").textContent = `${Math.round(imp * 100)}%`;
+      document.getElementById("lbl-act").textContent = `${Math.round(act * 100)}%`;
+
+      // PT price = 1 / (1 + imp)^t ; YT price = 1 - PT price
+      const ptPrice = 1 / Math.pow(1 + imp, t);
+      const ytPrice = Math.max(0.001, 1 - ptPrice);
+      const ytLev = 1 / ytPrice;
+
+      document.getElementById("m-ptp").textContent = `$${ptPrice.toFixed(3)}`;
+      document.getElementById("m-ytp").textContent = `$${ytPrice.toFixed(3)} (${ytLev.toFixed(1)}x)`;
+
+      // Strategy 1: Buy PT -> hold to maturity (each PT redeems for $1)
+      const ptQty = inv / ptPrice;
+      const ptFinal = ptQty * 1.0;
+      const ptPnl = ptFinal - inv;
+      const ptRoi = (ptPnl / inv) * 100;
+
+      // Strategy 2: Buy YT -> collect actual yield on ytQty underlying over t years; YT value -> 0 at maturity
+      const ytQty = inv / ytPrice;
+      const actualPeriodYield = Math.pow(1 + act, t) - 1;
+      const ytFinal = ytQty * actualPeriodYield;
+      const ytPnl = ytFinal - inv;
+      const ytRoi = (ytPnl / inv) * 100;
+
+      // Strategy 3: Hold SY directly
+      const syFinal = inv * (1 + actualPeriodYield);
+      const syPnl = syFinal - inv;
+      const syRoi = (syPnl / inv) * 100;
+
+      document.getElementById("split-grid").innerHTML = `
+        <div class="split-card">
+          <h3>🛡️ 买 PT（固定收益）</h3>
+          <div class="big-num val-good">$${Math.round(ptFinal).toLocaleString()}</div>
+          <p>净收益：<strong class="val-good">+$${Math.round(ptPnl).toLocaleString()} (+${ptRoi.toFixed(1)}%)</strong><br/>无论实际利率涨跌，到期必兑付 ${ptQty.toFixed(0)} PT。</p>
+        </div>
+        <div class="split-card">
+          <h3>⚡ 买 YT（${ytLev.toFixed(1)}x 收益杠杆）</h3>
+          <div class="big-num ${ytPnl >= 0 ? "val-good" : "val-bad"}">$${Math.round(ytFinal).toLocaleString()}</div>
+          <p>净盈亏：<strong class="${ytPnl >= 0 ? "val-good" : "val-bad"}">${ytPnl >= 0 ? "+" : ""}$${Math.round(ytPnl).toLocaleString()} (${ytRoi >= 0 ? "+" : ""}${ytRoi.toFixed(1)}%)</strong><br/>到期 YT 本身归零，全靠期间领回的利息/积分。</p>
+        </div>
+        <div class="split-card">
+          <h3>⚖️ 直接持有 SY</h3>
+          <div class="big-num">$${Math.round(syFinal).toLocaleString()}</div>
+          <p>净收益：<strong>+$${Math.round(syPnl).toLocaleString()} (+${syRoi.toFixed(1)}%)</strong><br/>不拆分，随行就市吃浮动收益。</p>
+        </div>
+      `;
+
+      const vEl = document.getElementById("verdict");
+      if (act > imp) {
+        vEl.innerHTML = `<span class="val-good"><strong>YT 胜出：</strong></span>实际年化（${Math.round(act * 100)}%）高于买入时的隐含年化（${Math.round(imp * 100)}%），YT 买家靠 ${ytLev.toFixed(1)}x 杠杆赚走了超额收益；PT 买家虽然少赚了，但零波动稳稳锁定了固定利息。`;
+      } else if (act < imp) {
+        vEl.innerHTML = `<span class="val-bad"><strong>PT 完胜，YT 亏损：</strong></span>实际年化（${Math.round(act * 100)}%）低于隐含年化（${Math.round(imp * 100)}%），YT 买家在到期归零后亏损 <strong>${ytRoi.toFixed(1)}%</strong>；而 PT 买家提前高位锁息，成功跑赢直接持有 SY！`;
+      } else {
+        vEl.innerHTML = `<strong>精确打平：</strong>实际年化刚好等于隐含年化（${Math.round(imp * 100)}%），YT 买家刚好收回本金（0% 净收益），PT 与直接持有 SY 收益一致。`;
+      }
+    }
+
+    [slInv, slDays, slImp, slAct].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

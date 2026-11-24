@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>零知识证明（ZK）直觉实验室 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .cave-box {
+      background: #0d1320; border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px; margin-bottom: 14px; text-align: center;
+    }
+    .round-log {
+      background: #0d1320; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; font-family: var(--mono); font-size: 12px; max-height: 150px; overflow-y: auto; line-height: 1.7;
+    }
+    .role-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .role-btn {
+      flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 13px;
+    }
+    .role-btn.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · 零知识证明与链上隐私层</span>
+      <h1>零知识证明（ZK）直觉实验室</h1>
+      <p>ZK Rollup 靠它把 1,000 笔交易压成一个小证明，隐私协议靠它隐藏转账金额。抛开晦涩的椭圆曲线数学，用 2 分钟彻底建立零知识证明的第一性原理直觉。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒生活隐喻</div>
+      <h2>你想向一个盲人朋友证明“左手红球、右手绿球颜色不同”，但不告诉他哪只是红的</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">或者更经典：在环形“阿里巴巴山洞”里，深处有一扇密码门，如何证明你知道密码却绝不念出口令？</div>
+        <button id="hook-btn" class="btn btn-primary">看清零知识证明的绝妙设计</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>把“暴露秘密”变成“回答随机挑战”！</strong><br />
+        1. 你先随机选左侧（A 通道）或右侧（B 通道）走入环形山洞深处（验证者在洞口看不到）。<br />
+        2. 验证者走到洞口，<strong>随机大喊</strong>：“请从 A 出口走出来！”或“从 B 出口走出来！”<br />
+        3. 如果你真知道密码，就算走错边也能开门穿过去，<strong>100% 通过</strong>；如果你是骗子，每轮只有 <strong>50% 概率蒙对</strong>。连测 20 轮后，骗子蒙混过关的概率不到 <strong>百万分之一</strong>，而验证者自始至终没听到半个密码字母！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>零知识证明必须同时满足的三大铁律</h2>
+      <div class="formula-box">
+        1. 完备性（Completeness）：如果陈述为真，诚实证明者几乎 100% 能让验证者信服<br/>
+        2. 可靠性（Soundness）：如果陈述为假，骗子蒙混过关的概率随轮数呈 (1/2)^N 指数级归零<br/>
+        3. 零知识性（Zero-Knowledge）：除了“命题为真”这一事实，验证者学不到任何关于秘密的信息
+      </div>
+      <p style="font-size:13px;color:var(--text-muted)">在链上，我们用 <strong>zk-SNARK / zk-STARK</strong> 把这种“多轮问答”用哈希函数压缩成<strong>非交互式、几百字节的单次数学证明</strong>，几毫秒即可在以太坊合约里完成验证。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>阿里巴巴山洞挑战模拟器（诚实证明者 vs 骗子）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">选择你的扮演身份：</div>
+          <div class="role-row">
+            <button class="role-btn active" id="role-honest">🧙 诚实者（懂密码）</button>
+            <button class="role-btn" id="role-cheat">🎭 骗子（靠瞎蒙）</button>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button class="btn btn-primary" id="btn-step">进行 1 轮随机洞口挑战</button>
+            <button class="btn" id="btn-run10">连续挑战 10 轮</button>
+            <button class="btn" id="btn-reset">重置实验</button>
+          </div>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">已通过轮数</div><div class="m-val val-good" id="m-pass">0 轮</div></div>
+            <div class="metric-box"><div class="m-label">骗子侥幸概率</div><div class="m-val val-warn" id="m-prob">100%</div></div>
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="cave-box">
+            <svg viewBox="0 0 360 120" width="100%" height="110" aria-label="Ali Baba Cave">
+              <path d="M 180 15 C 60 15, 45 105, 180 105 C 315 105, 300 15, 180 15 Z" fill="none" stroke="#334155" stroke-width="14" />
+              <line x1="180" y1="90" x2="180" y2="115" stroke="#ef4444" stroke-width="5" stroke-dasharray="4 2" />
+              <text x="180" y="84" fill="#fca5a5" font-size="11" text-anchor="middle">🔒 密码门</text>
+              <text x="72" y="65" fill="#38bdf8" font-size="12" font-weight="bold">通道 A</text>
+              <text x="248" y="65" fill="#10b981" font-size="12" font-weight="bold">通道 B</text>
+              <text x="180" y="34" fill="#e5e7eb" font-size="11" text-anchor="middle">👀 验证者（洞口喊 A 或 B）</text>
+              <circle id="prover-dot" cx="180" cy="15" r="7" fill="#f59e0b" />
+            </svg>
+            <div id="cave-status" style="font-size:13px;color:var(--text-muted);">点击左侧按钮开始随机挑战。</div>
+          </div>
+          <div class="round-log" id="round-log">等待开始挑战...</div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：以「诚实者」身份连点 10 轮，观察骗子侥幸概率降到 0.098%，而密码从未被暴露。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：切换成「骗子」身份点挑战，看看你最多能蒙混过关几轮就会当场穿帮被抓包！</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>ZK 在 Web3 中的两大超能力：隐私保护 + 极速扩容</h2>
+      <div class="callout-warn">
+        <strong>一图看懂为什么全行业都在押注 ZK：</strong><br />
+        1. <strong>隐私证明（Privacy）</strong>：证明“我钱包里有 ≥ 10 ETH”“我是合法 KYC 用户”“这笔资金不来自黑客地址”，但完全不暴露钱包地址和具体余额。<br />
+        2. <strong>计算压缩（Succinctness，即 ZK Rollup / zkVM）</strong>：把链下 10,000 笔复杂交易的计算过程打包成一份极小的数学证明，主网节点无需重算一遍，几毫秒验完即可确认全批交易 100% 合法。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "21-zk-privacy/01-zk-proof-intuition.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "21 · ZK 与链上隐私" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    let role = "honest";
+    let passed = 0;
+    let busted = false;
+    const logs = [];
+
+    const btnHonest = document.getElementById("role-honest");
+    const btnCheat = document.getElementById("role-cheat");
+    const dot = document.getElementById("prover-dot");
+
+    function reset() {
+      passed = 0;
+      busted = false;
+      logs.length = 0;
+      dot.setAttribute("cx", "180");
+      dot.setAttribute("cy", "15");
+      document.getElementById("cave-status").textContent = "已重置，点击左侧按钮开始挑战。";
+      document.getElementById("round-log").textContent = "等待开始挑战...";
+      updateMetrics();
+    }
+
+    btnHonest.addEventListener("click", () => { role = "honest"; btnHonest.classList.add("active"); btnCheat.classList.remove("active"); reset(); });
+    btnCheat.addEventListener("click", () => { role = "cheat"; btnCheat.classList.add("active"); btnHonest.classList.remove("active"); reset(); });
+
+    function updateMetrics() {
+      const mPass = document.getElementById("m-pass");
+      mPass.textContent = busted ? `${passed} 轮后穿帮` : `${passed} 轮`;
+      mPass.className = `m-val ${busted ? "val-bad" : "val-good"}`;
+
+      const prob = Math.pow(0.5, passed) * 100;
+      const mProb = document.getElementById("m-prob");
+      mProb.textContent = busted ? "0% (已被识破)" : prob < 0.01 ? `${prob.toFixed(4)}%` : `${prob.toFixed(2)}%`;
+      mProb.className = `m-val ${busted ? "val-bad" : prob < 1 ? "val-good" : "val-warn"}`;
+    }
+
+    function runRound() {
+      if (busted) return;
+      const entered = Math.random() < 0.5 ? "A" : "B";
+      const asked = Math.random() < 0.5 ? "A" : "B";
+      dot.setAttribute("cx", asked === "A" ? "85" : "275");
+      dot.setAttribute("cy", "60");
+
+      if (role === "honest") {
+        passed++;
+        const usedDoor = entered !== asked ? "（输入密码穿门而出）" : "（原路走出）";
+        logs.unshift(`#${passed} 进 ${entered} → 喊 ${asked} → <span class="val-good">通过</span> ${usedDoor}`);
+        document.getElementById("cave-status").innerHTML = `<span class="val-good">第 ${passed} 轮通过！</span>验证者未获知任何密码字母。`;
+      } else {
+        if (entered === asked) {
+          passed++;
+          logs.unshift(`#${passed} 蒙进 ${entered} → 喊 ${asked} → <span class="val-warn">侥幸蒙对！</span>`);
+          document.getElementById("cave-status").innerHTML = `<span class="val-warn">侥幸蒙对第 ${passed} 轮！</span>再测几轮就会露馅。`;
+        } else {
+          busted = true;
+          logs.unshift(`#${passed + 1} 蒙进 ${entered} → 喊 ${asked} → <span class="val-bad">穿帮！打不开密码门！</span>`);
+          document.getElementById("cave-status").innerHTML = `<span class="val-bad">🚨 当场穿帮！</span>你走的是 ${entered} 通道，却打不开门从 ${asked} 走出，验证者 100% 确认你是骗子！`;
+        }
+      }
+      document.getElementById("round-log").innerHTML = logs.slice(0, 25).join("<br/>");
+      updateMetrics();
+    }
+
+    document.getElementById("btn-step").addEventListener("click", runRound);
+    document.getElementById("btn-run10").addEventListener("click", () => {
+      for (let i = 0; i < 10; i++) { if (!busted) runRound(); }
+    });
+    document.getElementById("btn-reset").addEventListener("click", reset);
+    updateMetrics();
+  </script>
+</body>
+</html>

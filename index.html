@@ -4,22 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
+  <meta name="description" content="用第一性原理拆解 + 零风险参数沙盒吃透链上底层机制：21 大模块、42 个交互实验页与 V1–V5 综合排雷测验。" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Web3 Interactive Atlas — 21 模块 · 42 个链上交互沙盒" />
+  <meta property="og:description" content="不谈暴富神话，只拆真实规则。涵盖钱包安全、多签托管、AMM/v3、循环贷清算、MEV、代币经济学、ZK 隐私、RWA 与 AI Agent x402。" />
+  <meta property="og:image" content="og-cover.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="shared/theme.css" />
   <style>
     .hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 20px; }
     .hero h1 { font-size: 36px; margin-bottom: 10px; }
-    .hero p { color: var(--text-muted); max-width: 680px; }
+    .hero p { color: var(--text-muted); max-width: 720px; }
     .toolbar {
       max-width: 1040px; margin: 0 auto 16px; padding: 0 20px;
       display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
     }
     .search-input {
       background: var(--surface); border: 1px solid var(--border); color: var(--text);
-      padding: 10px 14px; border-radius: 8px; width: 320px; max-width: 100%; font-size: 14px;
+      padding: 10px 14px; border-radius: 8px; width: 340px; max-width: 100%; font-size: 14px;
     }
+    .tracks-section { max-width: 1040px; margin: 0 auto 20px; padding: 0 20px; }
+    .tracks-title { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .tracks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .track-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; cursor: pointer; transition: 0.15s; text-align: left; color: var(--text);
+    }
+    .track-card:hover { border-color: var(--accent); }
+    .track-card.active { border-color: var(--accent); background: var(--accent-soft); }
+    .track-card .t-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .track-card .t-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+    .track-card .t-prog { font-size: 11px; font-family: var(--mono); color: var(--accent); }
     .filter-row {
       max-width: 1040px; margin: 0 auto 24px; padding: 0 20px;
-      display: flex; gap: 8px; flex-wrap: wrap;
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
     }
     .filter-btn {
       padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
@@ -31,12 +50,19 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 24px;
     }
-    .module-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
+    .module-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
     .module-head h2 { font-size: 20px; }
+    .module-meta-right { display: flex; align-items: center; gap: 10px; }
     .module-layer { font-size: 12px; color: var(--accent); }
+    .mod-prog-badge { font-size: 11px; font-family: var(--mono); padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); }
+    .mod-prog-badge.all-done { border-color: rgba(16, 185, 129, 0.55); color: #6ee7b7; background: rgba(16, 185, 129, 0.12); }
+    .backup-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .backup-modal.open { display: flex; }
+    .backup-dialog { width: 100%; max-width: 520px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
     .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
     .lesson-card {
-      display: block; background: var(--surface-2); border: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between;
+      background: var(--surface-2); border: 1px solid var(--border);
       border-radius: 10px; padding: 16px; color: var(--text); transition: 0.15s;
     }
     .lesson-card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-2px); }
@@ -45,29 +71,74 @@
     .lesson-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
     .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface); color: var(--text-muted); }
+    .prereq-row {
+      margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border);
+      font-size: 11px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .prereq-chip { padding: 1px 7px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+    .prereq-chip.met { border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7; }
+    .prereq-chip.unmet { border-color: rgba(245, 158, 11, 0.45); color: #fcd34d; }
   </style>
 </head>
 <body>
+  <header class="atlas-topbar">
+    <a class="brand" href="index.html">
+      <img src="favicon.svg" alt="" width="22" height="22" />
+      <span>Web3 Interactive Atlas</span>
+    </a>
+    <div class="nav-actions">
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="glossary.html">📖 术语速查</a>
+      <button id="btn-open-backup" class="btn" style="padding:5px 10px;font-size:13px;">进度备份/恢复</button>
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="https://github.com/liamamilin/web3-interactive-atlas" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
   <section class="hero">
     <h1>Web3 Interactive Atlas</h1>
-    <p>用“第一性原理拆解 + 零风险参数沙盒”吃透链上底层机制。不谈暴富神话，只拆真实规则。</p>
+    <p>用“第一性原理拆解 + 零风险参数沙盒”吃透链上底层机制（21 大模块 · 42 个交互实验页）。不谈暴富神话，只拆真实规则。</p>
   </section>
 
   <div class="toolbar">
-    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、Permit、MEV、FDV、P/F）..." />
-    <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
+    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、Permit、MEV、LST、Pendle、ZK）..." />
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
+      <a id="quiz-entry-btn" class="btn btn-primary" href="quiz.html">🧭 V1–V5 综合排雷测验</a>
+    </div>
   </div>
+
+  <section class="tracks-section">
+    <div class="tracks-title">
+      <span>🎯 推荐学习路线（点击路线按推荐顺序过滤课程，再次点击取消）</span>
+      <span id="track-hint" style="color:var(--accent)"></span>
+    </div>
+    <div id="tracks-grid" class="tracks-grid"></div>
+  </section>
 
   <div id="filter-row" class="filter-row">
     <button class="filter-btn active" data-layer="ALL">全部阶段 (V1–V5)</button>
-    <button class="filter-btn" data-layer="V1">V1 · 链上生存与交易</button>
+    <button class="filter-btn" data-layer="V1">V1 · 链上生存与托管</button>
     <button class="filter-btn" data-layer="V2">V2 · DeFi 金融引擎</button>
-    <button class="filter-btn" data-layer="V3">V3 · 底层基建与 MEV</button>
+    <button class="filter-btn" data-layer="V3">V3 · 底层基建与隐私</button>
     <button class="filter-btn" data-layer="V4">V4 · 经济模型与投研</button>
-    <button class="filter-btn" data-layer="V5">V5 · 前沿叙事与下一代体验</button>
+    <button class="filter-btn" data-layer="V5">V5 · 前沿叙事与体验</button>
   </div>
 
   <main id="modules" class="modules-wrap"></main>
+
+  <div id="backup-modal" class="backup-modal" role="dialog" aria-modal="true" aria-label="进度备份与恢复">
+    <div class="backup-dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="font-size:17px;">📦 跨设备学习进度备份 / 恢复</h3>
+        <button id="btn-close-backup" class="btn" style="padding:4px 10px;">关闭</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">全选复制下方 JSON 即可保存全部课程与排雷测验进度；换设备时粘贴后点击「导入恢复」。</p>
+      <textarea id="backup-text" rows="5" placeholder="粘贴之前导出的 JSON 进度代码..."></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center;">
+        <button id="btn-select-backup" class="btn btn-primary">全选进度代码</button>
+        <button id="btn-import-backup" class="btn">导入并恢复</button>
+        <span id="backup-msg" style="font-size:12px;color:var(--green);"></span>
+      </div>
+    </div>
+  </div>
 
   <script src="shared/sandbox-ui.js"></script>
   <script src="catalog.js"></script>
@@ -77,7 +148,79 @@
     const wrap = document.getElementById("modules");
     const searchEl = document.getElementById("search");
     const summaryEl = document.getElementById("progress-summary");
+    const tracksGrid = document.getElementById("tracks-grid");
+    const trackHint = document.getElementById("track-hint");
+
+    const TRACKS = [
+      {
+        id: "survival",
+        name: "🛡️ 新手防坑生存线",
+        desc: "助记词、CEX 托管边界、Gas、防盗授权到第一笔 Swap",
+        modules: ["01-wallet-keys", "20-custody-multisig", "02-tx-gas-multichain", "03-security-traps", "04-first-swap-amm"]
+      },
+      {
+        id: "defi",
+        name: "⚡ DeFi 交易与收益线",
+        desc: "AMM/v3 集中流动性、稳定币、借贷、质押循环贷、Pendle 与 MEV",
+        modules: ["04-first-swap-amm", "19-clmm-yield-splitting", "05-stablecoins-peg", "06-lending-liquidation", "18-staking-restaking", "07-perps-leverage", "11-mev-dark-forest"]
+      },
+      {
+        id: "research",
+        name: "🔍 链上投研排雷线",
+        desc: "联合曲线 PvP、解锁抛压、预言机、真实收益与链上指标体检",
+        modules: ["08-bonding-curves", "12-tokenomics", "13-oracles-real-apps", "14-onchain-forensics"]
+      },
+      {
+        id: "frontier",
+        name: "🚀 底层原理与前沿线",
+        desc: "账本共识、L2 跨链桥、ZK 隐私、账户抽象、RWA 与 AI Agent",
+        modules: ["09-consensus-ledger", "10-scaling-bridges", "21-zk-privacy", "15-account-abstraction", "16-rwa-institutional", "17-ai-agent-crypto"]
+      }
+    ];
+
+    // Build lesson lookup map for prerequisite titles
+    const lessonByPath = {};
+    const moduleById = {};
+    catalog.modules.forEach((m) => {
+      moduleById[m.id] = m;
+      m.lessons.forEach((l) => { lessonByPath[l.path] = l; });
+    });
+
     let activeLayer = "ALL";
+    let activeTrack = null;
+
+    function renderTracks() {
+      tracksGrid.innerHTML = TRACKS.map((t) => {
+        let total = 0, done = 0;
+        t.modules.forEach((mid) => {
+          const m = moduleById[mid];
+          if (!m) return;
+          m.lessons.forEach((l) => { total++; if (progress[l.path]) done++; });
+        });
+        return `
+          <button class="track-card ${activeTrack === t.id ? "active" : ""}" data-track="${t.id}">
+            <div class="t-name">
+              <span>${t.name}</span>
+              <span class="t-prog">${done}/${total}</span>
+            </div>
+            <div class="t-desc">${t.desc}</div>
+          </button>
+        `;
+      }).join("");
+
+      tracksGrid.querySelectorAll(".track-card").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.track;
+          activeTrack = activeTrack === id ? null : id;
+          if (activeTrack) {
+            activeLayer = "ALL";
+            document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b.dataset.layer === "ALL"));
+          }
+          renderTracks();
+          render();
+        });
+      });
+    }
 
     function render() {
       const q = searchEl.value.trim().toLowerCase();
@@ -87,10 +230,25 @@
         if (progress[l.path]) doneAll++;
       }));
       summaryEl.textContent = `总学习进度：${doneAll} / ${totalAll} 已掌握`;
+      try {
+        const qSaved = JSON.parse(localStorage.getItem("web3_atlas_quiz_v1") || "{}");
+        const cleared = ["V1", "V2", "V3", "V4", "V5"].filter((k) => qSaved[k]?.cleared).length;
+        const qBtn = document.getElementById("quiz-entry-btn");
+        if (qBtn) qBtn.textContent = cleared > 0 ? `🧭 排雷测验（已通关 ${cleared}/5）` : "🧭 V1–V5 综合排雷测验";
+      } catch {}
+
+      let displayModules = catalog.modules.slice();
+      if (activeTrack) {
+        const trackObj = TRACKS.find((t) => t.id === activeTrack);
+        displayModules = (trackObj ? trackObj.modules : []).map((mid) => moduleById[mid]).filter(Boolean);
+        trackHint.textContent = trackObj ? `当前路线：${trackObj.name}（按建议学习顺序排列）` : "";
+      } else {
+        trackHint.textContent = "";
+      }
 
       wrap.innerHTML = "";
-      catalog.modules.forEach((mod) => {
-        if (activeLayer !== "ALL" && !(mod.layer || "").startsWith(activeLayer)) return;
+      displayModules.forEach((mod, idx) => {
+        if (!activeTrack && activeLayer !== "ALL" && !(mod.layer || "").startsWith(activeLayer)) return;
         const lessons = mod.lessons.filter((l) => {
           if (!q) return true;
           const hay = [mod.title.zh, l.title.zh, l.subtitle.zh, ...(l.concepts || [])].join(" ").toLowerCase();
@@ -98,24 +256,43 @@
         });
         if (!lessons.length) return;
 
+        const modTotal = mod.lessons.length;
+        const modDone = mod.lessons.filter((l) => !!progress[l.path]).length;
+        const stepPrefix = activeTrack ? `Step ${idx + 1} · ` : "";
         const card = document.createElement("section");
         card.className = "module-card";
         card.innerHTML = `
           <div class="module-head">
-            <h2>${mod.icon || "📦"} ${mod.title.zh}</h2>
-            <span class="module-layer">${mod.layer || ""}</span>
+            <h2>${stepPrefix}${mod.icon || "📦"} ${mod.title.zh}</h2>
+            <div class="module-meta-right">
+              <span class="module-layer">${mod.layer || ""}</span>
+              <span class="mod-prog-badge ${modDone === modTotal ? "all-done" : ""}">${modDone === modTotal ? "✓ " : ""}${modDone}/${modTotal}</span>
+            </div>
           </div>
           <p style="font-size:14px;color:var(--text-muted)">${mod.summary?.zh || ""}</p>
           <div class="lesson-grid">
             ${lessons.map((l) => {
               const isDone = !!progress[l.path];
+              const prereqs = (l.prerequisites || []).filter((p) => lessonByPath[p]);
+              const prereqHtml = prereqs.length ? `
+                <div class="prereq-row">
+                  <span>建议前置：</span>
+                  ${prereqs.map((p) => {
+                    const met = !!progress[p];
+                    return `<span class="prereq-chip ${met ? "met" : "unmet"}">${met ? "✓ " : "○ "}${lessonByPath[p].title.zh}</span>`;
+                  }).join("")}
+                </div>
+              ` : "";
               return `
                 <a class="lesson-card ${isDone ? "done" : ""}" href="${l.path}">
-                  <h3>${isDone ? "✓ " : ""}${l.title.zh}</h3>
-                  <p>${l.subtitle.zh}</p>
-                  <div class="tag-row">
-                    ${(l.concepts || []).map((c) => `<span class="tag">${c}</span>`).join("")}
+                  <div>
+                    <h3>${isDone ? "✓ " : ""}${l.title.zh}</h3>
+                    <p>${l.subtitle.zh}</p>
+                    <div class="tag-row">
+                      ${(l.concepts || []).map((c) => `<span class="tag">${c}</span>`).join("")}
+                    </div>
                   </div>
+                  ${prereqHtml}
                 </a>
               `;
             }).join("")}
@@ -131,6 +308,8 @@
 
     document.querySelectorAll(".filter-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
+        activeTrack = null;
+        renderTracks();
         document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         activeLayer = btn.dataset.layer;
@@ -138,6 +317,40 @@
       });
     });
     searchEl.addEventListener("input", render);
+
+    const modal = document.getElementById("backup-modal");
+    const backupText = document.getElementById("backup-text");
+    const backupMsg = document.getElementById("backup-msg");
+    const buildExportJson = () => JSON.stringify({
+      lessons: window.AtlasUI.getProgress(),
+      quiz: JSON.parse(localStorage.getItem("web3_atlas_quiz_v1") || "{}")
+    }, null, 2);
+    document.getElementById("btn-open-backup").addEventListener("click", () => {
+      backupText.value = buildExportJson(); backupMsg.textContent = ""; modal.classList.add("open");
+    });
+    document.getElementById("btn-close-backup").addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
+    document.getElementById("btn-select-backup").addEventListener("click", () => {
+      backupText.value = buildExportJson();
+      backupText.focus();
+      backupText.select();
+      backupMsg.style.color = "var(--green)"; backupMsg.textContent = "✓ 已全选，按 ⌘+C / Ctrl+C 复制即可";
+    });
+    document.getElementById("btn-import-backup").addEventListener("click", () => {
+      try {
+        const p = JSON.parse(backupText.value.trim());
+        if (p.lessons && typeof p.lessons === "object") localStorage.setItem("web3_atlas_progress_v1", JSON.stringify(p.lessons));
+        if (p.quiz && typeof p.quiz === "object") localStorage.setItem("web3_atlas_quiz_v1", JSON.stringify(p.quiz));
+        Object.keys(progress).forEach((k) => delete progress[k]);
+        Object.assign(progress, window.AtlasUI.getProgress());
+        renderTracks(); render();
+        backupMsg.style.color = "var(--green)"; backupMsg.textContent = "✓ 进度已成功恢复！";
+      } catch {
+        backupMsg.style.color = "var(--red)"; backupMsg.textContent = "✕ JSON 格式无效，请检查粘贴内容";
+      }
+    });
+
+    renderTracks();
     render();
   </script>
 </body>

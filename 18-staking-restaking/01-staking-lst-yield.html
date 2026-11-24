@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>质押生息与流动性质押（LST）沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .mode-tab {
+      flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 13px; text-align: center;
+    }
+    .mode-tab.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+    .bar-track { height: 10px; background: #0d1320; border-radius: 999px; overflow: hidden; margin-top: 6px; }
+    .bar-fill { height: 100%; background: var(--green); transition: width 0.2s; }
+    .yield-breakdown { display: grid; gap: 10px; margin-top: 12px; font-size: 13px; }
+    .yield-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 质押、流动性质押与再质押</span>
+      <h1>质押生息与流动性质押（LST）沙盒</h1>
+      <p>PoS 公链上，原生质押是全链的“无风险基准利率”。但原生质押需要锁仓排队，流动性质押代币（LST）如何让你“边吃质押利息、边把资产拿去 DeFi”？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>你有 10 枚 ETH，想吃每年 ~3.5% 的 PoS 验证者收益，但又不想被锁死流动性</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">对比「原地不动」「原生锁仓质押」与「流动性质押（Lido stETH / wstETH）」三种方案：</div>
+        <button id="hook-btn" class="btn btn-primary">一键对比三种资产状态</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>LST（Liquid Staking Token）的本质是“带息存单”！</strong><br />
+        • <strong>原地不动</strong>：0% 收益，长期被全网 PoS 增发轻微稀释。<br />
+        • <strong>原生质押</strong>：赚 100% 验证者收益，但门槛高（以太坊独立节点需 32 ETH），且退出需排队数天。<br />
+        • <strong>流动性质押（stETH / rETH）</strong>：把 ETH 存入质押协议，换回 1:1 凭证代币。协议收 ~10% 收益抽成，但你的存单可以随时在 DEX 卖出变现，甚至拿去 Aave 抵押借钱！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>质押收益从哪来？为什么 stETH 和 wstETH 长得不一样？</h2>
+      <p>PoS 质押收益由两部分构成：<strong>共识层增发奖励（协议新发币）</strong> + <strong>执行层小费与 MEV 分成（链上真实交易手续费）</strong>。而 LST 记账方式分为两大流派：</p>
+      <div class="formula-box">
+        1. Rebase 余额增长型（如 stETH）：1 stETH 始终 ≈ 1 ETH，每天钱包里的 stETH 数量自动变多<br/>
+        2. 汇率增长型（如 wstETH / rETH）：钱包里的代币数量不变，但 1 wstETH 可兑换的 ETH 汇率每天上涨
+      </div>
+      <p style="font-size:13px;color:var(--text-muted)">提示：大多数 DeFi 协议（借贷、跨链桥、DEX）更偏爱<strong>汇率增长型（wstETH）</strong>，因为余额每天自动变动的 Rebase 代币容易让智能合约记账出错。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>LST 收益与记账模式模拟器（Rebase vs 汇率增长）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="mode-tabs">
+            <button class="mode-tab active" id="tab-rebase">Rebase 型 (stETH)</button>
+            <button class="mode-tab" id="tab-rate">汇率增长型 (wstETH)</button>
+          </div>
+          <div class="control-group">
+            <label>投入质押数量 <strong id="lbl-eth">10 ETH</strong></label>
+            <input id="sl-eth" type="range" min="1" max="100" step="1" value="10" />
+          </div>
+          <div class="control-group">
+            <label>底层验证者名义年化（APR） <strong id="lbl-apr">3.8%</strong></label>
+            <input id="sl-apr" type="range" min="1.5" max="8.0" step="0.1" value="3.8" />
+          </div>
+          <div class="control-group">
+            <label>LST 协议抽成比例 <strong id="lbl-fee">10%</strong></label>
+            <input id="sl-fee" type="range" min="0" max="20" step="1" value="10" />
+          </div>
+          <div class="control-group">
+            <label>持有复利时长 <strong id="lbl-yrs">3 年</strong></label>
+            <input id="sl-yrs" type="range" min="1" max="10" step="1" value="3" />
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">净复利年化 (Net APY)</div><div class="m-val val-good" id="m-apy">3.48%</div></div>
+            <div class="metric-box"><div class="m-label">到期可赎回总 ETH</div><div class="m-val" id="m-total">11.08 ETH</div></div>
+            <div class="metric-box"><div class="m-label">净赚 ETH 收益</div><div class="m-val val-good" id="m-gain">+1.08 ETH</div></div>
+          </div>
+          <div class="yield-breakdown" id="breakdown"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：分别切换「Rebase 型 (stETH)」和「汇率增长型 (wstETH)」，观察钱包显示的代币数量与兑换汇率有何不同，但最终赎回的 ETH 总价值完全一致。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把协议抽成从 10% 调到 0%（对比独立自建节点），计算 3 年下来为换取“流动性 + 免运维”实际支付了多少 ETH 成本。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>LST 不是零风险“等价 ETH”：三条隐藏边界</h2>
+      <div class="callout-warn">
+        <strong>实战防坑清单：</strong><br />
+        1. <strong>二级市场折价风险</strong>：虽然协议支持 1:1 赎回，但赎回需要排队（几天到数周）。市场恐慌时大家抢着在 DEX 直接抛售 stETH 换 ETH，会导致 stETH 短期跌到 0.95 ETH 甚至更低。<br />
+        2. <strong>智能合约与节点惩罚（Slashing）风险</strong>：LST 叠加了质押协议合约漏洞风险 + 验证节点运营商集体掉线/双签被罚没的风险。<br />
+        3. <strong>别被“包装高息”忽悠</strong>：纯 ETH PoS 底层收益率受全网质押率约束，通常在 2.5%–4.5% 区间；任何承诺“无风险 ETH 质押年化 20%”的项目，多半靠发空气币补贴或暗藏高杠杆。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "18-staking-restaking/01-staking-lst-yield.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "18 · 质押与再质押" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    let mode = "rebase";
+    const tabRebase = document.getElementById("tab-rebase");
+    const tabRate = document.getElementById("tab-rate");
+    tabRebase.addEventListener("click", () => { mode = "rebase"; tabRebase.classList.add("active"); tabRate.classList.remove("active"); update(); });
+    tabRate.addEventListener("click", () => { mode = "rate"; tabRate.classList.add("active"); tabRebase.classList.remove("active"); update(); });
+
+    const slEth = document.getElementById("sl-eth");
+    const slApr = document.getElementById("sl-apr");
+    const slFee = document.getElementById("sl-fee");
+    const slYrs = document.getElementById("sl-yrs");
+
+    function update() {
+      const eth = +slEth.value;
+      const apr = +slApr.value / 100;
+      const fee = +slFee.value / 100;
+      const yrs = +slYrs.value;
+
+      document.getElementById("lbl-eth").textContent = `${eth} ETH`;
+      document.getElementById("lbl-apr").textContent = `${(apr * 100).toFixed(1)}%`;
+      document.getElementById("lbl-fee").textContent = `${(fee * 100).toFixed(0)}%`;
+      document.getElementById("lbl-yrs").textContent = `${yrs} 年`;
+
+      const netApr = apr * (1 - fee);
+      const netApy = Math.pow(1 + netApr / 365, 365) - 1;
+      const grossTotal = eth * Math.pow(1 + apr / 365, 365 * yrs);
+      const netTotal = eth * Math.pow(1 + netApr / 365, 365 * yrs);
+      const netGain = netTotal - eth;
+      const feePaid = grossTotal - netTotal;
+      const exchangeRate = netTotal / eth;
+
+      document.getElementById("m-apy").textContent = `${(netApy * 100).toFixed(2)}%`;
+      document.getElementById("m-total").textContent = `${netTotal.toFixed(3)} ETH`;
+      document.getElementById("m-gain").textContent = `+${netGain.toFixed(3)} ETH`;
+
+      const tokenBalance = mode === "rebase" ? `${netTotal.toFixed(4)} stETH` : `${eth.toFixed(4)} wstETH`;
+      const rateText = mode === "rebase" ? `1 stETH = 1.0000 ETH（每日自动增发余额）` : `1 wstETH = ${exchangeRate.toFixed(4)} ETH（汇率持续上涨）`;
+      const gainPct = Math.min(100, (netGain / eth) * 200);
+
+      document.getElementById("breakdown").innerHTML = `
+        <div class="yield-row"><span>钱包显示代币数量</span><strong style="font-family:var(--mono);color:var(--accent)">${tokenBalance}</strong></div>
+        <div class="yield-row"><span>当前兑换汇率</span><strong style="font-family:var(--mono)">${rateText}</strong></div>
+        <div class="yield-row"><span>协议累计抽成成本</span><strong style="font-family:var(--mono);color:var(--amber)">-${feePaid.toFixed(3)} ETH</strong></div>
+        <div style="padding:10px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:12px;">
+            <span>复利累积进度（相对本金增长 +${((netGain / eth) * 100).toFixed(1)}%）</span>
+            <span>${yrs} 年后</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:${gainPct}%"></div></div>
+        </div>
+      `;
+    }
+
+    [slEth, slApr, slFee, slYrs].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

@@ -1067,6 +1067,261 @@
           "path": "17-ai-agent-crypto/02-verifiable-ai-tee-zkml.html"
         }
       ]
+    },
+    {
+      "id": "18-staking-restaking",
+      "order": 18,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "🥩",
+      "accentColor": "#14b8a6",
+      "title": {
+        "zh": "质押、流动性质押与再质押",
+        "en": "Staking, LST & Restaking"
+      },
+      "summary": {
+        "zh": "拆解 PoS 质押的真实收益来源、stETH/wstETH 流动性质押机制，以及 LST 循环贷与再质押套娃为何会在轻微脱锚时引发连环清算。",
+        "en": "How PoS staking yield works, Rebase vs Exchange-Rate LSTs, and why looped LST / Restaking positions blow up on small depegs."
+      },
+      "lessons": [
+        {
+          "file": "01-staking-lst-yield.html",
+          "title": {
+            "zh": "质押生息与流动性质押（LST）沙盒",
+            "en": "PoS Staking & Liquid Staking (LST) Lab"
+          },
+          "subtitle": {
+            "zh": "ETH 质押年化 3.5% 是凭空印的还是赚来的？拆解 stETH 余额增长与 wstETH 汇率增长的底层差异。",
+            "en": "Where PoS yield comes from and how Rebase (stETH) vs Reward-Bearing (wstETH) tokens work."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "PoS Staking",
+            "LST",
+            "stETH vs wstETH",
+            "Withdrawal Queue"
+          ],
+          "prerequisites": [
+            "09-consensus-ledger/02-pow-pos-fork.html"
+          ],
+          "path": "18-staking-restaking/01-staking-lst-yield.html"
+        },
+        {
+          "file": "02-restaking-loop-risk.html",
+          "title": {
+            "zh": "LST 循环贷与再质押（Restaking）连环清算模拟器",
+            "en": "LST Looping & Restaking Depeg Simulator"
+          },
+          "subtitle": {
+            "zh": "质押赚 4%、借币花 2.5%，套 8 倍循环贷看起来稳赚 14%？亲手拉动 5% 脱锚看清本金如何瞬间蒸发。",
+            "en": "Simulate how recursive LST looping and stacked AVS slashing amplify tiny depegs into total liquidation."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Recursive Looping",
+            "Restaking",
+            "stETH Depeg",
+            "Stacked Slashing"
+          ],
+          "prerequisites": [
+            "18-staking-restaking/01-staking-lst-yield.html",
+            "06-lending-liquidation/01-health-factor-liquidation.html"
+          ],
+          "path": "18-staking-restaking/02-restaking-loop-risk.html"
+        }
+      ]
+    },
+    {
+      "id": "19-clmm-yield-splitting",
+      "order": 19,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "🎯",
+      "accentColor": "#0ea5e9",
+      "title": {
+        "zh": "集中流动性与收益拆分",
+        "en": "Concentrated Liquidity & Yield Splitting"
+      },
+      "summary": {
+        "zh": "进阶 DeFi 两大核心引擎：拆解 Uniswap v3 区间做市（CLMM）为何手续费翻倍却极易“出区间变砖”，以及 Pendle 如何把收益拆成固定利率（PT）与杠杆积分（YT）。",
+        "en": "Master Uniswap v3 concentrated liquidity ranges and Pendle PT/YT fixed-yield vs leveraged-yield tokenization."
+      },
+      "lessons": [
+        {
+          "file": "01-uniswap-v3-clmm.html",
+          "title": {
+            "zh": "集中流动性（Uniswap v3 CLMM）区间做市沙盒",
+            "en": "Uniswap v3 Concentrated Liquidity Lab"
+          },
+          "subtitle": {
+            "zh": "把资金集中到 ±10% 区间，手续费效率暴涨 10 倍，但为什么币价一跌出区间，你手里的 U 全变成了跌价币？",
+            "en": "Explore how narrow LP ranges amplify both fee capital efficiency and impermanent loss."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "CLMM",
+            "Uniswap v3",
+            "Capital Efficiency",
+            "Out of Range"
+          ],
+          "prerequisites": [
+            "04-first-swap-amm/02-impermanent-loss.html"
+          ],
+          "path": "19-clmm-yield-splitting/01-uniswap-v3-clmm.html"
+        },
+        {
+          "file": "02-pendle-pt-yt.html",
+          "title": {
+            "zh": "收益代币化（Pendle PT / YT）固定利率与积分杠杆",
+            "en": "Pendle PT & YT Yield Splitting Lab"
+          },
+          "subtitle": {
+            "zh": "1 个生息资产 = 1 PT（本金）+ 1 YT（收益）。为什么买 PT 能锁定固定年化，买 YT 却可能归零也可能暴赚？",
+            "en": "Simulate fixed-rate PT convergence vs leveraged YT yield and points speculation."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Pendle",
+            "PT / YT",
+            "Implied APY",
+            "Yield Leverage"
+          ],
+          "prerequisites": [
+            "18-staking-restaking/01-staking-lst-yield.html"
+          ],
+          "path": "19-clmm-yield-splitting/02-pendle-pt-yt.html"
+        }
+      ]
+    },
+    {
+      "id": "20-custody-multisig",
+      "order": 20,
+      "layer": "V1: 链上生存与第一笔交易",
+      "icon": "🔐",
+      "accentColor": "#f43f5e",
+      "title": {
+        "zh": "托管边界、冷钱包与多签安全",
+        "en": "Custody Boundaries, Hardware & Multisig"
+      },
+      "summary": {
+        "zh": "补齐进入 Web3 的资产托管全景：拆解中心化交易所（CEX）的账面欠条与挤兑风险，以及硬件冷签名与 Safe M-of-N 多签钱包如何守住大额资产。",
+        "en": "Understand CEX IOUs vs self-custody, Proof of Reserves limits, hardware cold signing, and M-of-N Safe multisig security."
+      },
+      "lessons": [
+        {
+          "file": "01-cex-vs-self-custody.html",
+          "title": {
+            "zh": "CEX 托管、储备证明（PoR）与自托管对比沙盒",
+            "en": "CEX Custody, Proof of Reserves & Self-Custody"
+          },
+          "subtitle": {
+            "zh": "交易所里的余额只是一张电子欠条！亲手模拟交易所挪用资金遭遇挤兑，理解“Not your keys, not your coins”。",
+            "en": "Simulate exchange bank runs and why Proof of Assets without Proof of Liabilities cannot stop insolvency."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "CEX vs Self-Custody",
+            "IOU Ledger",
+            "Proof of Reserves",
+            "Bank Run"
+          ],
+          "prerequisites": [
+            "01-wallet-keys/01-seed-to-address.html"
+          ],
+          "path": "20-custody-multisig/01-cex-vs-self-custody.html"
+        },
+        {
+          "file": "02-hardware-and-multisig.html",
+          "title": {
+            "zh": "硬件冷签名与多签钱包（Safe M-of-N）攻防模拟器",
+            "en": "Hardware Cold Signing & Safe Multisig Lab"
+          },
+          "subtitle": {
+            "zh": "电脑中木马、助记词丢了一把，为什么 2-of-3 多签 + 硬件钱包依然能保住全部资产？",
+            "en": "Test single-point-of-failure attacks against hot wallets, hardware wallets, and M-of-N Safe multisigs."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Hardware Wallet",
+            "Cold Signing",
+            "Safe Multisig",
+            "M-of-N Threshold"
+          ],
+          "prerequisites": [
+            "20-custody-multisig/01-cex-vs-self-custody.html",
+            "03-security-traps/01-approve-and-permit.html"
+          ],
+          "path": "20-custody-multisig/02-hardware-and-multisig.html"
+        }
+      ]
+    },
+    {
+      "id": "21-zk-privacy",
+      "order": 21,
+      "layer": "V3: 底层基建与黑暗森林",
+      "icon": "🕵️",
+      "accentColor": "#8b5cf6",
+      "title": {
+        "zh": "零知识证明与链上隐私层",
+        "en": "Zero-Knowledge Proofs & On-chain Privacy"
+      },
+      "summary": {
+        "zh": "拆解密码学最神奇的魔法——零知识证明（ZK）如何在不暴露秘密的前提下自证清白，以及公链“伪匿名”追踪风险与合规隐私池（Privacy Pools）的破局方案。",
+        "en": "Build intuition for Zero-Knowledge Proofs (Ali Baba cave) and explore on-chain deanonymization vs compliant Privacy Pools."
+      },
+      "lessons": [
+        {
+          "file": "01-zk-proof-intuition.html",
+          "title": {
+            "zh": "零知识证明（ZK）直觉实验室",
+            "en": "Zero-Knowledge Proof Intuition Lab"
+          },
+          "subtitle": {
+            "zh": "不亮身份证怎么证明你已满 18 岁？用“阿里巴巴山洞”亲手体验骗子为什么绝对蒙不过 20 轮随机挑战。",
+            "en": "Simulate honest vs cheating provers in the Ali Baba cave to see Completeness, Soundness, and Zero-Knowledge."
+          },
+          "duration": "4 min",
+          "sandboxType": "visualizer",
+          "concepts": [
+            "Zero-Knowledge",
+            "Completeness",
+            "Soundness",
+            "zk-SNARK"
+          ],
+          "prerequisites": [
+            "01-wallet-keys/01-seed-to-address.html"
+          ],
+          "path": "21-zk-privacy/01-zk-proof-intuition.html"
+        },
+        {
+          "file": "02-onchain-privacy-pools.html",
+          "title": {
+            "zh": "链上地址追踪与合规隐私池（Privacy Pools）博弈沙盒",
+            "en": "On-chain Tracking & Privacy Pools Lab"
+          },
+          "subtitle": {
+            "zh": "区块链不是匿名，而是全网实况直播！体验地址聚类如何扒光身份，以及合规隐私池如何用 ZK 证明“我不是黑客”。",
+            "en": "See how deanonymization heuristics break naive privacy and how Privacy Pools separate honest users from hackers."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Pseudonymity",
+            "Anonymity Set",
+            "Privacy Pools",
+            "Proof of Innocence"
+          ],
+          "prerequisites": [
+            "21-zk-privacy/01-zk-proof-intuition.html",
+            "20-custody-multisig/01-cex-vs-self-custody.html"
+          ],
+          "path": "21-zk-privacy/02-onchain-privacy-pools.html"
+        }
+      ]
     }
   ]
 }

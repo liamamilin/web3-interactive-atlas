@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0f17"/>
+      <stop offset="60%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0f2236"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g opacity="0.14" stroke="#38bdf8" stroke-width="1">
+    <line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+  <g transform="translate(920,165)">
+    <polygon points="100,0 186,50 186,150 100,200 14,150 14,50" fill="rgba(56,189,248,0.08)" stroke="url(#accent)" stroke-width="5"/>
+    <polygon points="100,36 155,68 155,132 100,164 45,132 45,68" fill="rgba(16,185,129,0.14)" stroke="#38bdf8" stroke-width="3"/>
+    <circle cx="100" cy="100" r="14" fill="#10b981"/>
+  </g>
+  <rect x="80" y="92" width="286" height="38" rx="19" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="104" y="117" fill="#38bdf8" font-family="-apple-system, BlinkMacSystemFont, PingFang SC, sans-serif" font-size="18" font-weight="700">OPEN SOURCE · ZERO DEPENDENCY</text>
+  <text x="80" y="218" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, PingFang SC, sans-serif" font-size="68" font-weight="800">Web3 Interactive Atlas</text>
+  <text x="80" y="286" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, PingFang SC, sans-serif" font-size="30" font-weight="500">第一性原理拆解 + 零风险参数沙盒 · 吃透链上底层机制</text>
+  <rect x="80" y="346" width="220" height="84" rx="14" fill="#111827" stroke="#263248" stroke-width="2"/>
+  <text x="106" y="384" fill="#38bdf8" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">21 模块</text>
+  <text x="106" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">V1 → V5 全景认知</text>
+  <rect x="322" y="346" width="230" height="84" rx="14" fill="#111827" stroke="#263248" stroke-width="2"/>
+  <text x="348" y="384" fill="#10b981" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">42 沙盒</text>
+  <text x="348" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">零风险互动实验页</text>
+  <rect x="574" y="346" width="246" height="84" rx="14" fill="#111827" stroke="#263248" stroke-width="2"/>
+  <text x="600" y="384" fill="#f59e0b" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">20 排雷题</text>
+  <text x="600" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">V1–V5 实战决策测验</text>
+  <rect x="80" y="510" width="1040" height="3" fill="url(#accent)" opacity="0.5"/>
+  <text x="80" y="562" fill="#cbd5e1" font-family="ui-monospace, Menlo, monospace" font-size="22">liamamilin.github.io/web3-interactive-atlas</text>
+</svg>

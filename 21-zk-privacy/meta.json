@@ -1,0 +1,62 @@
+{
+  "id": "21-zk-privacy",
+  "order": 21,
+  "layer": "V3: 底层基建与黑暗森林",
+  "icon": "🕵️",
+  "accentColor": "#8b5cf6",
+  "title": {
+    "zh": "零知识证明与链上隐私层",
+    "en": "Zero-Knowledge Proofs & On-chain Privacy"
+  },
+  "summary": {
+    "zh": "拆解密码学最神奇的魔法——零知识证明（ZK）如何在不暴露秘密的前提下自证清白，以及公链“伪匿名”追踪风险与合规隐私池（Privacy Pools）的破局方案。",
+    "en": "Build intuition for Zero-Knowledge Proofs (Ali Baba cave) and explore on-chain deanonymization vs compliant Privacy Pools."
+  },
+  "lessons": [
+    {
+      "file": "01-zk-proof-intuition.html",
+      "title": {
+        "zh": "零知识证明（ZK）直觉实验室",
+        "en": "Zero-Knowledge Proof Intuition Lab"
+      },
+      "subtitle": {
+        "zh": "不亮身份证怎么证明你已满 18 岁？用“阿里巴巴山洞”亲手体验骗子为什么绝对蒙不过 20 轮随机挑战。",
+        "en": "Simulate honest vs cheating provers in the Ali Baba cave to see Completeness, Soundness, and Zero-Knowledge."
+      },
+      "duration": "4 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "Zero-Knowledge",
+        "Completeness",
+        "Soundness",
+        "zk-SNARK"
+      ],
+      "prerequisites": [
+        "01-wallet-keys/01-seed-to-address.html"
+      ]
+    },
+    {
+      "file": "02-onchain-privacy-pools.html",
+      "title": {
+        "zh": "链上地址追踪与合规隐私池（Privacy Pools）博弈沙盒",
+        "en": "On-chain Tracking & Privacy Pools Lab"
+      },
+      "subtitle": {
+        "zh": "区块链不是匿名，而是全网实况直播！体验地址聚类如何扒光身份，以及合规隐私池如何用 ZK 证明“我不是黑客”。",
+        "en": "See how deanonymization heuristics break naive privacy and how Privacy Pools separate honest users from hackers."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Pseudonymity",
+        "Anonymity Set",
+        "Privacy Pools",
+        "Proof of Innocence"
+      ],
+      "prerequisites": [
+        "21-zk-privacy/01-zk-proof-intuition.html",
+        "20-custody-multisig/01-cex-vs-self-custody.html"
+      ]
+    }
+  ]
+}

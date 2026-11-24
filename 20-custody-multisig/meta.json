@@ -1,0 +1,62 @@
+{
+  "id": "20-custody-multisig",
+  "order": 20,
+  "layer": "V1: 链上生存与第一笔交易",
+  "icon": "🔐",
+  "accentColor": "#f43f5e",
+  "title": {
+    "zh": "托管边界、冷钱包与多签安全",
+    "en": "Custody Boundaries, Hardware & Multisig"
+  },
+  "summary": {
+    "zh": "补齐进入 Web3 的资产托管全景：拆解中心化交易所（CEX）的账面欠条与挤兑风险，以及硬件冷签名与 Safe M-of-N 多签钱包如何守住大额资产。",
+    "en": "Understand CEX IOUs vs self-custody, Proof of Reserves limits, hardware cold signing, and M-of-N Safe multisig security."
+  },
+  "lessons": [
+    {
+      "file": "01-cex-vs-self-custody.html",
+      "title": {
+        "zh": "CEX 托管、储备证明（PoR）与自托管对比沙盒",
+        "en": "CEX Custody, Proof of Reserves & Self-Custody"
+      },
+      "subtitle": {
+        "zh": "交易所里的余额只是一张电子欠条！亲手模拟交易所挪用资金遭遇挤兑，理解“Not your keys, not your coins”。",
+        "en": "Simulate exchange bank runs and why Proof of Assets without Proof of Liabilities cannot stop insolvency."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "CEX vs Self-Custody",
+        "IOU Ledger",
+        "Proof of Reserves",
+        "Bank Run"
+      ],
+      "prerequisites": [
+        "01-wallet-keys/01-seed-to-address.html"
+      ]
+    },
+    {
+      "file": "02-hardware-and-multisig.html",
+      "title": {
+        "zh": "硬件冷签名与多签钱包（Safe M-of-N）攻防模拟器",
+        "en": "Hardware Cold Signing & Safe Multisig Lab"
+      },
+      "subtitle": {
+        "zh": "电脑中木马、助记词丢了一把，为什么 2-of-3 多签 + 硬件钱包依然能保住全部资产？",
+        "en": "Test single-point-of-failure attacks against hot wallets, hardware wallets, and M-of-N Safe multisigs."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Hardware Wallet",
+        "Cold Signing",
+        "Safe Multisig",
+        "M-of-N Threshold"
+      ],
+      "prerequisites": [
+        "20-custody-multisig/01-cex-vs-self-custody.html",
+        "03-security-traps/01-approve-and-permit.html"
+      ]
+    }
+  ]
+}

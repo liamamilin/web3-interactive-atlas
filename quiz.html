@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V1–V5 阶段综合排雷关卡 — Web3 Interactive Atlas</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="shared/theme.css" />
+  <style>
+    .stage-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .stage-tab {
+      padding: 8px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+      transition: 0.15s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .stage-tab:hover { border-color: var(--accent); color: var(--text); }
+    .stage-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .stage-tab.cleared { border-color: rgba(16, 185, 129, 0.55); color: #6ee7b7; }
+    .quiz-summary {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 20px; margin-bottom: 20px;
+    }
+    .q-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
+    }
+    .q-meta { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+    .q-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+    .opt-list { display: grid; gap: 10px; }
+    .opt-btn {
+      width: 100%; text-align: left; padding: 12px 14px; border-radius: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      font-size: 14px; cursor: pointer; transition: 0.15s; line-height: 1.5;
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--accent); }
+    .opt-btn:disabled { cursor: default; }
+    .opt-btn.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.14); color: #d1fae5; }
+    .opt-btn.wrong { border-color: var(--red); background: rgba(239, 68, 68, 0.14); color: #fee2e2; }
+    .explain-box {
+      margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.65;
+      background: #0d1320; border-left: 3px solid var(--accent); display: none;
+    }
+    .explain-box.show { display: block; }
+    .explain-box .review-link { display: inline-block; margin-top: 8px; font-weight: 600; }
+    .result-banner {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 20px; margin-top: 20px; display: none;
+    }
+    .result-banner.pass { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+    .result-banner.fail { border-color: var(--amber); background: rgba(245, 158, 11, 0.1); }
+  </style>
+</head>
+<body>
+  <header class="atlas-topbar">
+    <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
+    <div class="nav-actions">
+      <span id="overall-badge" style="color:var(--text-muted)">已通关 0 / 5 阶段</span>
+    </div>
+  </header>
+
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">实战检验 · 20 道真实链上排雷场景</span>
+      <h1>V1–V5 阶段综合排雷关卡</h1>
+      <p>把分散在 21 个模块里的底层机制串成真实链上决策：每个阶段 4 道高发踩坑题，答对 ≥ 3 题即可点亮阶段通关徽章，答错直接一键跳转回对应沙盒复盘。</p>
+    </header>
+
+    <div id="stage-tabs" class="stage-tabs"></div>
+
+    <div class="quiz-summary">
+      <div>
+        <div id="stage-heading" style="font-size:17px;font-weight:700;"></div>
+        <div id="stage-sub" style="font-size:13px;color:var(--text-muted);margin-top:2px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="stage-score" style="font-family:var(--mono);font-size:14px;color:var(--accent);">当前得分：0 / 4</span>
+        <button id="btn-retry" class="btn">重置本阶段</button>
+      </div>
+    </div>
+
+    <div id="quiz-list"></div>
+    <div id="result-banner" class="result-banner"></div>
+
+    <section class="stage-card" style="margin-top:28px;">
+      <div class="stage-label">战绩与分享 · Web3 排雷段位成绩单</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+        <div>
+          <h2 id="rank-title" style="margin-bottom:4px;">当前段位：🌱 链上萌新</h2>
+          <p id="rank-desc" style="font-size:13px;color:var(--text-muted);margin-bottom:0;">完成任意阶段测验即可点亮对应通关徽章，支持一键复制战绩或导出高清 PNG 分享图。</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button id="btn-copy-card" class="btn">复制战绩文案</button>
+          <button id="btn-export-png" class="btn btn-primary">导出 PNG 成绩单</button>
+        </div>
+      </div>
+      <div id="share-msg" style="font-size:12px;color:var(--green);margin-top:8px;"></div>
+      <canvas id="score-canvas" width="1200" height="630" style="display:none;"></canvas>
+    </section>
+  </main>
+
+  <script>
+    const QUIZ_STORAGE_KEY = "web3_atlas_quiz_v1";
+
+    const STAGES = [
+      {
+        id: "V1",
+        name: "V1 · 链上生存与托管",
+        desc: "检验助记词、离线签名钓鱼、蜜罐合约与交易所/多签托管边界",
+        questions: [
+          {
+            prompt: "你在 X 上看到一个“限时领空投”网站，连上钱包后弹出一个零 Gas 费的离线消息签名（含 Permit / spender / value=MAX 字段）。你应该怎么判断？",
+            options: [
+              "不花 Gas 费说明不上链，签了肯定不会转走我的币",
+              "极高危 Permit 离线钓鱼签名！对方拿到签名后可以替你付 Gas 把你的授权代币瞬间转空",
+              "只要不输入 12 个助记词，任何签名弹窗都可以放心点确认",
+              "先把 ETH 转走，留着 USDT 就不会被盗"
+            ],
+            answer: 1,
+            explain: "ERC-2612 Permit / Permit2 允许你通过零 Gas 离线签名把代币花费权（Allowance）授给恶意地址，黑客拿到签名后自己出 Gas 上链即可直接抽干你的 USDT/代币，全程不需要你的助记词。",
+            lesson: { title: "授权机制与钓鱼签名攻防", path: "03-security-traps/01-approve-and-permit.html" }
+          },
+          {
+            prompt: "某中心化交易所被传挪用资金，官方发推晒出冷钱包地址里躺着 10 亿美元加密资产，称“资金 100% 安全”。这能证明它没有资不抵债吗？",
+            options: [
+              "可以，链上地址余额公开透明，说明绝对安全",
+              "不能！只晒资产（PoA）不公开可验证的用户总负债（Merkle PoL），无法排除资产小于负债或临时借币拍快照",
+              "只要它能正常交易买卖，就说明储备率大于 100%",
+              "只要把币换成稳定币放在交易所里就绝对安全"
+            ],
+            answer: 1,
+            explain: "真正的储备证明（PoR）必须同时证明链上资产（PoA）和全体用户总负债（Merkle Tree PoL），否则交易所可能背负 20 亿美元用户负债却只晒出 10 亿美元冷钱包。",
+            lesson: { title: "CEX 托管、储备证明与自托管对比沙盒", path: "20-custody-multisig/01-cex-vs-self-custody.html" }
+          },
+          {
+            prompt: "你用 Safe 建了一个 2-of-3 多签金库（3 把独立硬件钱包）。某天其中 1 把硬件的助记词不慎泄露给黑客，但另外 2 把完好无损。此时金库状态如何？",
+            options: [
+              "黑客已经拿到 1 把私钥，资金会在几秒内被转空",
+              "资金立刻永久锁死，连你自己也取不出来了",
+              "资金目前安全！黑客凑不够 2 票无法盗币，你应立刻用剩余 2 把完好硬件签名，把资产迁移到全新多签或剔除泄露签名者",
+              "必须集齐 3 把私钥同时签名才能把钱转走"
+            ],
+            answer: 2,
+            explain: "2-of-3 多签的核心优势就是同时抵御单点被盗（防盗阈值 M=2）和单点丢失（容错 N-M=1）。1 把泄露后黑客无法单方面动用资金，你可以用剩余 2 把诚实设备从容转移资产。",
+            lesson: { title: "硬件冷签名与多签钱包攻防模拟器", path: "20-custody-multisig/02-hardware-and-multisig.html" }
+          },
+          {
+            prompt: "链上新出的某 Meme 币 1 小时暴涨 12 倍，K 线全是绿色买单几乎没有卖单，你买入后想止盈却发现无论调高多少滑点都交易报错。最可能遇到了什么？",
+            options: [
+              "网络太拥堵，把 Gas 调高 10 倍就能卖出去",
+              "蜜罐（貔貅盘）恶意合约：合约代码限制了普通地址卖出，只能买不能卖",
+              "这是流动性太深导致的正常现象",
+              "钱包坏了，换一个浏览器插件就能卖出"
+            ],
+            answer: 1,
+            explain: "貔貅盘（Honeypot）会在代币合约的 transfer 函数里写黑名单或 100% 卖出税，只允许项目方白名单地址卖出，散户买进去就彻底沦为接盘筹码。",
+            lesson: { title: "蜜罐（貔貅盘）与撤池子拆解", path: "03-security-traps/02-honeypot-rugpull.html" }
+          }
+        ]
+      },
+      {
+        id: "V2",
+        name: "V2 · DeFi 金融引擎",
+        desc: "检验循环贷脱锚清算、Uniswap v3 区间做市、Pendle PT/YT 与永续合约爆仓",
+        questions: [
+          {
+            prompt: "你用 10 ETH 做了 8 倍 stETH/ETH 循环贷（抵押 80 stETH、借 70 ETH，清算阈值 93%）。某天因巨鲸砸盘，stETH/ETH 在二级市场短暂跌到 0.94（脱锚 6%），第二天又涨回 1.00。你的仓位会发生什么？",
+            options: [
+              "只要底层 ETH 没少，第二天涨回来就毫发无伤",
+              "脱锚瞬间健康系数跌破 1.00 触发强制清算，清算机器人没收抵押品砸盘还债，第二天涨回 1.00 时本金也已永久亏损",
+              "只会自动多扣一点借款利息，不会清算",
+              "清算只看 ETH 美元价格，不看 stETH/ETH 汇率"
+            ],
+            answer: 1,
+            explain: "8 倍循环贷的清算缓冲极薄，6% 的二级市场脱锚就会让抵押品价值跌破清算线（HF < 1.0），触发链上原子清算，这是 2022 年 stETH 脱锚惨案中无数杠杆玩家的真实结局。",
+            lesson: { title: "LST 循环贷与再质押连环清算模拟器", path: "18-staking-restaking/02-restaking-loop-risk.html" }
+          },
+          {
+            prompt: "ETH 现价 $3,000，你投入 $10,000 在 Uniswap v3 设置 [$2,850, $3,150]（±5%）窄区间做 ETH/USDC LP。结果 ETH 一路暴跌至 $2,400，此时你的 LP 仓位变成了什么？",
+            options: [
+              "依然保持 50% ETH + 50% USDC，并且继续赚 20 倍手续费",
+              "全部自动换成了 USDC，完美躲过暴跌",
+              "在跌破 $2,850 时你的 USDC 已全部自动接盘变成了 100% ETH，且跌出区间后手续费收入立刻归零",
+              "协议会自动帮你把区间向下平移到 $2,400 附近"
+            ],
+            answer: 2,
+            explain: "集中流动性（CLMM）在价格跌穿下限时，池子会自动用你的稳定币一路接盘下跌资产，最终变成 100% 单边跌价币并停止赚取任何手续费。",
+            lesson: { title: "集中流动性（Uniswap v3 CLMM）区间做市沙盒", path: "19-clmm-yield-splitting/01-uniswap-v3-clmm.html" }
+          },
+          {
+            prompt: "某热门积分项目在 Pendle 上距离到期还剩 45 天，市场隐含年化（Implied APY）被 FOMO 炒到 60%。此时看到 YT 价格天天跌，新手想“抄底 YT 拿到期”，这有多危险？",
+            options: [
+              "YT 到期会 1:1 涨回本金，越跌越该抄底",
+              "极度危险！YT 到期价格必然归零，60% Implied APY 意味着如果实际利息+空投折算年化低于 60%，买 YT 必然净亏损",
+              "YT 和 PT 一样，都能稳锁定 60% 固定收益",
+              "只要持有到到期日，YT 会自动转换成底层生息资产"
+            ],
+            answer: 1,
+            explain: "1 SY = 1 PT + 1 YT。到期时是 PT 回归 1.00，而 YT 随着剩余派息天数减少必然归零。高位 Implied APY 时反而是买 PT 的人白捡高额固定收益。",
+            lesson: { title: "收益代币化（Pendle PT / YT）固定利率与积分杠杆", path: "19-clmm-yield-splitting/02-pendle-pt-yt.html" }
+          },
+          {
+            prompt: "你在永续合约上开了 50 倍全仓做多，此时市场极度狂热、资金费率高达 +0.1% / 8小时。你同时面临哪两重压力？",
+            options: [
+              "空头会每 8 小时给你发钱，而且 50x 杠杆能扛住 20% 回调",
+              "只需反向插针波动不到 2% 就会瞬间爆仓，且每 8 小时还要持续向空头支付高额资金费",
+              "永续合约没有交割日，所以只要不平仓就永远不会爆仓",
+              "资金费率是交易所补贴给多头的奖励"
+            ],
+            answer: 1,
+            explain: "高倍杠杆把爆仓线压缩到极窄（50x ≈ 2% 反向波动即归零），而正资金费率下多头必须定期向空头付费以把合约价压回现货锚定。",
+            lesson: { title: "杠杆倍数与插针爆仓模拟器", path: "07-perps-leverage/02-liquidation-heatmap.html" }
+          }
+        ]
+      },
+      {
+        id: "V3",
+        name: "V3 · 底层基建与隐私",
+        desc: "检验 MEV 防夹、跨链桥脱锚、Rollup 提现哲学与链上隐私聚类",
+        questions: [
+          {
+            prompt: "你在以太坊主网用一个公开 RPC 节点买某个深度一般的新币，怕交易失败顺手把滑点容忍度设成了 12%。成交后发现买在了当根 K 线最高针尖，紧接着价格回落。发生了什么？",
+            options: [
+              "运气不好，刚好撞上正常大户也在同一秒买",
+              "被 MEV 夹子机器人发动了三明治攻击：它监控公开 Mempool，在你前面抢先拉高价格，等你按 12% 滑点接盘后立刻反手砸盘套利",
+              "DEX 智能合约算错了汇率",
+              "节点矿工偷偷改了你的买入数量"
+            ],
+            answer: 1,
+            explain: "高滑点 + 公开 Mempool 是 MEV 三明治机器人的最爱。把交易路由到 Flashbots Protect / MEV Blocker 等私有 RPC 并合理控制滑点，才能隐身防夹。",
+            lesson: { title: "三明治攻击时间轴沙盒", path: "11-mev-dark-forest/01-sandwich-attack-lab.html" }
+          },
+          {
+            prompt: "你通过某个 Lock & Mint（锁定铸造）跨链桥把 5 ETH 从以太坊跨到 B 链拿到 5 wETH。随后黑客攻破了该跨链桥在以太坊主网的托管金库并盗空了所有原生 ETH。你手里的 5 wETH 会怎样？",
+            options: [
+              "完全不受影响，因为我的 5 wETH 在 B 链上很安全",
+              "瞬间失去 1:1 底层锚定资产支撑，在 B 链二级市场暴跌脱锚甚至趋近归零",
+              "B 链验证者会自动赔付我 5 ETH",
+              "黑客只能偷走还没跨链的人的币"
+            ],
+            answer: 1,
+            explain: "资产并没有真的“飞”到另一条链，目标链上的 wETH 只是对应原链金库的兑换凭证。一旦原链金库被掏空，凭证立即失去兑付价值。",
+            lesson: { title: "跨链桥底层机制与被盗路径模拟器", path: "10-scaling-bridges/02-bridge-mechanics-hacks.html" }
+          },
+          {
+            prompt: "你新生成了一个“完全隐私”的钱包 B，打算与对外公开的实名钱包 A 彻底隔离。但因为 B 没钱付手续费，你顺手从 A 给 B 转了 0.01 ETH 当 Gas。结果如何？",
+            options: [
+              "金额太小了，链上追踪工具不会注意到 0.01 ETH",
+              "隐私彻底破防！链上聚类引擎 1 秒就能通过这笔 Gas 转账把 A 和 B 关联为同一控制人",
+              "只要 B 不绑定 ENS 域名就永远查不到",
+              "换个网络节点发送转账就能隐藏来源地址"
+            ],
+            answer: 1,
+            explain: "公链是全透明的伪匿名账本，Gas 费资助关系是最经典的链上聚类指纹之一。真正的隐私需要彻底切断资金图谱或借助合规隐私池（Privacy Pools）等 ZK 方案。",
+            lesson: { title: "链上地址追踪与合规隐私池博弈沙盒", path: "21-zk-privacy/02-onchain-privacy-pools.html" }
+          },
+          {
+            prompt: "从 Optimistic Rollup（如 Arbitrum / Optimism）走官方原生桥提现回以太坊主网，为什么通常需要等待约 7 天，而 ZK Rollup 只需要几分钟到几小时？",
+            options: [
+              "OP 链服务器网速较慢，排队打包需要 7 天",
+              "OP 默认“乐观相信”批次无误，必须留出 7 天欺诈证明挑战期；ZK 每次提交都附带密码学有效性证明，主网验证通过即可最终确认",
+              "这是以太坊主网故意限制 OP 提现的政策",
+              "7 天是为了等待比特币区块确认"
+            ],
+            answer: 1,
+            explain: "Optimistic Rollup 靠经济博弈与 7 天挑战期兜底安全，ZK Rollup 靠零知识数学证明实时自证清白，这是两条 L2 路线的核心哲学差异。",
+            lesson: { title: "Rollup 扩容：OP 挑战期 vs ZK 数学证明", path: "10-scaling-bridges/01-rollup-and-zk.html" }
+          }
+        ]
+      },
+      {
+        id: "V4",
+        name: "V4 · 经济模型与投研",
+        desc: "检验高 FDV 解锁抛压、真实收益 vs 庞氏补贴、预言机操纵与预测市场 EV",
+        questions: [
+          {
+            prompt: "某新币上线大所，流通市值仅 $4,000 万看着很便宜，但你查了下发现初始流通率仅 4%（FDV 高达 10 亿美元），且第 12 个月团队与 VC 将迎来悬崖解锁。买进去长期死拿最大风险是什么？",
+            options: [
+              "流通盘越小越容易永远暴涨，不用看 FDV",
+              "持续的筹码稀释与巨额解锁抛压：即便项目总市值不变，流通量翻 5 倍也会把币价砸掉 80%",
+              "解锁后 VC 一定会高价继续买入拉盘",
+              "只要项目方改个名字，解锁就不会影响价格"
+            ],
+            answer: 1,
+            explain: "单价 = 流通市值 ÷ 流通量。低流通、高 FDV 代币在解锁期会释放海量低成本筹码，如果买盘增长跟不上流通量膨胀速度，币价必然阴跌。",
+            lesson: { title: "低流通高 FDV 与解锁悬崖模拟器", path: "12-tokenomics/01-fdv-unlock-cliff.html" }
+          },
+          {
+            prompt: "某 DeFi 协议宣传“质押年化 250% APY”。你打开 DefiLlama 一查：协议过去一年真实手续费收入仅 $150 万，但靠增发自家代币发出去的补贴高达 $3,000 万。这属于什么收益？",
+            options: [
+              "极其优质的真实收益（Real Yield），闭眼重仓",
+              "典型的通胀庞氏补贴：你赚到的高年化绝大部分来自印空气币稀释持币人，一旦停止拉新币价就会螺旋下跌",
+              "说明协议非常有钱，补贴越多越安全",
+              "只要复投就能跑赢通胀"
+            ],
+            answer: 1,
+            explain: "判断收益含金量的核心公式是「净盈利 = 真实协议收入 - 代币激励支出」。当激励支出远大于真实收入时，高 APY 只是左脚踩右脚的通胀幻觉。",
+            lesson: { title: "真实收益 vs 通胀庞氏拆解器", path: "14-onchain-forensics/01-real-yield-vs-ponzi.html" }
+          },
+          {
+            prompt: "一个新兴借贷协议为了省事，直接读取某个小 DEX 流动性池的瞬时现货价格作为抵押品喂价，没有用 Chainlink 中位数或 TWAP。黑客最容易用什么招数一笔交易掏空它？",
+            options: [
+              "用闪电贷借入巨资瞬间把小 DEX 的币价拉高 10 倍，借走借贷池全部真钱后在同一区块归还闪电贷",
+              "发送 100 万笔垃圾交易把以太坊堵死",
+              "暴力破解协议创始人的助记词",
+              "把所有流动性都质押到 PoS 节点里"
+            ],
+            answer: 0,
+            explain: "单一现货池极易在单区块内被闪电贷瞬间操纵价格。成熟协议必须使用去中心化多源中位数预言机（如 Chainlink）或抗操纵的 TWAP 均价。",
+            lesson: { title: "预言机喂价与防操纵沙盒", path: "13-oracles-real-apps/01-oracle-price-feed.html" }
+          },
+          {
+            prompt: "在 Polymarket 预测市场上，某宏观事件的 Yes 股现价 $0.75、No 股现价 $0.25。经过深度研究你认为该事件真实发生的概率只有 50%。从数学期望（EV）看，你该怎么做？",
+            options: [
+              "买 Yes 股，因为 50% 概率不低",
+              "买 No 股！花 $0.25 买一个 50% 概率兑付 $1.00 的资产，正期望值 EV = +$0.25（+100% 期望回报）",
+              "Yes 和 No 同时等量买入就能稳赚翻倍",
+              "概率 50% 说明买哪边期望值都一样是 0"
+            ],
+            answer: 1,
+            explain: "预测市场买的是「赔率差」而不是单纯猜对错。Yes $0.75 隐含 75% 胜率，若真实胜率仅 50%，买 No（隐含 25% 胜率、实际 50%）具备极高的正期望值。",
+            lesson: { title: "预测市场（Polymarket）赔率与套利引擎", path: "13-oracles-real-apps/02-prediction-market-odds.html" }
+          }
+        ]
+      },
+      {
+        id: "V5",
+        name: "V5 · 前沿叙事与体验",
+        desc: "检验 ERC-4337 账户抽象、RWA 合规白名单、AI Agent x402 微支付与可验证推理",
+        questions: [
+          {
+            prompt: "一个新用户刚收到 100 USDC，钱包里没有任何 ETH。使用 ERC-4337 智能合约钱包时，他是如何丝滑完成一笔 Swap 交易而不用专门去买 ETH 付 Gas 的？",
+            options: [
+              "以太坊取消了所有交易的 Gas 费",
+              "通过 Paymaster（代付合约）用 USDC 抵扣 Gas 或由应用方赞助，并利用交易批处理把 Approve 和 Swap 合并成 1 次确认",
+              "把私钥托管给中心化客服代为操作",
+              "智能合约钱包会自动凭空挖出 ETH"
+            ],
+            answer: 1,
+            explain: "账户抽象（ERC-4337）把钱包升级为可编程智能合约，借助 UserOperation、Bundler 与 Paymaster 实现任意代币付 Gas、应用赞助与一键批量操作。",
+            lesson: { title: "ERC-4337 与 Paymaster 免 Gas 代付沙盒", path: "15-account-abstraction/01-aa-paymaster-gasless.html" }
+          },
+          {
+            prompt: "你通过合规渠道买了链上美债 RWA 代币（采用 ERC-3643 合规标准），然后尝试直接把它转给朋友一个刚新建的普通钱包地址，结果链上交易直接 Revert 报错。为什么？",
+            options: [
+              "以太坊不支持转账美债代币",
+              "ERC-3643 合约内置了身份白名单（KYC Whitelist）校验，接收地址未通过合规认证会被合约直接拒绝转账",
+              "因为周末美股休市所以链上也禁止转账",
+              "Gas 费给太低了，翻倍就能绕过限制"
+            ],
+            answer: 1,
+            explain: "机构级 RWA 是链上效率与链下法律合规的结合体：ERC-3643 在 transfer 时强制检查发送方和接收方是否均在 KYC 白名单内，且发行方通常保留司法冻结权限。",
+            lesson: { title: "RWA 的围墙花园：白名单、冻结权限与托管风险", path: "16-rwa-institutional/02-rwa-compliance-risk.html" }
+          },
+          {
+            prompt: "你的自主研究 AI Agent 每天需要向不同数据源按次调用 1,000 次 API，单次报价 $0.004。为什么传统信用卡行不通，而 Crypto + x402 成了天然解？",
+            options: [
+              "信用卡每笔固定手续费就高达 ~$0.30（比数据贵 75 倍）且 AI 无法办卡；链上稳定币 + HTTP 402 + Session Key 限额钱包能以极低费用 24/7 自动结算且不怕刷爆",
+              "信用卡不支持美元结算",
+              "因为 AI 只能读懂比特币价格，读不懂法币",
+              "x402 可以让 API 彻底永久免费"
+            ],
+            answer: 0,
+            explain: "高频机器微支付（M2M）在传统支付轨道上因固定清算成本和自然人 KYC 门槛在数学上不可行，而 L2/Solana 稳定币 + x402 + 限额会话密钥恰好完美匹配。",
+            lesson: { title: "AI Agent 钱包与 x402 机器微支付沙盒", path: "17-ai-agent-crypto/01-agent-wallet-micropayments.html" }
+          },
+          {
+            prompt: "你花钱调用去中心化算力网络运行顶级大模型，如何防止云端节点“挂羊头卖狗肉”，偷偷把你的请求换成廉价小模型来骗取算力费？",
+            options: [
+              "靠节点发誓遵守职业道德",
+              "通过可验证推理技术：如 TEE 硬件飞地远程证明（快、依赖硬件信任）或 zkML 零知识推理证明（纯数学验证、目前开销较高）",
+              "只要算力节点质押了 Meme 币就不会作弊",
+              "把模型参数全部写进以太坊主网区块里运行"
+            ],
+            answer: 1,
+            explain: "TEE（可信执行环境）、opML（乐观挑战）与 zkML（零知识证明）分别在速度、成本与密码学信任假设之间做权衡，是去中心化 AI 防作弊的核心基础设施。",
+            lesson: { title: "可验证 AI 推理：TEE 硬件飞地 vs zkML 对比器", path: "17-ai-agent-crypto/02-verifiable-ai-tee-zkml.html" }
+          }
+        ]
+      }
+    ];
+
+    function loadSaved() {
+      try { return JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveCleared(stageId, score, total) {
+      const data = loadSaved();
+      data[stageId] = { score, total, cleared: score >= 3 };
+      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(data));
+      updateOverallBadge();
+    }
+
+    let activeStageIdx = 0;
+    const answers = {}; // { "V1-0": chosenIdx }
+
+    function updateOverallBadge() {
+      const saved = loadSaved();
+      const clearedCount = STAGES.filter((s) => saved[s.id]?.cleared).length;
+      document.getElementById("overall-badge").textContent = `已通关 ${clearedCount} / ${STAGES.length} 阶段`;
+    }
+
+    function renderTabs() {
+      const saved = loadSaved();
+      const tabsEl = document.getElementById("stage-tabs");
+      tabsEl.innerHTML = STAGES.map((st, i) => {
+        const isCleared = !!saved[st.id]?.cleared;
+        const isActive = i === activeStageIdx;
+        return `<button class="stage-tab ${isActive ? "active" : ""} ${isCleared ? "cleared" : ""}" data-idx="${i}">
+          ${isCleared ? "✓ " : ""}${st.name}
+        </button>`;
+      }).join("");
+      tabsEl.querySelectorAll(".stage-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeStageIdx = +btn.dataset.idx;
+          render();
+        });
+      });
+    }
+
+    function render() {
+      renderTabs();
+      updateOverallBadge();
+      const stage = STAGES[activeStageIdx];
+      document.getElementById("stage-heading").textContent = stage.name;
+      document.getElementById("stage-sub").textContent = stage.desc;
+
+      let answeredCount = 0;
+      let correctCount = 0;
+
+      const listEl = document.getElementById("quiz-list");
+      listEl.innerHTML = stage.questions.map((q, qi) => {
+        const key = `${stage.id}-${qi}`;
+        const chosen = answers[key];
+        const isAnswered = chosen !== undefined;
+        if (isAnswered) {
+          answeredCount++;
+          if (chosen === q.answer) correctCount++;
+        }
+
+        const optsHtml = q.options.map((opt, oi) => {
+          let cls = "opt-btn";
+          if (isAnswered) {
+            if (oi === q.answer) cls += " correct";
+            else if (oi === chosen) cls += " wrong";
+          }
+          const prefix = String.fromCharCode(65 + oi);
+          return `<button class="${cls}" data-qi="${qi}" data-oi="${oi}" ${isAnswered ? "disabled" : ""}><strong>${prefix}.</strong> ${opt}</button>`;
+        }).join("");
+
+        return `
+          <article class="q-card">
+            <div class="q-meta">${stage.id} · 排雷场景 ${qi + 1} / ${stage.questions.length}</div>
+            <div class="q-title">${q.prompt}</div>
+            <div class="opt-list">${optsHtml}</div>
+            <div class="explain-box ${isAnswered ? "show" : ""}">
+              <div>${isAnswered ? (chosen === q.answer ? '<strong class="val-good">✓ 判断精准！</strong>' : '<strong class="val-bad">✕ 踩雷了！</strong>') : ""} ${q.explain}</div>
+              <a class="review-link" href="${q.lesson.path}">→ 回看对应沙盒：${q.lesson.title}</a>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll(".opt-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const qi = +btn.dataset.qi;
+          const oi = +btn.dataset.oi;
+          answers[`${stage.id}-${qi}`] = oi;
+          render();
+        });
+      });
+
+      document.getElementById("stage-score").textContent = `当前得分：${correctCount} / ${stage.questions.length}`;
+
+      const banner = document.getElementById("result-banner");
+      if (answeredCount === stage.questions.length) {
+        saveCleared(stage.id, correctCount, stage.questions.length);
+        renderTabs();
+        banner.style.display = "block";
+        if (correctCount >= 3) {
+          banner.className = "result-banner pass";
+          const nextStage = STAGES[activeStageIdx + 1];
+          banner.innerHTML = `
+            <div style="font-size:17px;font-weight:700;color:var(--green);margin-bottom:6px;">🎉 ${stage.name} 通关成功（${correctCount} / ${stage.questions.length}）！</div>
+            <p style="font-size:14px;color:var(--text-muted);margin-bottom:10px;">你已经稳稳吃透了本阶段的核心链上规则与高发陷阱。</p>
+            ${nextStage ? `<button class="btn btn-primary" id="btn-next-stage">挑战下一关：${nextStage.name} →</button>` : `<a class="btn btn-primary" href="index.html">返回全景认知地图</a>`}
+          `;
+          const nextBtn = document.getElementById("btn-next-stage");
+          if (nextBtn) {
+            nextBtn.addEventListener("click", () => { activeStageIdx++; render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+          }
+        } else {
+          banner.className = "result-banner fail";
+          banner.innerHTML = `
+            <div style="font-size:17px;font-weight:700;color:var(--amber);margin-bottom:6px;">⚠️ 差一点通关（${correctCount} / ${stage.questions.length}，需 ≥ 3 题）</div>
+            <p style="font-size:14px;color:var(--text-muted);margin-bottom:0;">建议点击上面错题里的沙盒链接回去亲手拉一拉参数，再点右上角「重置本阶段」重新挑战！</p>
+          `;
+        }
+      } else {
+        banner.style.display = "none";
+      }
+    }
+
+    document.getElementById("btn-retry").addEventListener("click", () => {
+      const stage = STAGES[activeStageIdx];
+      stage.questions.forEach((_, qi) => delete answers[`${stage.id}-${qi}`]);
+      render();
+    });
+
+    const RANKS = [
+      { min: 0, title: "🌱 链上萌新", desc: "刚踏入链上世界，建议从 V1 生存与托管关卡开始排雷。" },
+      { min: 1, title: "🛡️ 防坑学徒", desc: "已迈出第一步，能避开最常见的链上初级陷阱。" },
+      { min: 2, title: "⚡ DeFi 猎手", desc: "已看懂核心金融引擎与清算机制，开始建立链上风控直觉。" },
+      { min: 3, title: "🌲 黑暗森林幸存者", desc: "在 MEV、跨链桥、解锁抛压与隐私追踪中具备独立判断力。" },
+      { min: 4, title: "🔭 链上投研专家", desc: "接近全景通关，只差最后一关即可点亮全套徽章！" },
+      { min: 5, title: "🏆 Web3 全景架构师", desc: "V1–V5 全部通关！从钱包底层到 AI Agent 经济规则已全部打通。" }
+    ];
+
+    function getRankInfo() {
+      const saved = loadSaved();
+      const cleared = STAGES.filter((s) => saved[s.id]?.cleared).length;
+      const totalScore = STAGES.reduce((acc, s) => acc + (saved[s.id]?.score || 0), 0);
+      const rank = RANKS[Math.min(RANKS.length - 1, cleared)];
+      return { saved, cleared, totalScore, rank };
+    }
+
+    function updateRankUI() {
+      const { cleared, totalScore, rank } = getRankInfo();
+      document.getElementById("rank-title").textContent = `当前段位：${rank.title}（已通关 ${cleared}/5 · 累计 ${totalScore}/20 题）`;
+      document.getElementById("rank-desc").textContent = rank.desc;
+    }
+
+    const origRender = render;
+    render = function () {
+      origRender();
+      updateRankUI();
+    };
+
+    document.getElementById("btn-copy-card").addEventListener("click", () => {
+      const { saved, cleared, totalScore, rank } = getRankInfo();
+      const lines = STAGES.map((s) => `${saved[s.id]?.cleared ? "✅" : "⬜"} ${s.name}（${saved[s.id]?.score || 0}/4）`).join("\n");
+      const text = `【Web3 Interactive Atlas 排雷成绩单】\n段位：${rank.title}\n总成绩：${cleared}/5 阶段通关 · ${totalScore}/20 题\n${lines}`;
+      const msgEl = document.getElementById("share-msg");
+      msgEl.innerHTML = "";
+      const ta = document.createElement("textarea");
+      ta.readOnly = true;
+      ta.rows = 6;
+      ta.style.marginTop = "8px";
+      ta.value = text;
+      ta.addEventListener("click", () => ta.select());
+      msgEl.appendChild(ta);
+      ta.select();
+    });
+
+    document.getElementById("btn-export-png").addEventListener("click", () => {
+      const { saved, cleared, totalScore, rank } = getRankInfo();
+      const canvas = document.getElementById("score-canvas");
+      const ctx = canvas.getContext("2d");
+
+      const grad = ctx.createLinearGradient(0, 0, 1200, 630);
+      grad.addColorStop(0, "#0b0f17");
+      grad.addColorStop(0.6, "#111827");
+      grad.addColorStop(1, "#0f2236");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1200, 630);
+
+      ctx.strokeStyle = "rgba(56,189,248,0.22)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(36, 36, 1128, 558);
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
+      ctx.fillText("WEB3 INTERACTIVE ATLAS · V1–V5 排雷成绩单", 76, 102);
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "bold 54px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
+      ctx.fillText(rank.title, 76, 185);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "24px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
+      ctx.fillText(`阶段通关：${cleared} / 5    ·    实战排雷得分：${totalScore} / 20`, 76, 236);
+
+      STAGES.forEach((s, idx) => {
+        const x = 76 + idx * 212;
+        const y = 285;
+        const rec = saved[s.id];
+        const ok = !!rec?.cleared;
+        ctx.fillStyle = ok ? "rgba(16,185,129,0.16)" : "#1a2234";
+        ctx.strokeStyle = ok ? "#10b981" : "#263248";
+        ctx.lineWidth = 2;
+        ctx.fillRect(x, y, 196, 150);
+        ctx.strokeRect(x, y, 196, 150);
+
+        ctx.fillStyle = ok ? "#6ee7b7" : "#94a3b8";
+        ctx.font = "bold 24px ui-monospace, Menlo, monospace";
+        ctx.fillText(s.id, x + 20, y + 44);
+
+        ctx.fillStyle = "#e5e7eb";
+        ctx.font = "bold 28px ui-monospace, Menlo, monospace";
+        ctx.fillText(`${rec?.score || 0} / 4`, x + 20, y + 92);
+
+        ctx.fillStyle = ok ? "#10b981" : "#64748b";
+        ctx.font = "18px -apple-system, PingFang SC, sans-serif";
+        ctx.fillText(ok ? "✓ 已通关" : "待挑战", x + 20, y + 128);
+      });
+
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "22px ui-monospace, Menlo, monospace";
+      ctx.fillText("Web3 Interactive Atlas · 21 Modules · 42 Interactive Labs", 76, 540);
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const msgEl = document.getElementById("share-msg");
+      msgEl.innerHTML = `<div style="margin-top:10px;"><a class="btn btn-primary" href="${dataUrl}" download="web3-atlas-rank-${cleared}of5.png">⬇ 点击保存 PNG 成绩单</a></div><img src="${dataUrl}" alt="成绩单预览" style="width:100%;max-width:600px;border-radius:10px;border:1px solid var(--border);margin-top:10px;display:block;" />`;
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>集中流动性（Uniswap v3 CLMM）区间做市沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .range-track {
+      position: relative; height: 34px; background: #0d1320; border: 1px solid var(--border);
+      border-radius: 8px; margin: 14px 0 10px; overflow: hidden;
+    }
+    .range-band {
+      position: absolute; top: 0; bottom: 0; background: rgba(14, 165, 233, 0.25);
+      border-left: 2px solid var(--accent); border-right: 2px solid var(--accent);
+    }
+    .price-marker {
+      position: absolute; top: 0; bottom: 0; width: 3px; background: var(--amber);
+      box-shadow: 0 0 8px var(--amber); transition: left 0.12s;
+    }
+    .comp-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: #0d1320; margin: 8px 0; }
+    .comp-eth { background: #38bdf8; transition: width 0.2s; }
+    .comp-usdc { background: #10b981; transition: width 0.2s; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 集中流动性与收益拆分</span>
+      <h1>集中流动性（Uniswap v3 CLMM）区间做市沙盒</h1>
+      <p>Uniswap v2 把你的钱均匀铺在 0 到无穷大，99% 的资金都在睡大觉。Uniswap v3 允许你把全部资金压缩到自定义价格区间，手续费翻倍——但代价是风险也成倍放大。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒区间震撼</div>
+      <h2>ETH 现价 $3,000，你投入 $10,000 在 [$2,700, $3,300]（±10%）窄区间做 LP</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">如果在窄区间内震荡 vs 如果 ETH 突然单边跌破 $2,700：</div>
+        <button id="hook-btn" class="btn btn-primary">揭晓窄区间做市的双刃剑</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>区间内是印钞机，出区间瞬间“变砖”！</strong><br />
+        • <strong>在 [$2,700, $3,300] 区间内</strong>：你的资金效率约是 Uniswap v2 的 <strong>10.5 倍</strong>，同样本金赚 10 倍手续费！<br />
+        • <strong>一旦跌破 $2,700</strong>：你的 $5,000 USDC 已经在下跌途中<strong>全部自动接盘换成了 ETH</strong>（100% 满仓跌价资产），且手续费收入立刻归零！如果涨破 $3,300，则你的 ETH 全部被卖成了 USDC，彻底踏空后续涨幅。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>集中流动性 = 放大版无常损失 + 隐形卖期权</h2>
+      <p>设置区间 $[P_a, P_b]$ 越窄，你的单位资金提供的深度（$L$）越高，但一旦价格触及边界，持仓比例就会瞬间变成 100% 单边资产：</p>
+      <div class="formula-box">
+        相对 v2 的资金效率倍数 ≈ 1 ÷ (1 - √(P_a / P_b))<br/>
+        • 价格 P ≤ P_a（跌穿下限）：100% 变成 ETH，手续费 = 0<br/>
+        • 价格 P ≥ P_b（涨穿上限）：100% 变成 USDC，手续费 = 0
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>CLMM 区间宽度与出区间状态模拟器（入场价 $3,000 / 本金 $10,000）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>做市区间宽度 (±%) <strong id="lbl-w">±15%</strong></label>
+            <input id="sl-w" type="range" min="5" max="70" step="5" value="15" />
+          </div>
+          <div class="control-group">
+            <label>当前 ETH 市场价格 <strong id="lbl-p">$3,000</strong></label>
+            <input id="sl-p" type="range" min="1200" max="5400" step="50" value="3000" />
+          </div>
+          <div class="control-group">
+            <label>v2 基准年化手续费 <strong id="lbl-v2">8%</strong></label>
+            <input id="sl-v2" type="range" min="2" max="25" step="1" value="8" />
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">
+            设定价格区间：<strong id="range-text" style="color:var(--accent);font-family:var(--mono)">$2,550 ~ $3,450</strong>
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">资金效率倍数</div><div class="m-val val-good" id="m-eff">6.7x</div></div>
+            <div class="metric-box"><div class="m-label">当前状态 / 预估年化</div><div class="m-val val-good" id="m-apr">53.6%</div></div>
+            <div class="metric-box"><div class="m-label">LP 现值 vs 死拿现货</div><div class="m-val" id="m-il">0.0%</div></div>
+          </div>
+
+          <div style="font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>$1,200</span><span>蓝带 = 你的做市区间 · 黄线 = 现价</span><span>$5,400</span>
+          </div>
+          <div class="range-track">
+            <div id="range-band" class="range-band"></div>
+            <div id="price-marker" class="price-marker"></div>
+          </div>
+
+          <div style="font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:12px;">
+            <span id="lbl-eth-pct" style="color:#38bdf8">ETH 50%</span>
+            <span id="lbl-usdc-pct" style="color:#10b981">USDC 50%</span>
+          </div>
+          <div class="comp-bar">
+            <div id="comp-eth" class="comp-eth" style="width:50%"></div>
+            <div id="comp-usdc" class="comp-usdc" style="width:50%"></div>
+          </div>
+          <div id="detail-text" style="font-size:13px;color:#d1d5db;margin-top:10px;line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把区间宽度收窄到 ±5%，观察资金效率如何飙升到 20x，但价格只需微跌 $200 就会立刻跌出区间变成 100% ETH。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把当前 ETH 价格拉到 $4,800（大牛市暴涨），对比窄区间 LP 现值与直接死拿 50/50 现货的差距，体会“踏空卖飞”。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>为什么大多数散户在 Uniswap v3 窄区间里其实在亏钱？</h2>
+      <div class="callout-warn">
+        <strong>DeFi 进阶真相（LVR 逆向选择）：</strong><br />
+        1. <strong>卖方期权属性</strong>：做窄区间 LP 本质上是在持续卖空波动率。只要市场出现单边趋势行情，套利者就会以旧价格买走你的强势币、把弱势币塞给你，这种持续失血被称为 <strong>LVR（Loss-Versus-Rebalancing）</strong>。<br />
+        2. <strong>最适合 CLMM 的币对</strong>：高相关、低波动的锚定资产对（如 <code>USDC/USDT</code>、<code>wstETH/ETH</code>）才是窄区间集中流动性的真正甜区；高波动山寨币做超窄区间往往“赚了手续费，亏了大本金”。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "19-clmm-yield-splitting/01-uniswap-v3-clmm.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "19 · 集中流动性与收益拆分" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const P0 = 3000;
+    const CAP = 10000;
+    const slW = document.getElementById("sl-w");
+    const slP = document.getElementById("sl-p");
+    const slV2 = document.getElementById("sl-v2");
+
+    function update() {
+      const w = +slW.value / 100;
+      const P = +slP.value;
+      const v2Apr = +slV2.value;
+
+      const Pa = Math.max(300, P0 * (1 - w));
+      const Pb = P0 * (1 + w);
+
+      document.getElementById("lbl-w").textContent = `±${Math.round(w * 100)}%`;
+      document.getElementById("lbl-p").textContent = `$${P.toLocaleString()}`;
+      document.getElementById("lbl-v2").textContent = `${v2Apr}%`;
+      document.getElementById("range-text").textContent = `$${Math.round(Pa).toLocaleString()} ~ $${Math.round(Pb).toLocaleString()}`;
+
+      // Uniswap v3 exact concentrated liquidity math for symmetric deposit at P0
+      const sqrtP0 = Math.sqrt(P0), sqrtPa = Math.sqrt(Pa), sqrtPb = Math.sqrt(Pb), sqrtP = Math.sqrt(P);
+      // At P0, value V0 = L * [ (sqrtP0 - sqrtPa) + P0 * (1/sqrtP0 - 1/sqrtPb) ]
+      const denom = (sqrtP0 - sqrtPa) + P0 * (1 / sqrtP0 - 1 / sqrtPb);
+      const L = CAP / denom;
+
+      // Initial asset amounts at P0 (for HODL comparison)
+      const eth0 = L * (1 / sqrtP0 - 1 / sqrtPb);
+      const usdc0 = L * (sqrtP0 - sqrtPa);
+      const hodlVal = eth0 * P + usdc0;
+
+      // Current LP asset amounts at price P
+      let ethNow = 0, usdcNow = 0, inRange = true;
+      if (P <= Pa) {
+        ethNow = L * (1 / sqrtPa - 1 / sqrtPb);
+        usdcNow = 0;
+        inRange = false;
+      } else if (P >= Pb) {
+        ethNow = 0;
+        usdcNow = L * (sqrtPb - sqrtPa);
+        inRange = false;
+      } else {
+        ethNow = L * (1 / sqrtP - 1 / sqrtPb);
+        usdcNow = L * (sqrtP - sqrtPa);
+      }
+
+      const lpVal = ethNow * P + usdcNow;
+      const ilPct = ((lpVal - hodlVal) / hodlVal) * 100;
+      const eff = 1 / (1 - Math.sqrt(Pa / Pb));
+      const ethPct = lpVal > 0 ? ((ethNow * P) / lpVal) * 100 : 0;
+      const usdcPct = 100 - ethPct;
+
+      document.getElementById("m-eff").textContent = `${eff.toFixed(1)}x`;
+      const mApr = document.getElementById("m-apr");
+      if (inRange) {
+        mApr.textContent = `${(v2Apr * eff).toFixed(0)}% (区间内)`;
+        mApr.className = "m-val val-good";
+      } else {
+        mApr.textContent = "0% (已出区间)";
+        mApr.className = "m-val val-bad";
+      }
+
+      const mIl = document.getElementById("m-il");
+      mIl.textContent = `${ilPct.toFixed(1)}%`;
+      mIl.className = `m-val ${ilPct > -2 ? "" : ilPct > -8 ? "val-warn" : "val-bad"}`;
+
+      // Update range visualizer (scale 1200..5400)
+      const minS = 1200, maxS = 5400;
+      const leftPct = Math.max(0, Math.min(100, ((Pa - minS) / (maxS - minS)) * 100));
+      const rightPct = Math.max(0, Math.min(100, ((Pb - minS) / (maxS - minS)) * 100));
+      const curPct = Math.max(0, Math.min(100, ((P - minS) / (maxS - minS)) * 100));
+
+      const band = document.getElementById("range-band");
+      band.style.left = `${leftPct}%`;
+      band.style.width = `${Math.max(2, rightPct - leftPct)}%`;
+      document.getElementById("price-marker").style.left = `${curPct}%`;
+
+      document.getElementById("lbl-eth-pct").textContent = `ETH ${ethPct.toFixed(0)}% (${ethNow.toFixed(2)} ETH)`;
+      document.getElementById("lbl-usdc-pct").textContent = `USDC ${usdcPct.toFixed(0)}% ($${Math.round(usdcNow).toLocaleString()})`;
+      document.getElementById("comp-eth").style.width = `${ethPct}%`;
+      document.getElementById("comp-usdc").style.width = `${usdcPct}%`;
+
+      let note = `当前 LP 持仓价值 <strong>$${Math.round(lpVal).toLocaleString()}</strong>，若原地不动死拿最初资产价值 <strong>$${Math.round(hodlVal).toLocaleString()}</strong>。`;
+      if (!inRange && P <= Pa) {
+        note += ` <span class="val-bad">价格已跌破下限，你的 USDC 已全部抄底变成 ETH，且不再产生任何手续费！</span>`;
+      } else if (!inRange && P >= Pb) {
+        note += ` <span class="val-warn">价格已涨破上限，你的 ETH 已全部卖成 USDC，彻底踏空后续涨幅且手续费归零！</span>`;
+      } else {
+        note += ` <span class="val-good">处于活跃做市区间内，正在以 ${eff.toFixed(1)} 倍效率赚取手续费。</span>`;
+      }
+      document.getElementById("detail-text").innerHTML = note;
+    }
+
+    [slW, slP, slV2].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

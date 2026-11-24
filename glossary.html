@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 概念术语速查索引 — Web3 Interactive Atlas</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="shared/theme.css" />
+  <style>
+    .g-toolbar {
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .g-search {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 14px; border-radius: 8px; width: 340px; max-width: 100%; font-size: 14px;
+    }
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filter-btn {
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); transition: 0.15s;
+    }
+    .filter-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .glossary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+    }
+    .term-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+    }
+    .term-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .term-name { font-size: 16px; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .term-layer { font-size: 11px; color: var(--text-muted); }
+    .term-links { display: grid; gap: 6px; }
+    .term-link {
+      display: block; padding: 8px 10px; border-radius: 8px; font-size: 13px;
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text); transition: 0.15s;
+    }
+    .term-link:hover { border-color: var(--accent); text-decoration: none; }
+    .term-link small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <header class="atlas-topbar">
+    <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
+    <div class="nav-actions">
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="quiz.html">🧭 排雷测验</a>
+    </div>
+  </header>
+
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">全站概念索引 · 自动同步自 42 个沙盒</span>
+      <h1>Web3 高频术语速查索引</h1>
+      <p>在推特、研报或钱包弹窗里看到陌生黑话？直接搜词条，一键跳进对应的交互沙盒亲手验证底层机制。</p>
+    </header>
+
+    <div class="g-toolbar">
+      <input id="g-search" class="g-search" type="search" placeholder="输入术语关键词（如 Permit2、LTV、MEV、FDV、x402、ZK）..." />
+      <div id="g-count" style="font-size:13px;color:var(--text-muted);font-family:var(--mono);"></div>
+    </div>
+
+    <div id="g-filters" class="filter-row">
+      <button class="filter-btn active" data-layer="ALL">全部阶段</button>
+      <button class="filter-btn" data-layer="V1">V1 · 生存与托管</button>
+      <button class="filter-btn" data-layer="V2">V2 · DeFi 引擎</button>
+      <button class="filter-btn" data-layer="V3">V3 · 底层与隐私</button>
+      <button class="filter-btn" data-layer="V4">V4 · 经济与投研</button>
+      <button class="filter-btn" data-layer="V5">V5 · 前沿叙事</button>
+    </div>
+
+    <div id="glossary-grid" class="glossary-grid"></div>
+  </main>
+
+  <script src="catalog.js"></script>
+  <script>
+    const catalog = window.WEB3_ATLAS_CATALOG || { modules: [] };
+    const termMap = new Map();
+
+    catalog.modules.forEach((mod) => {
+      const layerCode = (mod.layer || "").slice(0, 2);
+      (mod.lessons || []).forEach((lesson) => {
+        (lesson.concepts || []).forEach((concept) => {
+          const key = concept.trim();
+          if (!key) return;
+          if (!termMap.has(key)) {
+            termMap.set(key, { name: key, layers: new Set(), items: [] });
+          }
+          const entry = termMap.get(key);
+          entry.layers.add(layerCode);
+          if (!entry.items.some((x) => x.path === lesson.path)) {
+            entry.items.push({
+              path: lesson.path,
+              title: lesson.title.zh,
+              subtitle: lesson.subtitle.zh,
+              moduleTitle: `${mod.icon || ""} ${mod.title.zh}`
+            });
+          }
+        });
+      });
+    });
+
+    const allTerms = Array.from(termMap.values()).sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
+    const searchEl = document.getElementById("g-search");
+    const countEl = document.getElementById("g-count");
+    const gridEl = document.getElementById("glossary-grid");
+    let activeLayer = "ALL";
+
+    function render() {
+      const q = searchEl.value.trim().toLowerCase();
+      const filtered = allTerms.filter((t) => {
+        if (activeLayer !== "ALL" && !t.layers.has(activeLayer)) return false;
+        if (!q) return true;
+        const hay = [t.name, ...t.items.map((i) => `${i.title} ${i.subtitle} ${i.moduleTitle}`)].join(" ").toLowerCase();
+        return hay.includes(q);
+      });
+
+      countEl.textContent = `共收录 ${allTerms.length} 个核心术语 · 当前显示 ${filtered.length} 个`;
+      if (!filtered.length) {
+        gridEl.innerHTML = `<p style="color:var(--text-muted)">没有匹配的概念词条，换个关键词试试。</p>`;
+        return;
+      }
+
+      gridEl.innerHTML = filtered.map((t) => `
+        <article class="term-card">
+          <div class="term-head">
+            <span class="term-name">${t.name}</span>
+            <span class="term-layer">${Array.from(t.layers).join(" / ")}</span>
+          </div>
+          <div class="term-links">
+            ${t.items.map((it) => `
+              <a class="term-link" href="${it.path}">
+                ${it.title} →
+                <small>${it.moduleTitle}</small>
+              </a>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    document.querySelectorAll("#g-filters .filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#g-filters .filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeLayer = btn.dataset.layer;
+        render();
+      });
+    });
+    searchEl.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
