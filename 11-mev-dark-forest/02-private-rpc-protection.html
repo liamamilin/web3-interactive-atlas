@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>黑暗森林隐身术：私有 RPC 防夹模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .route-box { background: #0d1320; border: 1px solid var(--border); border-radius: 10px; padding: 16px; font-family: var(--mono); font-size: 13px; line-height: 1.9; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · MEV 与黑暗森林博弈</span>
+      <h1>黑暗森林隐身术：私有 RPC 防夹模拟器</h1>
+      <p>既然公开内存池（Mempool）满是猎手，普通人怎么才能安全地做大额链上交易？答案是：走“地下加密专线”。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>你准备在链上卖出一笔 $30,000 的山寨币，有两条广播路线可选</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">路线 A：默认公开 RPC（全网大喇叭广播）；路线 B：Flashbots Protect / MEV Blocker（私有通道直连区块构建者）。</div>
+        <button id="hook-btn" class="btn btn-primary">对比两条路线的结局</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>走私有 RPC 后，夹子机器人彻底变成瞎子！</strong><br />
+        你的交易完全不经过公开 Mempool，直到它已经被打包进正式区块上链的那一刻，别人才第一次看到它——机器人连插队的机会都没有！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>公开广播 vs 私有通道（Private Orderflow）</h2>
+      <p>默认情况下，钱包把你的交易发给公共节点，节点会像发传单一样广播给全网（包括 MEV 机器人）。而<strong>防夹 RPC（如 Flashbots Protect、MEV Blocker、CoW Swap）</strong>把你的交易通过加密通道直接发给负责出块的 <strong>Block Builder</strong>，承诺绝不对外泄露。</p>
+      <div class="formula-box">
+        普通路径：钱包 → 公开 Mempool（被夹子扫描）→ 打包上链<br/>
+        隐身路径：钱包 → 私有 RPC 加密专线 → 区块构建者直接上链（0 泄露）
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>交易广播路径攻防模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>选择钱包 RPC 节点模式</label>
+            <select id="sel-rpc">
+              <option value="public">默认公开 RPC（暴露在 Mempool）</option>
+              <option value="private">防夹私有 RPC（Flashbots / MEV Blocker）</option>
+              <option value="intent">意图批量撮合（CoW Swap 协议）</option>
+            </select>
+          </div>
+          <button id="btn-send" class="btn btn-primary" style="width:100%;">发射 $25,000 大额 Swap 交易</button>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">被夹风险</div><div class="m-val" id="m-risk" style="font-size:15px;">极高</div></div>
+            <div class="metric-box"><div class="m-label">预期被夹损耗</div><div class="m-val" id="m-cost" style="font-size:15px;">-$420</div></div>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">交易路由追踪：</div>
+          <div id="route-out" class="route-box">点击左侧按钮模拟发射交易...</div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：用「默认公开 RPC」发射交易，观察交易在 Mempool 停留期间如何被夹子拦截。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：切换为「防夹私有 RPC」或「CoW Swap 意图撮合」，验证零被夹成交。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>给你的钱包 10 秒钟穿上防弹衣</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 在 MetaMask 等钱包里，花 10 秒钟把以太坊主网的 RPC 换成 <strong>MEV Blocker</strong> 或 <strong>Flashbots Protect</strong>（完全免费，且部分私有 RPC 还会把套利返佣退回你钱包）。<br />
+        2. 做大额链上兑换时，直接使用自带防 MEV 保护的聚合器（如 <strong>CoW Swap / 1inch Fusion</strong>），连 Gas 费失败都不会扣钱。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "11-mev-dark-forest/02-private-rpc-protection.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "11 · MEV 与黑暗森林" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selRpc = document.getElementById("sel-rpc");
+    const riskEl = document.getElementById("m-risk"), costEl = document.getElementById("m-cost"), outEl = document.getElementById("route-out");
+
+    function updateMeta() {
+      const v = selRpc.value;
+      if (v === "public") {
+        riskEl.textContent = "🚨 极高"; riskEl.className = "m-val val-bad";
+        costEl.textContent = "-$420"; costEl.className = "m-val val-bad";
+      } else if (v === "private") {
+        riskEl.textContent = "🛡️ 免疫三明治"; riskEl.className = "m-val val-good";
+        costEl.textContent = "$0"; costEl.className = "m-val val-good";
+      } else {
+        riskEl.textContent = "🛡️ 链下批量撮合"; riskEl.className = "m-val val-good";
+        costEl.textContent = "$0 (还省 Gas)"; costEl.className = "m-val val-good";
+      }
+    }
+    selRpc.addEventListener("change", updateMeta);
+
+    document.getElementById("btn-send").addEventListener("click", () => {
+      const v = selRpc.value;
+      if (v === "public") {
+        outEl.innerHTML = `
+          1. 钱包签名交易 → 发送至公开节点<br/>
+          2. 进入公开 Mempool → <span class="val-bad">12ms 内被 4 个 MEV 机器人捕获！</span><br/>
+          3. 机器人竞价插队 → <span class="val-bad">发动三明治攻击，你的成交价被顶高 1.7% (-$420)</span>
+        `;
+      } else if (v === "private") {
+        outEl.innerHTML = `
+          1. 钱包签名交易 → 通过 HTTPS 加密直连 <strong>Flashbots Protect</strong><br/>
+          2. <span class="val-good">跳过公开 Mempool，全网夹子机器人完全不可见</span><br/>
+          3. 区块构建者直接打包上链 → <span class="val-good">✓ 零被夹损耗，按真实市价完美成交！</span>
+        `;
+      } else {
+        outEl.innerHTML = `
+          1. 你仅签署一条离线交易意图（Intent）：我想用 $25k 换最多代币<br/>
+          2. <span class="val-good">全网 Solver 求解器互相竞价，直接点对点撮合对手盘</span><br/>
+          3. <span class="val-good">✓ 零三明治攻击、零失败 Gas 扣费，拿到全网最优成交价！</span>
+        `;
+      }
+    });
+    updateMeta();
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>跨链桥底层机制与被盗路径模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · Layer 2 扩容与跨链桥</span>
+      <h1>跨链桥底层机制与被盗路径模拟器</h1>
+      <p>加密史上金额最大的几起黑客事件（Ronin $6.2 亿、Wormhole $3.2 亿、Nomad $1.9 亿）全都是跨链桥被黑。为什么跨链桥这么脆弱？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉拆解</div>
+      <h2>把以太坊上的 10 ETH 跨链到 Solana，这 10 ETH 真的“飞”过去了吗？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">不同公链的账本完全隔离，ETH 根本无法离开以太坊。点击查看跨链桥的魔术真相：</div>
+        <button id="hook-btn" class="btn btn-primary">拆穿“跨链”底层魔术</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>锁定并印钞（Lock &amp; Mint）！</strong><br />
+        你把 10 ETH 锁进跨链桥在以太坊上的<strong>大金库合约</strong>里；跨链桥在 Solana 上给你凭空印出 10 个“欠条代币（Wrapped ETH）”。你手里拿的其实是一张金库寄存单！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>为什么跨链桥是黑客眼中的“超级蜜罐”？</h2>
+      <p>因为所有用户的真钱全都集中堆在源链的<strong>同一个金库合约</strong>里（动辄数亿美元），而目标链的印钞权限往往只由少数多签节点或复杂的跨链验证代码控制：</p>
+      <div class="formula-box">
+        攻击路径 A：伪造跨链消息 → 在目标链凭空印出天量 Wrapped 资产砸盘<br/>
+        攻击路径 B：攻破多签私钥 → 直接搬空源链金库 → 目标链上的所有映射币瞬间沦为无背书废纸！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>跨链金库与脱锚崩盘模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">源链金库真 ETH</div><div class="m-val val-good" id="m-vault">1,000 ETH</div></div>
+            <div class="metric-box"><div class="m-label">目标链映射 wETH</div><div class="m-val" id="m-mint">1,000 wETH</div></div>
+          </div>
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">映射币真实含金量</div><div class="m-val val-good" id="m-back">100.0%</div></div>
+            <div class="metric-box"><div class="m-label">市场状态</div><div class="m-val" id="m-st" style="font-size:14px;">1:1 锚定</div></div>
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button id="btn-bridge" class="btn">1. 正常跨链：存入 200 ETH → 铸造 200 wETH</button>
+            <button id="btn-hack-mint" class="btn btn-danger">2. 模拟黑客漏洞：目标链凭空增发 3,000 wETH</button>
+            <button id="btn-hack-vault" class="btn btn-danger">3. 模拟多签被盗：黑客直接搬空源链 900 ETH</button>
+            <button id="btn-reset" class="btn">重置跨链桥状态</button>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">跨链桥安全审计日志：</div>
+          <div id="b-log" style="font-family:var(--mono);font-size:12px;line-height:1.7;background:#0d1320;padding:12px;border-radius:8px;min-height:180px;"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：点击「目标链凭空增发」，观察即便源链金库一分没少，所有无辜用户的 wETH 含金量也瞬间暴跌。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：重置后点击「搬空源链金库」，看懂为什么跨链桥被黑时目标链上的衍生资产会瞬间脱锚。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>如何安全跨链？优先选原生资产与意图桥</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 尽量持有<strong>原生发行资产</strong>（如 Circle 官方原生 CCTP 跨链的 USDC），避免长期持有小众第三方跨链桥印出来的 <code>wXXX / xxx.e</code> 映射代币。<br />
+        2. 大额跨链时，把中心化交易所（如币安/Coinbase）当成“免费跨链桥”往往更安全、滑点更低。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "10-scaling-bridges/02-bridge-mechanics-hacks.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "10 · L2 扩容与跨链" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    let vault = 1000, minted = 1000;
+    const logEl = document.getElementById("b-log");
+    function log(msg, cls = "") {
+      logEl.innerHTML += `<div class="${cls}">&gt; ${msg}</div>`;
+    }
+    function sync() {
+      const ratio = minted > 0 ? Math.min(1, vault / minted) * 100 : 0;
+      document.getElementById("m-vault").textContent = `${vault} ETH`;
+      document.getElementById("m-mint").textContent = `${minted} wETH`;
+      const bEl = document.getElementById("m-back");
+      bEl.textContent = `${ratio.toFixed(1)}%`;
+      bEl.className = "m-val " + (ratio < 99 ? "val-bad" : "val-good");
+      const stEl = document.getElementById("m-st");
+      if (ratio < 99) { stEl.textContent = "🚨 资不抵债 · 严重脱锚"; stEl.className = "m-val val-bad"; }
+      else { stEl.textContent = "✓ 1:1 足额锚定"; stEl.className = "m-val val-good"; }
+    }
+    document.getElementById("btn-bridge").addEventListener("click", () => {
+      vault += 200; minted += 200; sync(); log("正常跨链：源链锁入 200 ETH，目标链铸造 200 wETH。", "val-good");
+    });
+    document.getElementById("btn-hack-mint").addEventListener("click", () => {
+      minted += 3000; sync(); log("漏洞触发！黑客伪造验证消息，凭空印出 3,000 wETH 并砸向市场！", "val-bad");
+    });
+    document.getElementById("btn-hack-vault").addEventListener("click", () => {
+      const stolen = Math.min(vault, 900); vault -= stolen; sync(); log(`多签沦陷！黑客从源链金库盗走 ${stolen} ETH，目标链映射币瞬间失去背书！`, "val-bad");
+    });
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      vault = 1000; minted = 1000; logEl.innerHTML = ""; sync(); log("金库已重置：1,000 ETH 对应 1,000 wETH。");
+    });
+    sync(); log("跨链桥运行中：尝试正常跨链或模拟黑客攻击。");
+  </script>
+</body>
+</html>

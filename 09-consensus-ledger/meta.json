@@ -1,0 +1,62 @@
+{
+  "id": "09-consensus-ledger",
+  "order": 9,
+  "layer": "V3: 底层基建与黑暗森林",
+  "icon": "⛓️",
+  "accentColor": "#6366f1",
+  "title": {
+    "zh": "账本模型与共识机制",
+    "en": "Ledger Models & Consensus"
+  },
+  "summary": {
+    "zh": "拆解比特币的 UTXO 找零账本与以太坊账户模型的本质区别，以及 PoW 算力竞争、51% 攻击与 PoS 质押惩罚。",
+    "en": "Comparing Bitcoin UTXO vs Ethereum Accounts, and simulating PoW forks vs PoS slashing."
+  },
+  "lessons": [
+    {
+      "file": "01-utxo-vs-account.html",
+      "title": {
+        "zh": "UTXO 找零模型 vs 账户余额模型",
+        "en": "UTXO vs Account Balance Model"
+      },
+      "subtitle": {
+        "zh": "为什么比特币转账像“拿 100 块现金买 30 块东西找回 70 块”，而以太坊像银行卡扣款？",
+        "en": "Why Bitcoin spends discrete cash bills while Ethereum updates account balances."
+      },
+      "duration": "5 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "UTXO",
+        "Account Model",
+        "Change Output",
+        "Bitcoin vs ETH"
+      ],
+      "prerequisites": [
+        "02-tx-gas-multichain/01-mempool-gas-auction.html"
+      ]
+    },
+    {
+      "file": "02-pow-pos-fork.html",
+      "title": {
+        "zh": "PoW 最长链分叉与 PoS 惩罚模拟器",
+        "en": "PoW Forking & PoS Slashing Lab"
+      },
+      "subtitle": {
+        "zh": "没有中心服务器，全球节点如何对“哪条链是真的”达成共识？亲手模拟 51% 双花攻击与 Slashing。",
+        "en": "How distributed nodes reach consensus and defend against double-spending."
+      },
+      "duration": "5 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "PoW",
+        "PoS",
+        "51% Attack",
+        "Finality",
+        "Slashing"
+      ],
+      "prerequisites": [
+        "09-consensus-ledger/01-utxo-vs-account.html"
+      ]
+    }
+  ]
+}

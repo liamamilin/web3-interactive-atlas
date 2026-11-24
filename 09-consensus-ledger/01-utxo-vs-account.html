@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UTXO 找零模型 vs 账户余额模型 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .utxo-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .utxo-pill {
+      padding: 8px 12px; border-radius: 8px; font-family: var(--mono); font-size: 13px;
+      background: #0d1320; border: 1px solid var(--accent); color: #bae6fd;
+    }
+    .utxo-pill.spent { opacity: 0.35; text-decoration: line-through; border-color: var(--border); }
+    .utxo-pill.new { border-color: var(--green); color: #a7f3d0; }
+    .split-box { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .split-box { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · 账本模型与共识机制</span>
+      <h1>UTXO 找零模型 vs 账户余额模型</h1>
+      <p>查比特币区块浏览器时，为什么你明明只给朋友转了 0.3 BTC，交易记录里却显示转出了 1.0 BTC，另外 0.7 BTC 转给了一个陌生新地址？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉踩坑</div>
+      <h2>你的比特币钱包里有一张面额 1.0 BTC 的“纸币”，现在要给朋友付 0.3 BTC</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">在比特币底层，<strong>根本不存在“余额 = 1.0 - 0.3 = 0.7”这个减法操作</strong>。点击查看真实发生了什么：</div>
+        <button id="hook-btn" class="btn btn-primary">执行这笔 0.3 BTC 转账</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>整张 1.0 BTC 被彻底销毁（花费）！</strong><br />
+        协议同时印出了两张新纸币：一张 <strong>0.3 BTC</strong> 归朋友，一张 <strong>0.6999 BTC</strong> 作为“找零”退回你自己的找零地址（0.0001 BTC 归矿工）。这就是 <strong>UTXO（未花费交易输出）</strong>。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>现金纸币模型（BTC） vs 银行卡余额模型（ETH）</h2>
+      <p>• <strong>比特币 UTXO 模型</strong>：账本里不记“你有多少钱”，只记一张张尚未花掉的“电子支票（UTXO）”。你的钱包余额只是 App 把所有属于你的 UTXO 面额加起来显示而已。优点是<strong>天然隐私性好、极易并行验证</strong>。</p>
+      <p>• <strong>以太坊 Account 模型</strong>：就像银行数据库，直接记录 <code>Balance[Alice] = 10 ETH</code>。转账就是 Alice 减 3、Bob 加 3。优点是<strong>极度适合复杂的智能合约状态管理</strong>（DeFi 乐高离不开它）。</p>
+      <div class="formula-box">
+        BTC (UTXO)：Input (旧纸币全额销毁) ──▶ Output 1 (收款人) + Output 2 (找零给自己) + 矿工费<br/>
+        ETH (Account)：Balance[A] -= Amount; &nbsp;Balance[B] += Amount; &nbsp;Nonce[A] += 1;
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>同笔转账在比特币与以太坊底层的执行对比</h2>
+      <div class="lab-panel" style="margin-bottom:16px;">
+        <div class="control-group" style="margin-bottom:10px;">
+          <label>设置转账金额（你的总资产为 1.00 BTC / ETH）<strong id="lbl-amt">0.35</strong></label>
+          <input id="sl-amt" type="range" min="0.05" max="0.95" step="0.05" value="0.35" />
+        </div>
+        <button id="btn-send" class="btn btn-primary">模拟发送这笔交易</button>
+        <button id="btn-reset" class="btn" style="margin-left:8px;">重置初始状态</button>
+      </div>
+
+      <div class="split-box">
+        <div class="lab-panel">
+          <h3 style="font-size:15px;margin-bottom:8px;">₿ 比特币 UTXO 钱包状态</h3>
+          <div style="font-size:12px;color:var(--text-muted);">当前持有的 UTXO（支票碎片）：</div>
+          <div id="btc-utxos" class="utxo-list"></div>
+          <div id="btc-log" style="font-size:12px;color:var(--text-muted);margin-top:12px;font-family:var(--mono);"></div>
+        </div>
+        <div class="lab-panel">
+          <h3 style="font-size:15px;margin-bottom:8px;">Ξ 以太坊 Account 账户状态</h3>
+          <div class="metrics-row" style="margin-top:8px;">
+            <div class="metric-box"><div class="m-label">你的余额</div><div class="m-val val-good" id="eth-bal">1.00 ETH</div></div>
+            <div class="metric-box"><div class="m-label">账户 Nonce</div><div class="m-val" id="eth-nonce">0</div></div>
+          </div>
+          <div id="eth-log" style="font-size:12px;color:var(--text-muted);font-family:var(--mono);">等待转账...</div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：初始钱包有 3 张零散 UTXO（0.2、0.3、0.5 BTC）。试着转 0.45 BTC，观察比特币钱包如何凑出两张支票（0.2+0.3）并找零 0.05 BTC。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：对比右侧以太坊，无论转多少，它永远只修改一个余额数字并让 Nonce + 1。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>什么是“粉尘（Dust）UTXO”？为什么比特币手续费和笔数有关？</h2>
+      <div class="callout-warn">
+        <strong>实操防坑清单：</strong><br />
+        1. 比特币的矿工费按<strong>交易字节大小</strong>计算。如果你钱包里攒了 100 笔零散小额 UTXO，合并转出时交易体积巨大，手续费会贵到离谱——因此老玩家会在网络空闲、费率低时主动做 <strong>UTXO 合并整理</strong>。<br />
+        2. 查比特币浏览器看到多余的“陌生输出地址”别慌，那通常是你钱包自动生成的<strong>找零地址（Change Address）</strong>。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "09-consensus-ledger/01-utxo-vs-account.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "09 · 账本与共识" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slAmt = document.getElementById("sl-amt");
+    let utxos = [], ethBal = 1.0, ethNonce = 0;
+
+    function reset() {
+      utxos = [
+        { id: "#1", val: 0.20, status: "active" },
+        { id: "#2", val: 0.30, status: "active" },
+        { id: "#3", val: 0.50, status: "active" }
+      ];
+      ethBal = 1.0; ethNonce = 0;
+      render("初始状态：持有 3 张 UTXO 纸币，合计 1.00 BTC。", "等待发送交易...");
+    }
+
+    function render(btcMsg, ethMsg) {
+      document.getElementById("btc-utxos").innerHTML = utxos.map((u) =>
+        `<div class="utxo-pill ${u.status}">${u.id}: ${u.val.toFixed(2)} BTC</div>`
+      ).join("");
+      document.getElementById("btc-log").textContent = btcMsg;
+      document.getElementById("eth-bal").textContent = `${ethBal.toFixed(2)} ETH`;
+      document.getElementById("eth-nonce").textContent = ethNonce;
+      document.getElementById("eth-log").textContent = ethMsg;
+    }
+
+    slAmt.addEventListener("input", () => {
+      document.getElementById("lbl-amt").textContent = (+slAmt.value).toFixed(2);
+    });
+
+    document.getElementById("btn-send").addEventListener("click", () => {
+      const amt = +slAmt.value;
+      const active = utxos.filter((u) => u.status !== "spent");
+      const total = active.reduce((s, u) => s + u.val, 0);
+      if (amt > total + 1e-6) {
+        render("❌ 余额不足！请点击重置。", "❌ 余额不足！请点击重置。");
+        return;
+      }
+      // 挑选 UTXO
+      let acc = 0, picked = [];
+      for (const u of active) {
+        if (acc >= amt - 1e-6) break;
+        u.status = "spent";
+        acc += u.val;
+        picked.push(u.id);
+      }
+      const change = +(acc - amt).toFixed(2);
+      if (change > 0) {
+        utxos.push({ id: `#${utxos.length + 1}(找零)`, val: change, status: "new" });
+      }
+      ethBal = Math.max(0, +(ethBal - amt).toFixed(2));
+      ethNonce++;
+      render(
+        `销毁输入 [${picked.join("+")}] 共 ${acc.toFixed(2)} BTC → 付给对方 ${amt.toFixed(2)} BTC${change > 0 ? ` + 生成找零 ${change.toFixed(2)} BTC` : ""}。`,
+        `直接扣减状态树：Balance -= ${amt.toFixed(2)} ETH，Nonce 递增为 ${ethNonce}。`
+      );
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", reset);
+    reset();
+  </script>
+</body>
+</html>

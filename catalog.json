@@ -497,6 +497,198 @@
           "path": "08-bonding-curves/02-early-vs-late-dump.html"
         }
       ]
+    },
+    {
+      "id": "09-consensus-ledger",
+      "order": 9,
+      "layer": "V3: 底层基建与黑暗森林",
+      "icon": "⛓️",
+      "accentColor": "#6366f1",
+      "title": {
+        "zh": "账本模型与共识机制",
+        "en": "Ledger Models & Consensus"
+      },
+      "summary": {
+        "zh": "拆解比特币的 UTXO 找零账本与以太坊账户模型的本质区别，以及 PoW 算力竞争、51% 攻击与 PoS 质押惩罚。",
+        "en": "Comparing Bitcoin UTXO vs Ethereum Accounts, and simulating PoW forks vs PoS slashing."
+      },
+      "lessons": [
+        {
+          "file": "01-utxo-vs-account.html",
+          "title": {
+            "zh": "UTXO 找零模型 vs 账户余额模型",
+            "en": "UTXO vs Account Balance Model"
+          },
+          "subtitle": {
+            "zh": "为什么比特币转账像“拿 100 块现金买 30 块东西找回 70 块”，而以太坊像银行卡扣款？",
+            "en": "Why Bitcoin spends discrete cash bills while Ethereum updates account balances."
+          },
+          "duration": "5 min",
+          "sandboxType": "visualizer",
+          "concepts": [
+            "UTXO",
+            "Account Model",
+            "Change Output",
+            "Bitcoin vs ETH"
+          ],
+          "prerequisites": [
+            "02-tx-gas-multichain/01-mempool-gas-auction.html"
+          ],
+          "path": "09-consensus-ledger/01-utxo-vs-account.html"
+        },
+        {
+          "file": "02-pow-pos-fork.html",
+          "title": {
+            "zh": "PoW 最长链分叉与 PoS 惩罚模拟器",
+            "en": "PoW Forking & PoS Slashing Lab"
+          },
+          "subtitle": {
+            "zh": "没有中心服务器，全球节点如何对“哪条链是真的”达成共识？亲手模拟 51% 双花攻击与 Slashing。",
+            "en": "How distributed nodes reach consensus and defend against double-spending."
+          },
+          "duration": "5 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "PoW",
+            "PoS",
+            "51% Attack",
+            "Finality",
+            "Slashing"
+          ],
+          "prerequisites": [
+            "09-consensus-ledger/01-utxo-vs-account.html"
+          ],
+          "path": "09-consensus-ledger/02-pow-pos-fork.html"
+        }
+      ]
+    },
+    {
+      "id": "10-scaling-bridges",
+      "order": 10,
+      "layer": "V3: 底层基建与黑暗森林",
+      "icon": "🌉",
+      "accentColor": "#06b6d4",
+      "title": {
+        "zh": "Layer 2 扩容与跨链桥",
+        "en": "Layer 2 Scaling & Bridges"
+      },
+      "summary": {
+        "zh": "拆解以太坊 Rollup（OP 挑战期 vs ZK 零知识证明）如何降本百倍，以及跨链桥为何屡屡成为黑客提款机。",
+        "en": "How Optimistic and ZK Rollups scale Ethereum, and why cross-chain bridges are prime hack targets."
+      },
+      "lessons": [
+        {
+          "file": "01-rollup-and-zk.html",
+          "title": {
+            "zh": "Rollup 扩容：OP 挑战期 vs ZK 数学证明",
+            "en": "Optimistic vs ZK Rollups"
+          },
+          "subtitle": {
+            "zh": "把 1,000 笔交易压成 1 笔发回主网！直观对比 Optimistic 与 ZK Rollup 的提现速度与安全哲学。",
+            "en": "Batching transactions off-chain and comparing fraud proofs vs validity proofs."
+          },
+          "duration": "5 min",
+          "sandboxType": "visualizer",
+          "concepts": [
+            "Layer 2",
+            "Optimistic Rollup",
+            "ZK Rollup",
+            "7-Day Challenge"
+          ],
+          "prerequisites": [
+            "02-tx-gas-multichain/02-eth-sol-tron-fees.html"
+          ],
+          "path": "10-scaling-bridges/01-rollup-and-zk.html"
+        },
+        {
+          "file": "02-bridge-mechanics-hacks.html",
+          "title": {
+            "zh": "跨链桥底层机制与被盗路径模拟器",
+            "en": "Cross-Chain Bridge Mechanics & Hacks"
+          },
+          "subtitle": {
+            "zh": "资产根本没有“飞”到另一条链！拆解锁定铸造（Lock & Mint）为何一被黑就脱锚归零。",
+            "en": "Why assets never actually leave their home chain, and how bridge exploits drain vaults."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Lock & Mint",
+            "Wrapped Asset",
+            "Bridge Hack",
+            "Intent Bridge"
+          ],
+          "prerequisites": [
+            "10-scaling-bridges/01-rollup-and-zk.html"
+          ],
+          "path": "10-scaling-bridges/02-bridge-mechanics-hacks.html"
+        }
+      ]
+    },
+    {
+      "id": "11-mev-dark-forest",
+      "order": 11,
+      "layer": "V3: 底层基建与黑暗森林",
+      "icon": "🌲",
+      "accentColor": "#a855f7",
+      "title": {
+        "zh": "MEV 与黑暗森林博弈",
+        "en": "MEV & The Dark Forest"
+      },
+      "summary": {
+        "zh": "揭开链上最隐秘的猎杀场：拆解 MEV 机器人如何监控 Mempool 对你发动三明治攻击，以及如何用私有 RPC 隐身防夹。",
+        "en": "How MEV bots hunt pending transactions in the mempool via sandwich attacks, and how Private RPCs protect you."
+      },
+      "lessons": [
+        {
+          "file": "01-sandwich-attack-lab.html",
+          "title": {
+            "zh": "三明治攻击（夹子机器人）时间轴沙盒",
+            "en": "MEV Sandwich Attack Lab"
+          },
+          "subtitle": {
+            "zh": "为什么你每次买完币价格就立刻回落？亲手复现夹子机器人在同一区块里“先买后卖”收割你。",
+            "en": "Step-by-step simulation of front-running and back-running your swap inside a single block."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "MEV",
+            "Sandwich Attack",
+            "Front-run",
+            "Back-run",
+            "Slippage"
+          ],
+          "prerequisites": [
+            "04-first-swap-amm/01-xyk-slippage-lab.html",
+            "02-tx-gas-multichain/01-mempool-gas-auction.html"
+          ],
+          "path": "11-mev-dark-forest/01-sandwich-attack-lab.html"
+        },
+        {
+          "file": "02-private-rpc-protection.html",
+          "title": {
+            "zh": "黑暗森林隐身术：私有 RPC 防夹模拟器",
+            "en": "Private RPC & MEV Protection"
+          },
+          "subtitle": {
+            "zh": "如何绕过公开 Mempool 直接把交易塞给区块构建者，让全网夹子机器人变成瞎子？",
+            "en": "Routing transactions through Flashbots Protect / MEV Blocker to hide from bots."
+          },
+          "duration": "4 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Flashbots Protect",
+            "Private RPC",
+            "Block Builder",
+            "MEV Rebate"
+          ],
+          "prerequisites": [
+            "11-mev-dark-forest/01-sandwich-attack-lab.html"
+          ],
+          "path": "11-mev-dark-forest/02-private-rpc-protection.html"
+        }
+      ]
     }
   ]
 }

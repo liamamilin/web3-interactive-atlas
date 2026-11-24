@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PoW 最长链分叉与 PoS 惩罚模拟器 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .chain-track { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 8px 0 14px; }
+    .blk {
+      padding: 6px 10px; border-radius: 6px; font-family: var(--mono); font-size: 12px;
+      background: #0d1320; border: 1px solid var(--border);
+    }
+    .blk.honest { border-color: var(--green); color: #a7f3d0; }
+    .blk.attack { border-color: var(--red); color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · 账本模型与共识机制</span>
+      <h1>PoW 最长链分叉与 PoS 惩罚模拟器</h1>
+      <p>没有总行拍板，全球几万台互不信任的机器凭什么对同一本账达成一致？拆解工作量证明（PoW）与权益证明（PoS）的博弈防线。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉测试</div>
+      <h2>为什么交易所充比特币要等 2~6 个区块确认，而不是 0 秒到账？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">假设黑客刚把 10 BTC 充进交易所卖成 USDT 提走，同时在暗地里用大算力挖出一条“不含这笔充值”的更长私有链：</div>
+        <button id="hook-btn" class="btn btn-danger">广播更长的秘密分叉链</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>全网节点遵循“最长链原则”，立刻抛弃原链！</strong><br />
+        黑客刚才充进交易所的 10 BTC 凭空消失了（退回黑客钱包），这就是<strong>双花攻击（Double Spend）</strong>。等待 6 个确认，就是让黑客追上最长链的概率趋近于 0。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>两种让作恶代价大到承受不起的经济机制</h2>
+      <p>• <strong>PoW（比特币）</strong>：比拼真实物理电费与矿机算力。只有掌控全网 <strong>&gt;51% 算力</strong> 才能稳定造出更长的链来篡改历史，但花几十亿美元买矿机砸盘只会让手里的 BTC 归零，得不偿失。</p>
+      <p>• <strong>PoS（以太坊 / Solana）</strong>：验证者质押原生代币（如 32 ETH）作为押金。如果验证者试图同时给两条冲突的分叉链签名（双签作恶），协议会自动触发 <strong>Slashing（罚没）</strong>，直接烧毁他的质押本金并踢出网络。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>PoW 51% 算力赛跑模拟器（对比诚实链 vs 攻击者链）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>攻击者掌控的全网算力占比 <strong id="lbl-hash">30%</strong></label>
+            <input id="sl-hash" type="range" min="10" max="70" step="5" value="30" />
+          </div>
+          <div style="display:grid;gap:8px;">
+            <button id="btn-mine" class="btn btn-primary">模拟出块 10 轮（随机算力抽签）</button>
+            <button id="btn-reset" class="btn">重置分叉起点</button>
+          </div>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">当前胜出主链</div><div class="m-val" id="m-win" style="font-size:15px;">诚实链领先</div></div>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:12px;color:var(--green);">诚实矿工链（含正常交易）：<span id="cnt-h">3</span> 块</div>
+          <div id="track-h" class="chain-track"></div>
+          <div style="font-size:12px;color:var(--red);">攻击者秘密链（试图双花回滚）：<span id="cnt-a">1</span> 块</div>
+          <div id="track-a" class="chain-track"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：攻击者算力设为 30%，连续点「模拟出块 10 轮」，看攻击链是否几乎永远被诚实链越甩越远。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把攻击者算力拉到 60%（超过 51%），点击模拟，亲眼目睹攻击链如何反超并篡改历史。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>小公链的“51% 攻击”是真实发生过的</h2>
+      <div class="callout-warn">
+        <strong>认知升级：</strong><br />
+        比特币和以太坊的共识安全预算高达数百亿美元，几乎不可能被攻击；但历史上 <strong>ETC（以太经典）、BSV</strong> 等小算力公链曾多次遭到租借算力的 51% 双花攻击，导致交易所暂停充提。这就是为什么<strong>底层安全预算（Security Budget）</strong>决定了一条链能承载多大资金体量。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "09-consensus-ledger/02-pow-pos-fork.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "09 · 账本与共识" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slHash = document.getElementById("sl-hash");
+    let hBlocks = 3, aBlocks = 1;
+
+    function render() {
+      document.getElementById("lbl-hash").textContent = `${slHash.value}%`;
+      document.getElementById("cnt-h").textContent = hBlocks;
+      document.getElementById("cnt-a").textContent = aBlocks;
+      document.getElementById("track-h").innerHTML = Array.from({ length: Math.min(hBlocks, 18) }, (_, i) => `<div class="blk honest">#${100 + i}</div>`).join("") + (hBlocks > 18 ? `<span style="font-size:12px;">...+${hBlocks-18}</span>` : "");
+      document.getElementById("track-a").innerHTML = Array.from({ length: Math.min(aBlocks, 18) }, (_, i) => `<div class="blk attack">A#${100 + i}</div>`).join("") + (aBlocks > 18 ? `<span style="font-size:12px;">...+${aBlocks-18}</span>` : "");
+
+      const winEl = document.getElementById("m-win");
+      if (aBlocks > hBlocks) {
+        winEl.textContent = "🚨 攻击链反超！双花成功"; winEl.className = "m-val val-bad";
+      } else {
+        winEl.textContent = "✓ 诚实链安全领先"; winEl.className = "m-val val-good";
+      }
+    }
+
+    document.getElementById("btn-mine").addEventListener("click", () => {
+      const pAttack = +slHash.value / 100;
+      for (let i = 0; i < 10; i++) {
+        if (Math.random() < pAttack) aBlocks++;
+        else hBlocks++;
+      }
+      render();
+    });
+    document.getElementById("btn-reset").addEventListener("click", () => { hBlocks = 3; aBlocks = 1; render(); });
+    slHash.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>三明治攻击（夹子机器人）时间轴沙盒 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .timeline { display: grid; gap: 10px; }
+    .t-step { background: #0d1320; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; }
+    .t-step.bot { border-left: 4px solid var(--red); }
+    .t-step.victim { border-left: 4px solid var(--amber); }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V3 · MEV 与黑暗森林博弈</span>
+      <h1>三明治攻击（夹子机器人）时间轴沙盒</h1>
+      <p>以太坊的公开内存池（Mempool）就像一片“黑暗森林”——你发出的每一笔未打包交易，在几毫秒内都会被数千个潜伏的 MEV 猎手机器人扫描分析。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒踩坑体验</div>
+      <h2>你想在 Uniswap 上花 $20,000 买一个热门山寨币，为了怕交易失败，顺手把滑点容忍度设成了 5%</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">你点击了确认，交易进入公开 Mempool……</div>
+        <button id="hook-btn" class="btn btn-danger">广播这笔 5% 滑点的大额买单</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>你刚刚被“夹”了！白白多付了近 $950！</strong><br />
+        在一个 12 秒的区块内，机器人给验证者多付了 $5 小费，强行把自己的买单插在你前面拉高价格，等你按你能忍受的最高价（+4.9%）接盘后，机器人立刻在你后面一笔砸盘套现！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>三明治攻击 = 抢跑买入（Front-run）+ 你接盘 + 尾随卖出（Back-run）</h2>
+      <p><strong>MEV（最大可提取价值）</strong>是指区块构建者或机器人通过<strong>重新排序、插入或审查区块内的交易</strong>所赚取的额外利润。三明治攻击把你的交易像火腿一样夹在两片面包中间：</p>
+      <div class="formula-box">
+        同一个区块内严格排序：[Tx 1: 机器人抢跑拉盘] ──▶ [Tx 2: 你高价成交] ──▶ [Tx 3: 机器人砸盘套现]
+      </div>
+      <p>整个过程在同一个区块里原子完成，机器人<strong>零持仓过夜风险</strong>，稳赚你白给的滑点差价。</p>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>三明治攻击利润与你的滑点损失模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>你的买入金额 <strong id="lbl-buy">$10,000</strong></label>
+            <input id="sl-buy" type="range" min="1000" max="50000" step="1000" value="10000" />
+          </div>
+          <div class="control-group">
+            <label>你设置的滑点容忍度 <strong id="lbl-slip">3.0%</strong></label>
+            <input id="sl-slip" type="range" min="0.1" max="10" step="0.1" value="3.0" />
+          </div>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">你的额外损失</div><div class="m-val val-bad" id="m-loss">$280</div></div>
+            <div class="metric-box"><div class="m-label">机器人净利润</div><div class="m-val val-warn" id="m-bot">$250</div></div>
+          </div>
+        </div>
+        <div class="lab-panel">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">区块 #21048922 内部交易执行顺序：</div>
+          <div id="tl" class="timeline"></div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：把你的滑点容忍度从 3.0% 调到 8.0%，观察机器人如何精准把你的价格顶到 7.9% 吃干抹净。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：把滑点容忍度压低到 0.3%，观察机器人算完 Gas 成本后是否直接放弃攻击你！</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>臭名昭著的夹子机器人 <code>jaredfromsubway.eth</code></h2>
+      <div class="callout-warn">
+        <strong>真实数据：</strong><br />
+        以太坊上最著名的 MEV 夹子机器人之一在几个月内就从散户手里夹走了超过数千万美元，它自己支付的 Gas 费甚至一度占全网以太坊消耗的 7%。<br />
+        <strong>防坑法则</strong>：永远不要把滑点设成“自动（Auto）”或 5% 以上，下一节我们将展示终极防御武器——私有 RPC。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "11-mev-dark-forest/01-sandwich-attack-lab.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "11 · MEV 与黑暗森林" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const slBuy = document.getElementById("sl-buy"), slSlip = document.getElementById("sl-slip");
+    function update() {
+      const buy = +slBuy.value, slip = +slSlip.value;
+      document.getElementById("lbl-buy").textContent = `$${buy.toLocaleString()}`;
+      document.getElementById("lbl-slip").textContent = `${slip.toFixed(1)}%`;
+
+      const gasBribe = 18;
+      const extractable = buy * (Math.max(0, slip - 0.1) / 100) * 0.92;
+      const attacked = extractable > gasBribe;
+      const botProfit = attacked ? extractable - gasBribe : 0;
+      const victimLoss = attacked ? extractable : 0;
+
+      document.getElementById("m-loss").textContent = attacked ? `-$${victimLoss.toFixed(0)}` : "$0 (安全)";
+      document.getElementById("m-loss").className = "m-val " + (attacked ? "val-bad" : "val-good");
+      document.getElementById("m-bot").textContent = attacked ? `+$${botProfit.toFixed(0)}` : "$0 (放弃攻击)";
+
+      const tl = document.getElementById("tl");
+      if (!attacked) {
+        tl.innerHTML = `
+          <div class="t-step" style="border-left:4px solid var(--green);">
+            <strong>✓ 攻击无利可图，机器人放弃猎杀！</strong><br/>
+            可榨取差价 ($${extractable.toFixed(1)}) 低于机器人的 Gas 贿赂成本 ($${gasBribe})，你的交易正常按市价成交。
+          </div>
+        `;
+      } else {
+        tl.innerHTML = `
+          <div class="t-step bot"><strong>Tx #1 [机器人 Front-run]：</strong> 提前抢跑买入，将池子价格精准推高 <strong>+${(slip - 0.1).toFixed(1)}%</strong>（贴着你的滑点上限）。</div>
+          <div class="t-step victim"><strong>Tx #2 [你的买单]：</strong> 按被拉高后的冤大头价格成交，实际多付了 <strong>$${victimLoss.toFixed(0)}</strong>。</div>
+          <div class="t-step bot"><strong>Tx #3 [机器人 Back-run]：</strong> 立刻砸盘卖出刚才抢跑的代币，扣除 $${gasBribe} 节点小费，净赚 <strong>+$${botProfit.toFixed(0)}</strong>。</div>
+        `;
+      }
+    }
+    [slBuy, slSlip].forEach((el) => el.addEventListener("input", update));
+    update();
+  </script>
+</body>
+</html>

@@ -14,6 +14,11 @@
 7. **07-perps-leverage**：永续合约资金费率引擎、杠杆倍数与插针爆仓模拟器
 8. **08-bonding-curves**：联合曲线发射与毕业实验室、早鸟筹码与砸盘数学模拟器
 
+## V3 模块清单（底层基建与黑暗森林）
+9. **09-consensus-ledger**：UTXO 找零 vs 账户余额模型、PoW 51% 分叉与 PoS 惩罚模拟器
+10. **10-scaling-bridges**：Rollup 拼车降本（OP 挑战期 vs ZK 证明）、跨链桥锁定铸造与被盗脱锚模拟
+11. **11-mev-dark-forest**：MEV 三明治攻击时间轴沙盒、私有 RPC 与意图撮合防夹模拟器
+
 ## 本地运行与扩展
 - 直接双击 `index.html` 即可运行。
 - 新增模块后执行 `python3 scripts/sync_catalog.py` 自动更新目录并推送部署。

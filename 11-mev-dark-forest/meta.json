@@ -1,0 +1,63 @@
+{
+  "id": "11-mev-dark-forest",
+  "order": 11,
+  "layer": "V3: 底层基建与黑暗森林",
+  "icon": "🌲",
+  "accentColor": "#a855f7",
+  "title": {
+    "zh": "MEV 与黑暗森林博弈",
+    "en": "MEV & The Dark Forest"
+  },
+  "summary": {
+    "zh": "揭开链上最隐秘的猎杀场：拆解 MEV 机器人如何监控 Mempool 对你发动三明治攻击，以及如何用私有 RPC 隐身防夹。",
+    "en": "How MEV bots hunt pending transactions in the mempool via sandwich attacks, and how Private RPCs protect you."
+  },
+  "lessons": [
+    {
+      "file": "01-sandwich-attack-lab.html",
+      "title": {
+        "zh": "三明治攻击（夹子机器人）时间轴沙盒",
+        "en": "MEV Sandwich Attack Lab"
+      },
+      "subtitle": {
+        "zh": "为什么你每次买完币价格就立刻回落？亲手复现夹子机器人在同一区块里“先买后卖”收割你。",
+        "en": "Step-by-step simulation of front-running and back-running your swap inside a single block."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "MEV",
+        "Sandwich Attack",
+        "Front-run",
+        "Back-run",
+        "Slippage"
+      ],
+      "prerequisites": [
+        "04-first-swap-amm/01-xyk-slippage-lab.html",
+        "02-tx-gas-multichain/01-mempool-gas-auction.html"
+      ]
+    },
+    {
+      "file": "02-private-rpc-protection.html",
+      "title": {
+        "zh": "黑暗森林隐身术：私有 RPC 防夹模拟器",
+        "en": "Private RPC & MEV Protection"
+      },
+      "subtitle": {
+        "zh": "如何绕过公开 Mempool 直接把交易塞给区块构建者，让全网夹子机器人变成瞎子？",
+        "en": "Routing transactions through Flashbots Protect / MEV Blocker to hide from bots."
+      },
+      "duration": "4 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Flashbots Protect",
+        "Private RPC",
+        "Block Builder",
+        "MEV Rebate"
+      ],
+      "prerequisites": [
+        "11-mev-dark-forest/01-sandwich-attack-lab.html"
+      ]
+    }
+  ]
+}

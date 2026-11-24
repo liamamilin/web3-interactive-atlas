@@ -1,0 +1,61 @@
+{
+  "id": "10-scaling-bridges",
+  "order": 10,
+  "layer": "V3: 底层基建与黑暗森林",
+  "icon": "🌉",
+  "accentColor": "#06b6d4",
+  "title": {
+    "zh": "Layer 2 扩容与跨链桥",
+    "en": "Layer 2 Scaling & Bridges"
+  },
+  "summary": {
+    "zh": "拆解以太坊 Rollup（OP 挑战期 vs ZK 零知识证明）如何降本百倍，以及跨链桥为何屡屡成为黑客提款机。",
+    "en": "How Optimistic and ZK Rollups scale Ethereum, and why cross-chain bridges are prime hack targets."
+  },
+  "lessons": [
+    {
+      "file": "01-rollup-and-zk.html",
+      "title": {
+        "zh": "Rollup 扩容：OP 挑战期 vs ZK 数学证明",
+        "en": "Optimistic vs ZK Rollups"
+      },
+      "subtitle": {
+        "zh": "把 1,000 笔交易压成 1 笔发回主网！直观对比 Optimistic 与 ZK Rollup 的提现速度与安全哲学。",
+        "en": "Batching transactions off-chain and comparing fraud proofs vs validity proofs."
+      },
+      "duration": "5 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "Layer 2",
+        "Optimistic Rollup",
+        "ZK Rollup",
+        "7-Day Challenge"
+      ],
+      "prerequisites": [
+        "02-tx-gas-multichain/02-eth-sol-tron-fees.html"
+      ]
+    },
+    {
+      "file": "02-bridge-mechanics-hacks.html",
+      "title": {
+        "zh": "跨链桥底层机制与被盗路径模拟器",
+        "en": "Cross-Chain Bridge Mechanics & Hacks"
+      },
+      "subtitle": {
+        "zh": "资产根本没有“飞”到另一条链！拆解锁定铸造（Lock & Mint）为何一被黑就脱锚归零。",
+        "en": "Why assets never actually leave their home chain, and how bridge exploits drain vaults."
+      },
+      "duration": "5 min",
+      "sandboxType": "attack-defense",
+      "concepts": [
+        "Lock & Mint",
+        "Wrapped Asset",
+        "Bridge Hack",
+        "Intent Bridge"
+      ],
+      "prerequisites": [
+        "10-scaling-bridges/01-rollup-and-zk.html"
+      ]
+    }
+  ]
+}
