@@ -95,6 +95,7 @@
           </div>
 
           <div id="status-box" class="status-banner safe"></div>
+          <div class="svg-chart-wrap"><svg id="hf-chart" viewBox="0 0 460 165" aria-label="脱锚幅度与健康系数曲线"></svg></div>
         </div>
       </div>
 
@@ -193,6 +194,33 @@
         box.className = "status-banner safe";
         box.innerHTML = `<strong>✅ 当前仓位安全（HF = ${hf.toFixed(2)}）：</strong>预计每年净赚 <strong>+${(cap * netApy).toFixed(2)} ETH</strong>。但请记住，可承受的最大联合脱锚+罚没缓冲仅约 <strong>${(((hf - 1.0) / hf) * 100).toFixed(1)}%</strong>。`;
       }
+
+      const W = 460, H = 165, padL = 38, padR = 14, padT = 16, padB = 26;
+      const toX = (dp) => padL + (dp / 15) * (W - padL - padR);
+      const toY = (val) => H - padB - ((Math.max(0.75, Math.min(1.6, val)) - 0.75) / 0.85) * (H - padT - padB);
+      const y1 = toY(1.0);
+      let path = "";
+      if (debt > 0.0001) {
+        for (let dp = 0; dp <= 15; dp += 0.5) {
+          const hVal = (L * (1 - Math.min(0.95, dp / 100 + slash)) * LT) / (L - 1);
+          path += (dp === 0 ? "M " : " L ") + `${toX(dp).toFixed(1)} ${toY(hVal).toFixed(1)}`;
+        }
+      } else {
+        path = `M ${toX(0)} ${toY(1.55)} L ${toX(15)} ${toY(1.55)}`;
+      }
+      const curX = toX(depeg * 100), curY = toY(debt > 0.0001 ? hf : 1.55);
+      document.getElementById("hf-chart").innerHTML = `
+        <rect x="${padL}" y="${y1.toFixed(1)}" width="${W - padL - padR}" height="${(H - padB - y1).toFixed(1)}" fill="rgba(239,68,68,0.13)" />
+        <line x1="${padL}" y1="${y1.toFixed(1)}" x2="${W - padR}" y2="${y1.toFixed(1)}" stroke="#ef4444" stroke-dasharray="4 3" />
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="#475569" />
+        <path d="${path}" fill="none" stroke="#38bdf8" stroke-width="2.5" />
+        <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="5.5" fill="${hf < 1 && debt > 0.0001 ? '#ef4444' : '#10b981'}" stroke="#fff" stroke-width="1.5" />
+        <text x="6" y="${y1.toFixed(1)}" fill="#ef4444" font-size="10">1.00</text>
+        <text x="${padL + 6}" y="${(y1 + 14).toFixed(1)}" fill="#ef4444" font-size="10">清算危险区 (HF &lt; 1.0)</text>
+        <text x="${padL}" y="${H - 8}" fill="#94a3b8" font-size="10">0% 脱锚</text>
+        <text x="${W - padR - 44}" y="${H - 8}" fill="#94a3b8" font-size="10">15% 脱锚</text>
+      `;
     }
 
     [slCap, slLev, slStake, slBorrow, slDepeg, chkSlash].forEach((el) => el.addEventListener("input", update));

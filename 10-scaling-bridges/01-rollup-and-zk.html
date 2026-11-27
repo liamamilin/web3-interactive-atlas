@@ -39,6 +39,11 @@
     <section class="stage-card">
       <div class="stage-label">Stage 3 · 主沙盒实验室</div>
       <h2>Rollup 拼车降本与架构对比模拟器</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="quiet">冷清时段 (20 笔 · OP)</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="normal">日常 Base/Arb (500 笔 · OP)</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="zkpeak">高峰 ZK 批量 (2000 笔 · ZK)</button>
+      </div>
       <div class="lab-grid">
         <div class="lab-panel">
           <div class="control-group">
@@ -79,9 +84,10 @@
       <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
       <h2>不想等 7 天？为什么第三方跨链桥 1 分钟就能到账？</h2>
       <div class="callout-warn">
-        <strong>实操防坑清单：</strong><br />
-        1. 从 Arbitrum/Base 提钱回主网，如果走<strong>官方桥</strong>确实要等 7 天；但日常小额跨链大家都用<strong>第三方流动性桥（如 Across / Stargate / Relay）</strong>，本质上是做市商先在主网垫付真钱给你，他们自己去扛那 7 天的等待期，收你几毛钱服务费。<br />
-        2. 跨链前务必确认目标链上是否已有少量原生 Gas 币，否则钱跨过去了却付不起转出 Gas。
+        <strong>真实档案与实操防坑清单：</strong><br />
+        1. <strong>第三方桥 1 分钟到账的原理</strong>：走 Arbitrum/Base 官方桥确实要等 7 天；日常用的 Across / Stargate / Relay 本质上是做市商先在主网垫付真钱给你，他们自己扛 7 天等待期并收几毛钱服务费。<br />
+        2. <strong>警惕“中心化 L2 排序器”与 L2Beat 评级</strong>：不少新兴 L2 处于 L2Beat <strong>Stage 0</strong>（由项目方多签直接控制合约升级且无逃生舱），历史上曾多次发生单一排序器宕机数小时导致链上无法平仓。大额资金进 L2 前，先去 <strong>L2BEAT</strong> 查它是否达到 Stage 1 以上。<br />
+        3. 跨链前务必确认目标链上已有少量原生 Gas 币，否则钱跨过去却付不起转出 Gas。
       </div>
     </section>
   </main>
@@ -108,6 +114,15 @@
       document.getElementById("m-time").textContent = t === "op" ? "7 天 (挑战期)" : "15~60 分钟";
       document.getElementById("m-mech").textContent = t === "op" ? "欺诈证明 (有人举报才查)" : "零知识数学证明 (即时验真)";
     }
+    document.querySelectorAll("[data-pre]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.pre;
+        if (p === "quiet") { slN.value = 20; slL1.value = 12; selType.value = "op"; }
+        if (p === "normal") { slN.value = 500; slL1.value = 8; selType.value = "op"; }
+        if (p === "zkpeak") { slN.value = 2000; slL1.value = 15; selType.value = "zk"; }
+        update();
+      });
+    });
     [slN, slL1, selType].forEach((el) => el.addEventListener("input", update));
     update();
   </script>

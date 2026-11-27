@@ -38,6 +38,11 @@
     <section class="stage-card">
       <div class="stage-label">Stage 3 · 主沙盒实验室</div>
       <h2>LP 做市 vs 死拿现货（HODL）净值对比器</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="stable">稳定币对 (1.00x)</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="bull">牛市翻 4 倍 (4.00x)</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="crash">土狗暴跌 -80% (0.20x)</button>
+      </div>
       <div class="lab-grid">
         <div class="lab-panel">
           <div class="control-group">
@@ -58,10 +63,11 @@
             <div class="metric-box"><div class="m-label">死拿现货 (HODL)</div><div class="m-val" id="m-hodl">$1,000</div></div>
             <div class="metric-box"><div class="m-label">LP 最终净值 (含手续费)</div><div class="m-val" id="m-lp">$1,000</div></div>
           </div>
-          <div class="metrics-row" style="margin-bottom:0;">
+          <div class="metrics-row">
             <div class="metric-box"><div class="m-label">无常损失比例</div><div class="m-val" id="m-il">0.00%</div></div>
             <div class="metric-box"><div class="m-label">LP 相对 HODL 盈亏</div><div class="m-val" id="m-diff">$0</div></div>
           </div>
+          <div class="svg-chart-wrap"><svg id="il-chart" viewBox="0 0 460 155" aria-label="无常损失曲线图"></svg></div>
         </div>
       </div>
 
@@ -75,9 +81,9 @@
       <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
       <h2>什么时候适合做 LP？</h2>
       <div class="callout-warn">
-        <strong>实操防坑清单：</strong><br />
-        1. <strong>稳定币对（如 USDC/USDT）</strong> 价格几乎不偏离，无常损失趋近于 0，是最稳健的 LP 策略。<br />
-        2. 千万别被土狗池子的“1000% APY”诱惑——一旦土狗币价暴跌 90%，你的 USDT 会被全部换成归零的空气币。
+        <strong>链上真实教训与实操清单：</strong><br />
+        1. <strong>DeFi Summer 流动性挖矿惨案</strong>：2020–2021 年无数散户冲进高年化山寨币/ETH 矿池，结果山寨币暴跌 90%，池子自动把他们手里的 ETH 全换成了跌价空气币——<strong>赚了 30% 手续费，亏了 70% 本金</strong>。<br />
+        2. <strong>最稳健的 LP 组合</strong>：高相关性锚定对（<code>USDC/USDT</code>、<code>wstETH/ETH</code>）无常损失趋近于 0；若做高波动币对，必须确认真实交易手续费足以覆盖潜在无常损失。
       </div>
     </section>
   </main>
@@ -114,7 +120,38 @@
       const diffEl = document.getElementById("m-diff");
       diffEl.textContent = `${diff >= 0 ? "+" : ""}$${diff.toFixed(0)}`;
       diffEl.className = "m-val " + (diff >= 0 ? "val-good" : "val-bad");
+
+      const W = 460, H = 155, padL = 38, padR = 14, padT = 16, padB = 26;
+      const toX = (rv) => padL + ((rv - 0.1) / 4.9) * (W - padL - padR);
+      const toY = (ilPct) => padT + (Math.min(50, Math.abs(ilPct)) / 50) * (H - padT - padB);
+      let path = "";
+      for (let i = 0; i <= 60; i++) {
+        const rv = 0.1 + (4.9 / 60) * i;
+        const pct = ((2 * Math.sqrt(rv)) / (1 + rv) - 1) * 100;
+        path += (i === 0 ? "M " : " L ") + `${toX(rv).toFixed(1)} ${toY(pct).toFixed(1)}`;
+      }
+      const cx = toX(r), cy = toY(ilRatio * 100);
+      document.getElementById("il-chart").innerHTML = `
+        <line x1="${padL}" y1="${padT}" x2="${W - padR}" y2="${padT}" stroke="#475569" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${toX(1).toFixed(1)}" y1="${padT}" x2="${toX(1).toFixed(1)}" y2="${H - padB}" stroke="#10b981" stroke-dasharray="3 3" />
+        <path d="${path}" fill="none" stroke="#ef4444" stroke-width="2.4" />
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5.5" fill="#f59e0b" stroke="#fff" stroke-width="1.5" />
+        <text x="6" y="${padT + 8}" fill="#94a3b8" font-size="10">0%</text>
+        <text x="4" y="${H - padB}" fill="#ef4444" font-size="10">-50%</text>
+        <text x="${toX(1) - 10}" y="${H - 8}" fill="#10b981" font-size="10">1.0x</text>
+        <text x="${W - padR - 26}" y="${H - 8}" fill="#94a3b8" font-size="10">5.0x</text>
+      `;
     }
+    document.querySelectorAll("[data-pre]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.pre;
+        if (p === "stable") { slR.value = 1.0; slFee.value = 60; }
+        if (p === "bull") { slR.value = 4.0; slFee.value = 0; }
+        if (p === "crash") { slR.value = 0.2; slFee.value = 0; }
+        update();
+      });
+    });
     [slCap, slR, slFee].forEach((el) => el.addEventListener("input", update));
     update();
   </script>

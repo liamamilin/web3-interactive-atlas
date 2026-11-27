@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
-  <meta name="description" content="用第一性原理拆解 + 零风险参数沙盒吃透链上底层机制：21 大模块、42 个交互实验页与 V1–V5 综合排雷测验。" />
+  <meta name="description" content="从 1 颗核心种子出发，通过张力驱动逐阶生长：22 大模块、44 个交互实验页与 V1–V5 综合排雷测验。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Web3 Interactive Atlas — 21 模块 · 42 个链上交互沙盒" />
+  <meta property="og:title" content="Web3 Interactive Atlas — 22 模块 · 44 个链上交互沙盒" />
   <meta property="og:description" content="不谈暴富神话，只拆真实规则。涵盖钱包安全、多签托管、AMM/v3、循环贷清算、MEV、代币经济学、ZK 隐私、RWA 与 AI Agent x402。" />
   <meta property="og:image" content="og-cover.svg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -78,6 +78,22 @@
     .prereq-chip { padding: 1px 7px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
     .prereq-chip.met { border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7; }
     .prereq-chip.unmet { border-color: rgba(245, 158, 11, 0.45); color: #fcd34d; }
+    .view-switch { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 4px; }
+    .view-btn { border: none; background: transparent; color: var(--text-muted); font-size: 13px; padding: 6px 14px; border-radius: 999px; cursor: pointer; transition: 0.15s; }
+    .view-btn.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .stage-progress-pills { max-width: 1040px; margin: 0 auto 18px; padding: 0 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .sp-pill { padding: 5px 11px; border-radius: 999px; font-size: 12px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+    .sp-pill.unlocked { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+    .growth-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 80px; display: grid; gap: 22px; }
+    .seed-card { background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(16,185,129,0.08)); border: 1.5px solid var(--accent); border-radius: var(--radius); padding: 24px; }
+    .seed-tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--accent); background: var(--accent-soft); padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+    .growth-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .tension-box { background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--amber); border-radius: 8px; padding: 12px 15px; margin: 12px 0 18px; font-size: 14px; line-height: 1.65; }
+    .tension-box strong { color: var(--amber); }
+    .causal-node { border-top: 1px dashed var(--border); padding-top: 16px; margin-top: 16px; }
+    .causal-node:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .causal-why { font-size: 13px; color: var(--card-text); margin-bottom: 12px; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; border: 1px solid var(--border); }
+    .closure-box { margin-top: 18px; padding: 12px 15px; border-radius: 8px; font-size: 13px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
   </style>
 </head>
 <body>
@@ -87,42 +103,57 @@
       <span>Web3 Interactive Atlas</span>
     </a>
     <div class="nav-actions">
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="tools.html">🧰 工具箱</a>
       <a class="btn" style="padding:5px 10px;font-size:13px;" href="glossary.html">📖 术语速查</a>
       <button id="btn-open-backup" class="btn" style="padding:5px 10px;font-size:13px;">进度备份/恢复</button>
+      <button id="home-theme-btn" class="btn" style="padding:5px 10px;font-size:13px;"></button>
       <a class="btn" style="padding:5px 10px;font-size:13px;" href="https://github.com/liamamilin/web3-interactive-atlas" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </header>
   <section class="hero">
     <h1>Web3 Interactive Atlas</h1>
-    <p>用“第一性原理拆解 + 零风险参数沙盒”吃透链上底层机制（21 大模块 · 42 个交互实验页）。不谈暴富神话，只拆真实规则。</p>
+    <p>不平铺概念清单：从 <strong>1 颗核心种子</strong>出发，看清每一次现实张力如何逼出整个 Web3（22 模块 · 44 个交互沙盒）。</p>
   </section>
 
   <div class="toolbar">
-    <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 AMM、Permit、MEV、LST、Pendle、ZK）..." />
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div class="view-switch" role="tablist">
+        <button id="tab-growth" class="view-btn active" role="tab">🌱 种子演化视图</button>
+        <button id="tab-catalog" class="view-btn" role="tab">📚 完整目录与路线</button>
+      </div>
+      <input id="search" class="search-input" type="search" placeholder="搜索主题、概念（如 Proxy、AMM、MEV、EIP-7702）..." />
+    </div>
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
       <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
       <a id="quiz-entry-btn" class="btn btn-primary" href="quiz.html">🧭 V1–V5 综合排雷测验</a>
     </div>
   </div>
 
-  <section class="tracks-section">
-    <div class="tracks-title">
-      <span>🎯 推荐学习路线（点击路线按推荐顺序过滤课程，再次点击取消）</span>
-      <span id="track-hint" style="color:var(--accent)"></span>
-    </div>
-    <div id="tracks-grid" class="tracks-grid"></div>
-  </section>
-
-  <div id="filter-row" class="filter-row">
-    <button class="filter-btn active" data-layer="ALL">全部阶段 (V1–V5)</button>
-    <button class="filter-btn" data-layer="V1">V1 · 链上生存与托管</button>
-    <button class="filter-btn" data-layer="V2">V2 · DeFi 金融引擎</button>
-    <button class="filter-btn" data-layer="V3">V3 · 底层基建与隐私</button>
-    <button class="filter-btn" data-layer="V4">V4 · 经济模型与投研</button>
-    <button class="filter-btn" data-layer="V5">V5 · 前沿叙事与体验</button>
+  <div id="growth-mode">
+    <div id="stage-pills" class="stage-progress-pills"></div>
+    <main id="growth-wrap" class="growth-wrap"></main>
   </div>
 
-  <main id="modules" class="modules-wrap"></main>
+  <div id="catalog-mode" style="display:none;">
+    <section class="tracks-section">
+      <div class="tracks-title">
+        <span>🎯 推荐学习路线（点击路线按推荐顺序过滤课程，再次点击取消）</span>
+        <span id="track-hint" style="color:var(--accent)"></span>
+      </div>
+      <div id="tracks-grid" class="tracks-grid"></div>
+    </section>
+
+    <div id="filter-row" class="filter-row">
+      <button class="filter-btn active" data-layer="ALL">全部阶段 (V1–V5)</button>
+      <button class="filter-btn" data-layer="V1">V1 · 链上生存与托管</button>
+      <button class="filter-btn" data-layer="V2">V2 · DeFi 金融引擎</button>
+      <button class="filter-btn" data-layer="V3">V3 · 底层基建与隐私</button>
+      <button class="filter-btn" data-layer="V4">V4 · 经济模型与投研</button>
+      <button class="filter-btn" data-layer="V5">V5 · 前沿叙事与体验</button>
+    </div>
+
+    <main id="modules" class="modules-wrap"></main>
+  </div>
 
   <div id="backup-modal" class="backup-modal" role="dialog" aria-modal="true" aria-label="进度备份与恢复">
     <div class="backup-dialog">
@@ -142,6 +173,7 @@
 
   <script src="shared/sandbox-ui.js"></script>
   <script src="catalog.js"></script>
+  <script src="shared/growth-view.js"></script>
   <script>
     const catalog = window.WEB3_ATLAS_CATALOG || { modules: [] };
     const progress = window.AtlasUI.getProgress();
@@ -161,8 +193,8 @@
       {
         id: "defi",
         name: "⚡ DeFi 交易与收益线",
-        desc: "AMM/v3 集中流动性、稳定币、借贷、质押循环贷、Pendle 与 MEV",
-        modules: ["04-first-swap-amm", "19-clmm-yield-splitting", "05-stablecoins-peg", "06-lending-liquidation", "18-staking-restaking", "07-perps-leverage", "11-mev-dark-forest"]
+        desc: "智能合约乐高、AMM/v3、稳定币、借贷、质押循环贷、Pendle 与 MEV",
+        modules: ["22-smart-contracts-composability", "04-first-swap-amm", "19-clmm-yield-splitting", "05-stablecoins-peg", "06-lending-liquidation", "18-staking-restaking", "07-perps-leverage", "11-mev-dark-forest"]
       },
       {
         id: "research",
@@ -186,8 +218,9 @@
       m.lessons.forEach((l) => { lessonByPath[l.path] = l; });
     });
 
+    window.AtlasUI.bindThemeToggle(document.getElementById("home-theme-btn"));
     let activeLayer = "ALL";
-    let activeTrack = null;
+    let activeTrack = window.AtlasUI.getActiveTrack();
 
     function renderTracks() {
       tracksGrid.innerHTML = TRACKS.map((t) => {
@@ -212,6 +245,7 @@
         btn.addEventListener("click", () => {
           const id = btn.dataset.track;
           activeTrack = activeTrack === id ? null : id;
+          window.AtlasUI.setActiveTrack(activeTrack);
           if (activeTrack) {
             activeLayer = "ALL";
             document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b.dataset.layer === "ALL"));
@@ -309,6 +343,7 @@
     document.querySelectorAll(".filter-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         activeTrack = null;
+        window.AtlasUI.setActiveTrack(null);
         renderTracks();
         document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
@@ -316,7 +351,27 @@
         render();
       });
     });
-    searchEl.addEventListener("input", render);
+    const growthCtrl = window.AtlasGrowth.mountGrowthView({ catalog, moduleById, lessonByPath });
+    const growthModeEl = document.getElementById("growth-mode");
+    const catalogModeEl = document.getElementById("catalog-mode");
+    const tabGrowth = document.getElementById("tab-growth");
+    const tabCatalog = document.getElementById("tab-catalog");
+    let currentView = "growth";
+    function switchView(v) {
+      currentView = v;
+      tabGrowth.classList.toggle("active", v === "growth");
+      tabCatalog.classList.toggle("active", v === "catalog");
+      growthModeEl.style.display = v === "growth" ? "block" : "none";
+      catalogModeEl.style.display = v === "catalog" ? "block" : "none";
+      if (v === "growth") growthCtrl.render();
+      else { renderTracks(); render(); }
+    }
+    tabGrowth.addEventListener("click", () => { searchEl.value = ""; switchView("growth"); });
+    tabCatalog.addEventListener("click", () => switchView("catalog"));
+    searchEl.addEventListener("input", () => {
+      if (searchEl.value.trim() && currentView !== "catalog") switchView("catalog");
+      else if (currentView === "catalog") render();
+    });
 
     const modal = document.getElementById("backup-modal");
     const backupText = document.getElementById("backup-text");
@@ -352,6 +407,7 @@
 
     renderTracks();
     render();
+    switchView("growth");
   </script>
 </body>
 </html>

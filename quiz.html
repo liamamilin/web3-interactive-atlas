@@ -58,6 +58,7 @@
     <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
     <div class="nav-actions">
       <span id="overall-badge" style="color:var(--text-muted)">已通关 0 / 5 阶段</span>
+      <button id="quiz-theme-btn" class="btn" style="padding:5px 10px;font-size:13px;"></button>
     </div>
   </header>
 
@@ -65,7 +66,7 @@
     <header class="lesson-header">
       <span class="badge">实战检验 · 20 道真实链上排雷场景</span>
       <h1>V1–V5 阶段综合排雷关卡</h1>
-      <p>把分散在 21 个模块里的底层机制串成真实链上决策：每个阶段 4 道高发踩坑题，答对 ≥ 3 题即可点亮阶段通关徽章，答错直接一键跳转回对应沙盒复盘。</p>
+      <p>把分散在 22 个模块里的底层机制串成真实链上决策：每个阶段 4 道高发踩坑题，答对 ≥ 3 题即可点亮阶段通关徽章，答错直接一键跳转回对应沙盒复盘。</p>
     </header>
 
     <div id="stage-tabs" class="stage-tabs"></div>
@@ -101,7 +102,9 @@
     </section>
   </main>
 
+  <script src="shared/sandbox-ui.js"></script>
   <script>
+    window.AtlasUI.bindThemeToggle(document.getElementById("quiz-theme-btn"));
     const QUIZ_STORAGE_KEY = "web3_atlas_quiz_v1";
 
     const STAGES = [
@@ -608,7 +611,7 @@
 
       ctx.fillStyle = "#cbd5e1";
       ctx.font = "22px ui-monospace, Menlo, monospace";
-      ctx.fillText("Web3 Interactive Atlas · 21 Modules · 42 Interactive Labs", 76, 540);
+      ctx.fillText("Web3 Interactive Atlas · 22 Modules · 44 Interactive Labs", 76, 540);
 
       const dataUrl = canvas.toDataURL("image/png");
       const msgEl = document.getElementById("share-msg");

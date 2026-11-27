@@ -50,8 +50,9 @@
             <label>选择钱包架构</label>
             <select id="sel-mode">
               <option value="eoa">传统 EOA 钱包 (仅支持 ETH 付 Gas)</option>
-              <option value="aa-usdc">AA 智能钱包 + USDC 自动扣 Gas</option>
-              <option value="aa-sponsor">AA 智能钱包 + DApp 项目方免 Gas 赞助</option>
+              <option value="aa-usdc">ERC-4337 智能钱包 + USDC 自动扣 Gas</option>
+              <option value="aa-sponsor">ERC-4337 智能钱包 + 项目方免 Gas 赞助</option>
+              <option value="eip7702">EIP-7702（老 EOA 原地升级：保留原地址 + 批处理代付）</option>
             </select>
           </div>
           <div class="control-group">
@@ -78,10 +79,11 @@
 
     <section class="stage-card">
       <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
-      <h2>为什么 2025–2026 年的 Web3 应用越来越像 Web2？</h2>
+      <h2>ERC-4337 vs EIP-7702 对比，以及新型授权钓鱼预警</h2>
       <div class="callout-warn">
-        <strong>认知升级：</strong><br />
-        Coinbase Smart Wallet、Safe、以及以太坊 <strong>EIP-7702</strong> 升级正在让普通 EOA 也能临时获得智能合约的打包与代付能力。未来普通用户甚至不需要知道“Gas 费”是什么，底层会被 <strong>链抽象（Chain Abstraction）+ Paymaster</strong> 彻底隐藏。
+        <strong>2025–2026 前沿必懂（EIP-7702 双刃剑）：</strong><br />
+        1. <strong>ERC-4337 vs EIP-7702</strong>：ERC-4337 需要你部署一个<strong>全新的智能合约地址</strong>并把旧资产迁过去；而以太坊 <strong>EIP-7702</strong> 允许你的老 MetaMask（EOA）地址直接通过签名委派（Delegation），原地临时获得批量打包与 Paymaster 代付能力，无需换地址。<br />
+        2. <strong>⚠️ 新型高危钓鱼（EIP-7702 恶意委派）</strong>：正因为 EIP-7702 能给老 EOA 挂载智能合约代码，黑客开始诱导用户签署恶意 <code>Authorization</code> 委派，把你的 EOA 绑定到黑客的抽水合约上——一旦中招，以后只要有任何新币转进这个地址都会被自动秒转走！绝不签署来路不明的 EIP-7702 委派授权。
       </div>
     </section>
   </main>
@@ -130,13 +132,21 @@
           2. 仅需 <strong>1 次确认</strong>，Bundler 提交至 EntryPoint 合约<br/>
           3. <span class="val-good">Paymaster 自动替你支付 ETH Gas，并从你的余额扣除 0.25 USDC 结算！</span>
         `;
-      } else {
+      } else if (m === "aa-sponsor") {
         sigEl.textContent = "1 次 (免油费)";
         resEl.textContent = "✓ 完全免费成交"; resEl.className = "m-val val-good";
         outEl.innerHTML = `
           1. 智能账户生成单条 UserOp：[Approve + Swap] 原子打包<br/>
           2. DApp 项目的 <strong>Verifying Paymaster</strong> 验证你是活跃用户，签字全额赞助 Gas<br/>
           3. <span class="val-good">✓ 用户 0 ETH 消耗、0 USDC 手续费，体验与 Web2 App 完全一致！</span>
+        `;
+      } else {
+        sigEl.textContent = "1 次 (老地址原地升级)";
+        resEl.textContent = "✓ 无需换地址 + 0 ETH 成交"; resEl.className = "m-val val-good";
+        outEl.innerHTML = `
+          1. 老 EOA 钱包签署一条 <strong>EIP-7702 Authorization</strong>，临时委派至官方审计的智能逻辑合约<br/>
+          2. 原地址无需迁移资产，直接批量执行 [Approve + Swap] 并由 Paymaster 代付 Gas<br/>
+          3. <span class="val-good">✓ 兼顾老钱包地址兼容与智能账户体验！（安全红线：只委派给可信钱包官方合约）</span>
         `;
       }
     });

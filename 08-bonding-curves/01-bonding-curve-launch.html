@@ -58,10 +58,11 @@
             <div class="metric-box"><div class="m-label">当前币价倍数</div><div class="m-val" id="m-mult">1.78x</div></div>
             <div class="metric-box"><div class="m-label">账面总市值 (MCap)</div><div class="m-val" id="m-mc">$8,000</div></div>
           </div>
-          <div class="metrics-row" style="margin-bottom:0;">
+          <div class="metrics-row">
             <div class="metric-box"><div class="m-label">池内真实真钱 (SOL)</div><div class="m-val val-warn" id="m-real">$1,500</div></div>
             <div class="metric-box"><div class="m-label">市值 / 真钱 杠杆比</div><div class="m-val val-bad" id="m-ratio">5.3x</div></div>
           </div>
+          <div class="svg-chart-wrap"><svg id="bc-chart" viewBox="0 0 460 175" aria-label="联合曲线价格图"></svg></div>
         </div>
       </div>
 
@@ -112,6 +113,31 @@
       document.getElementById("m-mc").textContent = `$${mc.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
       document.getElementById("m-real").textContent = `$${realUsd.toLocaleString()}`;
       document.getElementById("m-ratio").textContent = realUsd > 0 ? `${(mc / realUsd).toFixed(1)}x` : "∞";
+
+      const W = 460, H = 175, padL = 40, padR = 16, padT = 18, padB = 26;
+      const maxM = Math.pow((vSol0 + 85) / vSol0, 2);
+      const toX = (s) => padL + (s / 85) * (W - padL - padR);
+      const toY = (m) => H - padB - ((m - 1) / (maxM - 1)) * (H - padT - padB);
+      let d = "", area = `M ${toX(0).toFixed(1)} ${(H - padB).toFixed(1)}`;
+      for (let s = 0; s <= 85; s += 2) {
+        const mm = Math.pow((vSol0 + s) / vSol0, 2);
+        const px = toX(s).toFixed(1), py = toY(mm).toFixed(1);
+        d += (s === 0 ? "M " : " L ") + `${px} ${py}`;
+        if (s <= realSol) area += ` L ${px} ${py}`;
+      }
+      const cx = toX(realSol), cy = toY(mult);
+      area += ` L ${cx.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${(H - padB).toFixed(1)} Z`;
+      document.getElementById("bc-chart").innerHTML = `
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${toX(85)}" y1="${padT}" x2="${toX(85)}" y2="${H - padB}" stroke="#ec4899" stroke-dasharray="4 3" />
+        <path d="${area}" fill="rgba(56,189,248,0.18)" />
+        <path d="${d}" fill="none" stroke="#38bdf8" stroke-width="2.5" />
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5.5" fill="#ec4899" stroke="#ffffff" stroke-width="1.5" />
+        <text x="${padL + 4}" y="${padT + 10}" fill="#94a3b8" font-size="10">14.7x 毕业</text>
+        <text x="${W - padR - 52}" y="${H - 8}" fill="#ec4899" font-size="10">85 SOL 毕业</text>
+        <text x="${padL}" y="${H - 8}" fill="#94a3b8" font-size="10">0 SOL</text>
+      `;
     }
     slSol.addEventListener("input", update);
     update();

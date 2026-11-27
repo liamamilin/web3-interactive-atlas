@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>链上乐高（可组合性）与代理合约（Proxy）后门攻防 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .lego-chain { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    .lego-block {
+      flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px; font-size: 12px; text-align: center;
+    }
+    .lego-block.evil { border-color: var(--red); background: rgba(239, 68, 68, 0.14); }
+    .lego-block.safe { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+    .proxy-log { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 12px; line-height: 1.75; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V2 · 智能合约与链上乐高</span>
+      <h1>链上乐高（可组合性）与代理合约（Proxy）后门攻防</h1>
+      <p>为什么微信不能直接调用支付宝的账户余额，而以太坊上一个新写的 50 行合约却能在一笔交易里同时调用 Aave、Uniswap 和 Lido？以及这种架构最隐蔽的暗门在哪？</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒直觉对比</div>
+      <h2>你存入了一个“经过 3 家顶级机构审计”的 DeFi 收益金库，半年后却被项目方瞬间卷走全部本金</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">代码不是说“上链后不可篡改”吗？项目方是怎么绕过审计把代码换掉的？</div>
+        <button id="hook-btn" class="btn btn-danger">揭开“可升级代理合约（Proxy）”暗门</button>
+      </div>
+      <div id="hook-res" class="hook-result">
+        <strong>你存钱的合约只是一个“空壳转发器（Proxy）”！</strong><br />
+        为了方便修 Bug，许多项目采用 <strong>代理模式（Proxy Pattern）</strong>：用户的钱存在 Proxy 壳子里，但执行逻辑指向另一个 <code>Implementation v1</code> 合约。<br />
+        如果管理员（Admin）权限握在项目方单个私钥手里且没有时间锁（Timelock），他只需 1 笔交易把指针切换到恶意的 <code>Implementation v2（drainAll）</code>，就能合法转空所有用户的存款！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>无许可可组合性（Money Legos） vs 管理员升级权限</h2>
+      <p>公链上所有协议共享同一本状态账本，任何合约都能无需审批直接调用另一个合约（就像乐高积木一样拼接出闪电贷、聚合器、循环贷）：</p>
+      <div class="formula-box">
+        1 笔原子交易 = 质押 ETH(Lido) → 抵押 stETH 借 USDC(Aave) → 兑换资产(Uniswap)<br/>
+        安全治理铁律：不可升级（Immutable） &gt; 多签 + 48h 时间锁（Timelock） &gt;&gt; 单签随时可升级（极高危）
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室</div>
+      <h2>代理合约（Proxy）权限攻防模拟器</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>选择金库合约治理架构</label>
+            <select id="sel-gov">
+              <option value="eoa">单签 Admin 随时可升级（高危土狗常见）</option>
+              <option value="timelock">多签 Safe + 48 小时时间锁（主流合规）</option>
+              <option value="immutable">完全不可升级（Immutable，如 Uniswap 核心池）</option>
+            </select>
+          </div>
+          <button id="btn-attack" class="btn btn-danger" style="width:100%;">模拟：黑客/内部人发起恶意逻辑升级</button>
+          <div class="metrics-row" style="margin-top:14px;margin-bottom:0;">
+            <div class="metric-box"><div class="m-label">用户逃生窗口</div><div class="m-val val-bad" id="m-win">0 秒</div></div>
+            <div class="metric-box"><div class="m-label">金库资产结果</div><div class="m-val val-bad" id="m-res">待模拟</div></div>
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="lego-chain">
+            <div class="lego-block"><strong>用户存款壳</strong><br/>Proxy 合约<br/>($50M TVL)</div>
+            <div>──▶</div>
+            <div id="impl-box" class="lego-block safe"><strong>当前执行逻辑</strong><br/>Logic v1 (已审计)</div>
+          </div>
+          <div id="proxy-log" class="proxy-log">选择左侧治理模式，点击按钮测试恶意升级攻击...</div>
+        </div>
+      </div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：选择「单签 Admin 随时可升级」并点击发起攻击，观察用户为什么连 1 秒钟的撤离时间都没有。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：切换为「多签 + 48 小时时间锁」和「不可升级」，对比链上透明治理如何给用户留出安全逃生窗口。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
+      <h2>投研大额存钱前，30 秒排查“是否会被暗中换代码”</h2>
+      <div class="callout-warn">
+        <strong>实战排雷三连问：</strong><br />
+        1. 在 Etherscan 上看合约页面是否出现 <strong>Read / Write as Proxy</strong> 标签（说明它是可升级代理合约）。<br />
+        2. 如果是可升级合约，查看它的 <code>Admin / Owner</code> 地址是<strong>单个普通钱包</strong>，还是<strong>多签钱包 + 至少 24–48 小时 Timelock（时间锁）</strong>？<br />
+        3. 链上乐高越叠越多（如协议 A 套协议 B 再套协议 C），风险不是相加而是<strong>木桶效应</strong>：只要最脆弱的一块乐高被黑，整串组合都会连锁受损。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "22-smart-contracts-composability/02-composability-and-proxy-risk.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "22 · 智能合约与链上乐高" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const selGov = document.getElementById("sel-gov");
+    const mWin = document.getElementById("m-win");
+    const mRes = document.getElementById("m-res");
+    const implBox = document.getElementById("impl-box");
+    const logEl = document.getElementById("proxy-log");
+
+    document.getElementById("btn-attack").addEventListener("click", () => {
+      const g = selGov.value;
+      if (g === "eoa") {
+        mWin.textContent = "0 秒"; mWin.className = "m-val val-bad";
+        mRes.textContent = "🚨 瞬间归零"; mRes.className = "m-val val-bad";
+        implBox.className = "lego-block evil";
+        implBox.innerHTML = `<strong>已被篡改为</strong><br/>EvilLogic v2 (抽干资金)`;
+        logEl.innerHTML = `
+          &gt; 管理员单签发起 upgradeTo(0xEvilV2) → <span class="val-bad">12 秒立即生效！</span><br/>
+          &gt; 紧接着调用 drainAll()，Proxy 壳子内 $50M 存款在同一个区块被全部转走。<br/>
+          &gt; 结论：<span class="val-bad">哪怕 v1 通过了 10 次审计，单签无锁升级权限也会让审计形同虚设！</span>
+        `;
+      } else if (g === "timelock") {
+        mWin.textContent = "48 小时"; mWin.className = "m-val val-good";
+        mRes.textContent = "🛡️ 成功预警撤离"; mRes.className = "m-val val-good";
+        implBox.className = "lego-block safe";
+        implBox.innerHTML = `<strong>等待队列中</strong><br/>Logic v1 仍受保护`;
+        logEl.innerHTML = `
+          &gt; 升级提案进入 48 小时链上 Timelock 队列（需 3-of-5 多签批准）。<br/>
+          &gt; 链上监控机器人 10 秒内发出全网警报：检测到可疑代码变更！<br/>
+          &gt; 结论：<span class="val-good">所有用户拥有整整 48 小时窗口期，从容在旧版安全逻辑下提走全部本金！</span>
+        `;
+      } else {
+        mWin.textContent = "永久锁定"; mWin.className = "m-val val-good";
+        mRes.textContent = "🛡️ 绝对无法篡改"; mRes.className = "m-val val-good";
+        implBox.className = "lego-block safe";
+        implBox.innerHTML = `<strong>不可升级核心</strong><br/>Logic v1 (无 Admin)`;
+        logEl.innerHTML = `
+          &gt; 尝试调用 upgradeTo() → <span class="val-good">合约根本不存在升级函数，直接 Revert！</span><br/>
+          &gt; 结论：<span class="val-good">像 Uniswap v2/v3 核心池一样放弃了管理员权限，代码真正做到永久中立。</span>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

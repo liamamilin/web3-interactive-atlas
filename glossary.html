@@ -45,12 +45,13 @@
     <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
     <div class="nav-actions">
       <a class="btn" style="padding:5px 10px;font-size:13px;" href="quiz.html">🧭 排雷测验</a>
+      <button id="glossary-theme-btn" class="btn" style="padding:5px 10px;font-size:13px;"></button>
     </div>
   </header>
 
   <main class="lesson-container">
     <header class="lesson-header">
-      <span class="badge">全站概念索引 · 自动同步自 42 个沙盒</span>
+      <span class="badge">全站概念索引 · 自动同步自 44 个沙盒</span>
       <h1>Web3 高频术语速查索引</h1>
       <p>在推特、研报或钱包弹窗里看到陌生黑话？直接搜词条，一键跳进对应的交互沙盒亲手验证底层机制。</p>
     </header>
@@ -72,8 +73,10 @@
     <div id="glossary-grid" class="glossary-grid"></div>
   </main>
 
+  <script src="shared/sandbox-ui.js"></script>
   <script src="catalog.js"></script>
   <script>
+    window.AtlasUI.bindThemeToggle(document.getElementById("glossary-theme-btn"));
     const catalog = window.WEB3_ATLAS_CATALOG || { modules: [] };
     const termMap = new Map();
 

@@ -1322,6 +1322,70 @@ window.WEB3_ATLAS_CATALOG = {
           "path": "21-zk-privacy/02-onchain-privacy-pools.html"
         }
       ]
+    },
+    {
+      "id": "22-smart-contracts-composability",
+      "order": 22,
+      "layer": "V2: DeFi 金融引擎与市场博弈",
+      "icon": "🧱",
+      "accentColor": "#38bdf8",
+      "title": {
+        "zh": "智能合约与链上乐高",
+        "en": "Smart Contracts & Composability"
+      },
+      "summary": {
+        "zh": "从“只会记账转币”跃迁到“代码自动管钱”的关键桥梁：拆解无中介自动托管合约、协议间无许可乐高组合，以及可升级代理合约（Proxy）的隐藏后门。",
+        "en": "The missing bridge from simple transfers to DeFi: autonomous escrow code, permissionless Money Legos, and upgradeable Proxy risks."
+      },
+      "lessons": [
+        {
+          "file": "01-code-holds-money.html",
+          "title": {
+            "zh": "代码如何替人管钱？智能合约自动托管沙盒",
+            "en": "How Code Holds Money: Autonomous Escrow Lab"
+          },
+          "subtitle": {
+            "zh": "没有支付宝、没有老板，一段公开代码凭什么能锁住 10 亿美元并按条件自动放款？",
+            "en": "Simulate trustless conditional escrow where immutable on-chain code replaces middlemen."
+          },
+          "duration": "4 min",
+          "sandboxType": "simulator",
+          "concepts": [
+            "Smart Contract",
+            "Escrow",
+            "Code is Law",
+            "State Machine"
+          ],
+          "prerequisites": [
+            "01-wallet-keys/02-digital-signature.html",
+            "09-consensus-ledger/01-utxo-vs-account.html"
+          ],
+          "path": "22-smart-contracts-composability/01-code-holds-money.html"
+        },
+        {
+          "file": "02-composability-and-proxy-risk.html",
+          "title": {
+            "zh": "链上乐高（可组合性）与代理合约（Proxy）后门攻防",
+            "en": "Money Legos & Upgradeable Proxy Backdoors"
+          },
+          "subtitle": {
+            "zh": "为什么 DeFi 协议能像乐高一样 1 笔交易无缝拼接？又为什么“可升级代理合约”让项目方随时能偷换规则跑路？",
+            "en": "See how permissionless composability powers DeFi—and how admin-controlled Proxy contracts enable rug pulls."
+          },
+          "duration": "5 min",
+          "sandboxType": "attack-defense",
+          "concepts": [
+            "Composability",
+            "Money Legos",
+            "Upgradeable Proxy",
+            "Timelock"
+          ],
+          "prerequisites": [
+            "22-smart-contracts-composability/01-code-holds-money.html"
+          ],
+          "path": "22-smart-contracts-composability/02-composability-and-proxy-risk.html"
+        }
+      ]
     }
   ]
 };

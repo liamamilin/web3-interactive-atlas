@@ -78,10 +78,11 @@
             <div class="metric-box"><div class="m-label">当前总流通比例</div><div class="m-val" id="m-circ">32.5%</div></div>
             <div class="metric-box"><div class="m-label">模拟币价 (初始 $1)</div><div class="m-val" id="m-price">$0.46</div></div>
           </div>
-          <div class="metrics-row" style="margin-bottom:0;">
+          <div class="metrics-row">
             <div class="metric-box"><div class="m-label">相对上线涨跌幅</div><div class="m-val" id="m-chg">-53.8%</div></div>
             <div class="metric-box"><div class="m-label">通胀稀释倍数</div><div class="m-val val-warn" id="m-dil">3.25x</div></div>
           </div>
+          <div class="svg-chart-wrap"><svg id="unlock-chart" viewBox="0 0 460 170" aria-label="36个月解锁悬崖曲线"></svg></div>
         </div>
       </div>
 
@@ -147,6 +148,38 @@
       const cEl = document.getElementById("m-chg");
       cEl.textContent = `${chg >= 0 ? "+" : ""}${chg.toFixed(1)}%`;
       cEl.className = "m-val " + (chg >= 0 ? "val-good" : "val-bad");
+
+      const W = 460, H = 170, padL = 36, padR = 14, padT = 16, padB = 26;
+      const toX = (m) => padL + (m / 36) * (W - padL - padR);
+      const toY = (pct) => H - padB - (pct / 100) * (H - padT - padB);
+      let totalPath = `M ${toX(0).toFixed(1)} ${toY(initPct).toFixed(1)}`;
+      let areaPath = `M ${toX(0).toFixed(1)} ${(H - padB).toFixed(1)} L ${toX(0).toFixed(1)} ${toY(initPct).toFixed(1)}`;
+      for (let m = 1; m <= 36; m++) {
+        const ex = m < 12 ? 0 : locked * 0.25 + locked * 0.75 * Math.min(1, (m - 12) / 24);
+        const tot = initPct + ex;
+        if (m === 12) {
+          totalPath += ` L ${toX(12).toFixed(1)} ${toY(initPct).toFixed(1)}`;
+          areaPath += ` L ${toX(12).toFixed(1)} ${toY(initPct).toFixed(1)}`;
+        }
+        totalPath += ` L ${toX(m).toFixed(1)} ${toY(tot).toFixed(1)}`;
+        areaPath += ` L ${toX(m).toFixed(1)} ${toY(tot).toFixed(1)}`;
+      }
+      areaPath += ` L ${toX(36).toFixed(1)} ${(H - padB).toFixed(1)} Z`;
+      const mx = toX(mo), my = toY(circ);
+      const baseY = toY(initPct);
+      document.getElementById("unlock-chart").innerHTML = `
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="#475569" />
+        <path d="${areaPath}" fill="rgba(239,68,68,0.22)" />
+        <rect x="${padL}" y="${baseY.toFixed(1)}" width="${W - padL - padR}" height="${(H - padB - baseY).toFixed(1)}" fill="rgba(56,189,248,0.25)" />
+        <path d="${totalPath}" fill="none" stroke="#ef4444" stroke-width="2.2" />
+        <line x1="${mx.toFixed(1)}" y1="${padT}" x2="${mx.toFixed(1)}" y2="${H - padB}" stroke="#f59e0b" stroke-dasharray="3 3" />
+        <circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="5" fill="#f59e0b" stroke="#fff" stroke-width="1.5" />
+        <text x="${padL}" y="${H - 8}" fill="#94a3b8" font-size="10">TGE</text>
+        <text x="${toX(12) - 18}" y="${H - 8}" fill="#ef4444" font-size="10">12m 悬崖</text>
+        <text x="${W - padR - 24}" y="${H - 8}" fill="#94a3b8" font-size="10">36m</text>
+        <text x="6" y="${padT + 8}" fill="#94a3b8" font-size="10">100%</text>
+      `;
     }
     [slInit, slMo, slDem].forEach((el) => el.addEventListener("input", update));
     update();

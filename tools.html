@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 链上实战与防坑工具箱 — Web3 Interactive Atlas</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="shared/theme.css" />
+  <style>
+    .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .cat-btn {
+      padding: 6px 13px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); transition: 0.15s;
+    }
+    .cat-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .tool-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+    }
+    .tool-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .tool-name { font-size: 17px; font-weight: 700; color: var(--text); }
+    .tool-cat { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+    .tool-desc { font-size: 13px; color: var(--card-text); line-height: 1.6; }
+    .tool-when { font-size: 12px; color: var(--text-muted); background: var(--surface-2); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); }
+    .tool-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header class="atlas-topbar">
+    <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
+    <div class="nav-actions">
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="glossary.html">📖 术语速查</a>
+      <a class="btn" style="padding:5px 10px;font-size:13px;" href="quiz.html">🧭 排雷测验</a>
+      <button id="tools-theme-btn" class="btn" style="padding:5px 10px;font-size:13px;"></button>
+    </div>
+  </header>
+
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">实战落地 · 把沙盒认知接入真实链上工具</span>
+      <h1>Web3 链上实战与防坑工具箱</h1>
+      <p>学完机制后，真正上链防盗、查项目数据、看解锁抛压、防 MEV 夹子该打开哪些一手工具？这里只保留行业公认、最常用的核心免费工具。</p>
+    </header>
+
+    <div id="cat-tabs" class="cat-tabs">
+      <button class="cat-btn active" data-cat="ALL">全部工具</button>
+      <button class="cat-btn" data-cat="security">🛡️ 安全防盗与托管</button>
+      <button class="cat-btn" data-cat="research">📊 DeFi 与投研数据</button>
+      <button class="cat-btn" data-cat="infra">🌉 L2 风险与防夹交易</button>
+      <button class="cat-btn" data-cat="explorer">🔍 链上浏览器与追踪</button>
+    </div>
+
+    <div id="tool-grid" class="tool-grid"></div>
+
+    <section class="stage-card" style="margin-top:28px;">
+      <div class="stage-label">安全使用铁律</div>
+      <div class="callout-warn" style="margin-top:0;">
+        <strong>永远不要通过搜索引擎广告位点进 Web3 工具！</strong> 钓鱼团伙常买 Google 竞价广告伪造 Revoke / Safe / Uniswap 域名。建议将常用工具直接加入浏览器书签，每次连接钱包前核对域名拼写。
+      </div>
+    </section>
+  </main>
+
+  <script src="shared/sandbox-ui.js"></script>
+  <script>
+    window.AtlasUI.bindThemeToggle(document.getElementById("tools-theme-btn"));
+
+    const TOOLS = [
+      {
+        name: "Revoke.cash",
+        cat: "security",
+        catLabel: "安全防盗",
+        url: "https://revoke.cash",
+        desc: "一键检查并撤销钱包历史上的无限代币授权（Approve / Permit2），防止老协议被黑后顺着旧授权抽干钱包。",
+        when: "适用时机：每次交互完陌生 DApp 后，或定期做钱包体检时。",
+        lesson: { title: "授权机制与钓鱼签名攻防", path: "03-security-traps/01-approve-and-permit.html" }
+      },
+      {
+        name: "GoPlus Token Security",
+        cat: "security",
+        catLabel: "安全防盗",
+        url: "https://gopluslabs.io",
+        desc: "输入代币合约地址，3 秒自动检测是否为蜜罐（貔貅盘）、是否存在高额买卖税、Owner 增发或黑名单后门。",
+        when: "适用时机：冲任何新发射的土狗币 / 小盘山寨币之前必查。",
+        lesson: { title: "蜜罐（貔貅盘）与撤池子拆解", path: "03-security-traps/02-honeypot-rugpull.html" }
+      },
+      {
+        name: "Safe (原 Gnosis Safe)",
+        cat: "security",
+        catLabel: "托管与多签",
+        url: "https://app.safe.global",
+        desc: "行业标准智能合约多签金库，支持 2-of-3、3-of-5 阈值签名，彻底消除单私钥被盗或丢失的单点风险。",
+        when: "适用时机：管理个人大额长期资产或团队/DAO 链上财库。",
+        lesson: { title: "硬件冷签名与多签钱包攻防", path: "20-custody-multisig/02-hardware-and-multisig.html" }
+      },
+      {
+        name: "DefiLlama",
+        cat: "research",
+        catLabel: "DeFi 投研",
+        url: "https://defillama.com",
+        desc: "最干净无广告的链上数据总站：查各协议真实 TVL、协议手续费（Fees）、真实收入（Revenue）与稳定币发行量。",
+        when: "适用时机：判断某高年化项目是“真实收益”还是“通胀庞氏”。",
+        lesson: { title: "链上投研核心指标体检台", path: "14-onchain-forensics/02-onchain-metrics-dashboard.html" }
+      },
+      {
+        name: "Tokenomist (原 TokenUnlocks)",
+        cat: "research",
+        catLabel: "解锁日历",
+        url: "https://tokenomist.ai",
+        desc: "精准追踪主流代币的流通比例、FDV、团队与 VC 悬崖解锁（Cliff Unlock）及线性释放时间表。",
+        when: "适用时机：打算中长线买入任何低流通高 FDV 新币前必看。",
+        lesson: { title: "低流通高 FDV 与解锁悬崖模拟器", path: "12-tokenomics/01-fdv-unlock-cliff.html" }
+      },
+      {
+        name: "Dune Analytics",
+        cat: "research",
+        catLabel: "链上看板",
+        url: "https://dune.com",
+        desc: "社区驱动的 SQL 链上数据看板，覆盖 DEX 交易量、空投女巫分析、稳定币锚定、RWA 美债规模等一手图表。",
+        when: "适用时机：深度拆解赛道趋势、核验项目方宣称的活跃用户水分。",
+        lesson: { title: "真实收益 vs 通胀庞氏拆解器", path: "14-onchain-forensics/01-real-yield-vs-ponzi.html" }
+      },
+      {
+        name: "L2BEAT",
+        cat: "infra",
+        catLabel: "L2 风险评级",
+        url: "https://l2beat.com",
+        desc: "专门审计所有以太坊 Layer 2（OP / ZK Rollup）的真实去中心化阶段（Stage 0/1/2）、多签权限与排序器风险。",
+        when: "适用时机：把大额资金跨进陌生 L2 链之前，先看它的防跑路评级。",
+        lesson: { title: "Rollup 扩容：OP 挑战期 vs ZK 数学证明", path: "10-scaling-bridges/01-rollup-and-zk.html" }
+      },
+      {
+        name: "Flashbots Protect / MEV Blocker",
+        cat: "infra",
+        catLabel: "防夹 RPC",
+        url: "https://protect.flashbots.net",
+        desc: "一键为 MetaMask/Rabby 添加私有 RPC，让交易绕过公开 Mempool 直达区块构建者，避免被三明治机器人夹击。",
+        when: "适用时机：在以太坊主网进行大额 Swap 或交易波动剧烈币种时。",
+        lesson: { title: "黑暗森林隐身术：私有 RPC 防夹模拟器", path: "11-mev-dark-forest/02-private-rpc-protection.html" }
+      },
+      {
+        name: "CoW Swap",
+        cat: "infra",
+        catLabel: "意图防夹交易",
+        url: "https://swap.cow.fi",
+        desc: "基于意图撮合（Intent + Batch Auction）的去中心化聚合器，由 Solver 竞争报价并天然免疫 MEV 夹子攻击。",
+        when: "适用时机：主网大额换币，追求更优成交价与零 Gas 失败成本。",
+        lesson: { title: "三明治攻击时间轴沙盒", path: "11-mev-dark-forest/01-sandwich-attack-lab.html" }
+      },
+      {
+        name: "Etherscan",
+        cat: "explorer",
+        catLabel: "链上浏览器",
+        url: "https://etherscan.io",
+        desc: "以太坊一手原始账本浏览器：查交易状态（Pending/Revert）、实时 Gas、验证合约开源代码与代币前排持仓。",
+        when: "适用时机：交易卡住查 Nonce、核验合约是否开源或查大户动向。",
+        lesson: { title: "Mempool 排队与 Gas 竞价模拟器", path: "02-tx-gas-multichain/01-mempool-gas-auction.html" }
+      },
+      {
+        name: "Solscan",
+        cat: "explorer",
+        catLabel: "Solana 浏览器",
+        url: "https://solscan.io",
+        desc: "Solana 生态主流区块浏览器，快速查看 SPL 代币前 10 持仓集中度、流动性池创建记录与交易明细。",
+        when: "适用时机：排查 Solana Meme 币筹码分布与早期内盘老鼠仓。",
+        lesson: { title: "早鸟筹码与砸盘数学模拟器", path: "08-bonding-curves/02-early-vs-late-dump.html" }
+      },
+      {
+        name: "Arkham Intelligence",
+        cat: "explorer",
+        catLabel: "地址实体追踪",
+        url: "https://intel.arkm.com",
+        desc: "链上实体标签与资金流图谱工具，直观展示交易所冷热钱包、机构地址与黑客资金转移路径。",
+        when: "适用时机：监控交易所储备异动，或反查自己钱包的链上隐私暴露面。",
+        lesson: { title: "链上地址追踪与合规隐私池博弈沙盒", path: "21-zk-privacy/02-onchain-privacy-pools.html" }
+      }
+    ];
+
+    const grid = document.getElementById("tool-grid");
+    let activeCat = "ALL";
+
+    function render() {
+      const list = activeCat === "ALL" ? TOOLS : TOOLS.filter((t) => t.cat === activeCat);
+      grid.innerHTML = list.map((t) => `
+        <article class="tool-card">
+          <div>
+            <div class="tool-head">
+              <span class="tool-name">${t.name}</span>
+              <span class="tool-cat">${t.catLabel}</span>
+            </div>
+            <p class="tool-desc" style="margin:8px 0 10px;">${t.desc}</p>
+            <div class="tool-when">${t.when}</div>
+          </div>
+          <div class="tool-actions">
+            <a href="${t.lesson.path}" style="font-size:12px;color:var(--text-muted);">📚 对应沙盒：${t.lesson.title}</a>
+            <a class="btn btn-primary" style="padding:5px 11px;font-size:12px;" href="${t.url}" target="_blank" rel="noopener">打开官网 ↗</a>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    document.querySelectorAll("#cat-tabs .cat-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#cat-tabs .cat-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCat = btn.dataset.cat;
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>

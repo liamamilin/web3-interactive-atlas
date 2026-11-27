@@ -77,7 +77,8 @@
         <div class="lab-panel">
           <div style="font-size:13px;color:var(--text-muted)">持有至到期日的三种策略最终结果对比：</div>
           <div class="split-grid" id="split-grid"></div>
-          <div id="verdict" style="font-size:13px;color:#d1d5db;margin-top:14px;padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);line-height:1.65;"></div>
+          <div id="verdict" style="font-size:13px;color:var(--card-text);margin-top:14px;padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);line-height:1.65;"></div>
+          <div class="svg-chart-wrap"><svg id="ptyt-chart" viewBox="0 0 460 160" aria-label="PT回归1与YT归零收敛曲线"></svg></div>
         </div>
       </div>
 
@@ -178,6 +179,31 @@
       } else {
         vEl.innerHTML = `<strong>精确打平：</strong>实际年化刚好等于隐含年化（${Math.round(imp * 100)}%），YT 买家刚好收回本金（0% 净收益），PT 与直接持有 SY 收益一致。`;
       }
+
+      const W = 460, H = 160, padL = 38, padR = 16, padT = 16, padB = 26;
+      const toX = (f) => padL + f * (W - padL - padR);
+      const toY = (v) => H - padB - v * (H - padT - padB);
+      let ptPath = "", ytPath = "";
+      for (let i = 0; i <= 30; i++) {
+        const frac = i / 30;
+        const remT = t * (1 - frac);
+        const pPt = 1 / Math.pow(1 + imp, remT);
+        const pYt = 1 - pPt;
+        ptPath += (i === 0 ? "M " : " L ") + `${toX(frac).toFixed(1)} ${toY(pPt).toFixed(1)}`;
+        ytPath += (i === 0 ? "M " : " L ") + `${toX(frac).toFixed(1)} ${toY(pYt).toFixed(1)}`;
+      }
+      document.getElementById("ptyt-chart").innerHTML = `
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#475569" />
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="#475569" />
+        <path d="${ptPath}" fill="none" stroke="#10b981" stroke-width="2.5" />
+        <path d="${ytPath}" fill="none" stroke="#f59e0b" stroke-width="2.5" />
+        <circle cx="${toX(0)}" cy="${toY(ptPrice).toFixed(1)}" r="4.5" fill="#10b981" />
+        <circle cx="${toX(0)}" cy="${toY(ytPrice).toFixed(1)}" r="4.5" fill="#f59e0b" />
+        <text x="${padL + 6}" y="${padT + 10}" fill="#10b981" font-size="10">PT → 到期必回归 $1.00</text>
+        <text x="${padL + 6}" y="${H - padB - 8}" fill="#f59e0b" font-size="10">YT → 到期必归零 $0.00</text>
+        <text x="${padL}" y="${H - 8}" fill="#94a3b8" font-size="10">今天 (${days}天)</text>
+        <text x="${W - padR - 34}" y="${H - 8}" fill="#94a3b8" font-size="10">到期日</text>
+      `;
     }
 
     [slInv, slDays, slImp, slAct].forEach((el) => el.addEventListener("input", update));

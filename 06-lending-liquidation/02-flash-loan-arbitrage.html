@@ -46,6 +46,11 @@
     <section class="stage-card">
       <div class="stage-label">Stage 3 · 主沙盒实验室</div>
       <h2>无本套利模拟器（调节两个交易所的价差）</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="revert">无价差（触发原子回滚）</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="arb">常规 1% 搬砖 ($100k)</button>
+        <button class="btn" style="font-size:12px;padding:5px 10px;" data-pre="whale">巨额 $1M 瞬时套利</button>
+      </div>
       <div class="lab-grid">
         <div class="lab-panel">
           <div class="control-group">
@@ -78,8 +83,9 @@
       <div class="stage-label">Stage 4 · 链上真实档案与防坑</div>
       <h2>闪电贷是双刃剑：既是套利工具，也是黑客的“核武器”</h2>
       <div class="callout-warn">
-        <strong>认知升级：</strong><br />
-        以前黑客想操纵某个小协议的预言机价格需要几千万美元本金；有了闪电贷后，任何懂代码的黑客都能零成本撬动几千万资金去攻击漏洞协议。因此，评估一个 DeFi 协议是否安全，<strong>能否抵御闪电贷攻击</strong>是核心红线。
+        <strong>真实大案复盘与认知升级：</strong><br />
+        • <strong>2023 年 Euler Finance $1.97 亿闪电贷攻击</strong>：黑客零本金通过 Aave 闪电贷借出巨额 DAI，利用 Euler 捐赠函数缺少健康系数检查的漏洞，在<strong>单个区块内</strong>人为制造坏账并自我清算，瞬间抽干 1.97 亿美元（后经链上谈判大部分退回）。<br />
+        • <strong>核心红线</strong>：闪电贷把“发动亿级资金攻击的门槛”降到了几美元 Gas 费。评估任何新 DeFi 协议时，是否使用抗闪电贷预言机（Chainlink / TWAP）与完整审计，是绝不能省的排雷项。
       </div>
     </section>
   </main>
@@ -119,6 +125,15 @@
         </div>
       `;
     }
+    document.querySelectorAll("[data-pre]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.pre;
+        if (p === "revert") { slLoan.value = 100000; slPa.value = 3000; slPb.value = 3000; }
+        if (p === "arb") { slLoan.value = 100000; slPa.value = 3000; slPb.value = 3030; }
+        if (p === "whale") { slLoan.value = 1000000; slPa.value = 2980; slPb.value = 3025; }
+        update();
+      });
+    });
     [slLoan, slPa, slPb].forEach((el) => el.addEventListener("input", update));
     update();
   </script>
