@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
-  <meta name="description" content="从 1 颗核心种子出发，通过张力驱动逐阶生长：23 大模块、46 个交互实验页与 V1–V5 综合排雷测验。" />
+  <meta name="description" content="从 1 颗核心种子出发，通过张力驱动逐阶生长：23 大模块、46 个交互实验页与 V0–V5 综合排雷测验。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Web3 Interactive Atlas — 23 模块 · 46 个链上交互沙盒" />
-  <meta property="og:description" content="不谈暴富神话，只拆真实规则。涵盖钱包安全、多签托管、AMM/v3、循环贷清算、MEV、代币经济学、ZK 隐私、RWA 与 AI Agent x402。" />
-  <meta property="og:image" content="og-cover.svg" />
+  <meta property="og:description" content="不谈暴富神话，只拆真实规则。涵盖无银行账本蓝图、五维设计框架、钱包多签、AMM/v3、循环贷清算、MEV、ZK 隐私、RWA 与 AI Agent x402。" />
+  <meta property="og:image" content="og-cover.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="og-cover.png" />
   <link rel="stylesheet" href="shared/theme.css" />
   <style>
     .hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 20px; }
@@ -125,7 +126,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
       <div id="progress-summary" style="font-size:14px;color:var(--text-muted);"></div>
-      <a id="quiz-entry-btn" class="btn btn-primary" href="quiz.html">🧭 V1–V5 综合排雷测验</a>
+      <a id="quiz-entry-btn" class="btn btn-primary" href="quiz.html">🧭 V0–V5 综合排雷测验</a>
     </div>
   </div>
 
@@ -267,9 +268,9 @@
       summaryEl.textContent = `总学习进度：${doneAll} / ${totalAll} 已掌握`;
       try {
         const qSaved = JSON.parse(localStorage.getItem("web3_atlas_quiz_v1") || "{}");
-        const cleared = ["V1", "V2", "V3", "V4", "V5"].filter((k) => qSaved[k]?.cleared).length;
+        const cleared = ["V0", "V1", "V2", "V3", "V4", "V5"].filter((k) => qSaved[k]?.cleared).length;
         const qBtn = document.getElementById("quiz-entry-btn");
-        if (qBtn) qBtn.textContent = cleared > 0 ? `🧭 排雷测验（已通关 ${cleared}/5）` : "🧭 V1–V5 综合排雷测验";
+        if (qBtn) qBtn.textContent = cleared > 0 ? `🧭 排雷测验（已通关 ${cleared}/6）` : "🧭 V0–V5 综合排雷测验";
       } catch {}
 
       let displayModules = catalog.modules.slice();

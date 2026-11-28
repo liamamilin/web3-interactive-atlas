@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>V1–V5 阶段综合排雷关卡 — Web3 Interactive Atlas</title>
+  <title>V0–V5 阶段综合排雷关卡 — Web3 Interactive Atlas</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="shared/theme.css" />
   <style>
@@ -57,15 +57,15 @@
   <header class="atlas-topbar">
     <a class="brand" href="index.html">← Web3 Interactive Atlas</a>
     <div class="nav-actions">
-      <span id="overall-badge" style="color:var(--text-muted)">已通关 0 / 5 阶段</span>
+      <span id="overall-badge" style="color:var(--text-muted)">已通关 0 / 6 阶段</span>
       <button id="quiz-theme-btn" class="btn" style="padding:5px 10px;font-size:13px;"></button>
     </div>
   </header>
 
   <main class="lesson-container">
     <header class="lesson-header">
-      <span class="badge">实战检验 · 20 道真实链上排雷场景</span>
-      <h1>V1–V5 阶段综合排雷关卡</h1>
+      <span class="badge">实战检验 · 24 道真实链上排雷场景</span>
+      <h1>V0–V5 阶段综合排雷关卡</h1>
       <p>把分散在 23 个模块里的底层机制串成真实链上决策：每个阶段 4 道高发踩坑题，答对 ≥ 3 题即可点亮阶段通关徽章，答错直接一键跳转回对应沙盒复盘。</p>
     </header>
 
@@ -108,6 +108,61 @@
     const QUIZ_STORAGE_KEY = "web3_atlas_quiz_v1";
 
     const STAGES = [
+      {
+        id: "V0",
+        name: "V0 · 种子与协议蓝图",
+        desc: "检验四职能解耦、全节点验证红线、比特币激励安全预算与协议治理分叉",
+        questions: [
+          {
+            prompt: "某新兴公链把区块放大 100 倍、号称 10 万 TPS，但跑一个全节点需要 $20,000 顶配服务器和万兆专线，普通用户只能信任官方中心化 RPC。这违背了四职能拆解中的哪条底层红线？",
+            options: [
+              "完全没问题，TPS 越高说明区块链越先进",
+              "摧毁了低成本独立验证（Verification）！当普通人跑不起全节点，提议者与验证者重新合二为一，实质退化为联盟数据库",
+              "只要它发了代币，就一定是去中心化的",
+              "普通用户只需要看区块浏览器，不需要全节点验证"
+            ],
+            answer: 1,
+            explain: "区块链把存储、提议、验证、认同拆开后，核心红线是「提议可以很卷，但验证必须足够便宜」。一旦普通人失去独立验证能力，就只能重新盲信中心化服务器。",
+            lesson: { title: "无银行账本：存储、提议、验证与认同的四职能拆解", path: "00-blockchain-blueprint/01-four-roles-decoupled.html" }
+          },
+          {
+            prompt: "假设占全网 60% 算力的大矿工在自己挖出的新区块里，偷偷塞进了一笔“凭空给自己增发 500 BTC”的违规交易并广播全网。结果会怎样？",
+            options: [
+              "算力过半就能改写一切，他白赚 500 BTC",
+              "全球普通全节点在独立验证（Verification）阶段 1 秒报错并直接拒收该区块，大矿工白白烧掉电费",
+              "要等 6 个区块后才会发现这笔假账",
+              "只有比他算力更大的矿工才能拒绝他"
+            ],
+            answer: 1,
+            explain: "矿工只有「提议打包权」，没有「修改规则权」。全网数万个全节点严格执行交易与发行规则，任何违规区块都会被立刻孤立拒收。",
+            lesson: { title: "无银行账本：存储、提议、验证与认同的四职能拆解", path: "00-blockchain-blueprint/01-four-roles-decoupled.html" }
+          },
+          {
+            prompt: "比特币用「新币区块奖励 + 手续费」激励矿工。为什么大矿工宁愿老老实实挖矿，也不轻易发动 51% 双花攻击？随着未来区块奖励不断减半趋近于 0，又面临什么长期挑战？",
+            options: [
+              "矿工都签了道德承诺书；未来奖励归零后比特币就会免费运行",
+              "奖励以 BTC 结算且专用矿机沉没成本巨大，攻击会砸穿币价让矿工血本无归；远期区块奖励归零后，必须依靠足够的链上真实手续费来维持全网安全预算",
+              "因为比特币永远不会减半，区块奖励一直固定在 50 BTC",
+              "手续费越高，矿工越容易发动攻击"
+            ],
+            answer: 1,
+            explain: "好的激励不仅让人愿意记账，更让诚实比作恶更划算。比特币把矿工私利与币价深度绑定，而远期减半后的安全预算接棒，是其设计中最核心的长期张力。",
+            lesson: { title: "从零设计加密货币：五维框架、激励博弈与跨币种对照", path: "00-blockchain-blueprint/02-crypto-design-framework.html" }
+          },
+          {
+            prompt: "2017 年比特币区块大小之争中，占全网 80% 以上算力的矿工与部分大机构联手推动硬分叉扩容，为什么最终没能强行改写比特币规则？",
+            options: [
+              "因为中本聪发邮件阻止了他们",
+              "因为全球运行全节点的用户群体拒绝升级客户端（UASF），坚持按旧规则验证——加密治理的本质是自愿共识与低成本用脚投票",
+              "因为矿工投票系统出了 Bug",
+              "因为证监会下令禁止扩大区块"
+            ],
+            answer: 1,
+            explain: "在五维框架最顶层的治理机制里，开发者写代码、矿工出块，但拒绝接受违规区块的全节点经济用户掌握着终极否决权。",
+            lesson: { title: "从零设计加密货币：五维框架、激励博弈与跨币种对照", path: "00-blockchain-blueprint/02-crypto-design-framework.html" }
+          }
+        ]
+      },
       {
         id: "V1",
         name: "V1 · 链上生存与托管",
@@ -513,25 +568,27 @@
     });
 
     const RANKS = [
-      { min: 0, title: "🌱 链上萌新", desc: "刚踏入链上世界，建议从 V1 生存与托管关卡开始排雷。" },
-      { min: 1, title: "🛡️ 防坑学徒", desc: "已迈出第一步，能避开最常见的链上初级陷阱。" },
-      { min: 2, title: "⚡ DeFi 猎手", desc: "已看懂核心金融引擎与清算机制，开始建立链上风控直觉。" },
-      { min: 3, title: "🌲 黑暗森林幸存者", desc: "在 MEV、跨链桥、解锁抛压与隐私追踪中具备独立判断力。" },
-      { min: 4, title: "🔭 链上投研专家", desc: "接近全景通关，只差最后一关即可点亮全套徽章！" },
-      { min: 5, title: "🏆 Web3 全景架构师", desc: "V1–V5 全部通关！从钱包底层到 AI Agent 经济规则已全部打通。" }
+      { min: 0, title: "🌱 链上萌新", desc: "刚踏入链上世界，建议从 V0 种子蓝图与 V1 生存关卡开始排雷。" },
+      { min: 1, title: "🧱 协议入门者", desc: "已看懂无银行账本底层逻辑或基础防坑红线。" },
+      { min: 2, title: "🛡️ 防坑学徒", desc: "能避开最常见的链上初级陷阱，建立起安全边界意识。" },
+      { min: 3, title: "⚡ DeFi 猎手", desc: "已看懂核心金融引擎与清算机制，开始建立链上风控直觉。" },
+      { min: 4, title: "🌲 黑暗森林幸存者", desc: "在 MEV、跨链桥、解锁抛压与隐私追踪中具备独立判断力。" },
+      { min: 5, title: "🔭 链上投研专家", desc: "接近全景通关，只差最后一关即可点亮全套 6 阶徽章！" },
+      { min: 6, title: "🏆 Web3 全景架构师", desc: "V0–V5 全部通关！从无银行底层蓝图到 AI Agent 经济规则已彻底打通。" }
     ];
 
     function getRankInfo() {
       const saved = loadSaved();
       const cleared = STAGES.filter((s) => saved[s.id]?.cleared).length;
       const totalScore = STAGES.reduce((acc, s) => acc + (saved[s.id]?.score || 0), 0);
+      const maxQuestions = STAGES.reduce((acc, s) => acc + s.questions.length, 0);
       const rank = RANKS[Math.min(RANKS.length - 1, cleared)];
-      return { saved, cleared, totalScore, rank };
+      return { saved, cleared, totalScore, maxQuestions, rank };
     }
 
     function updateRankUI() {
-      const { cleared, totalScore, rank } = getRankInfo();
-      document.getElementById("rank-title").textContent = `当前段位：${rank.title}（已通关 ${cleared}/5 · 累计 ${totalScore}/20 题）`;
+      const { cleared, totalScore, maxQuestions, rank } = getRankInfo();
+      document.getElementById("rank-title").textContent = `当前段位：${rank.title}（已通关 ${cleared}/${STAGES.length} · 累计 ${totalScore}/${maxQuestions} 题）`;
       document.getElementById("rank-desc").textContent = rank.desc;
     }
 
@@ -542,14 +599,14 @@
     };
 
     document.getElementById("btn-copy-card").addEventListener("click", () => {
-      const { saved, cleared, totalScore, rank } = getRankInfo();
+      const { saved, cleared, totalScore, maxQuestions, rank } = getRankInfo();
       const lines = STAGES.map((s) => `${saved[s.id]?.cleared ? "✅" : "⬜"} ${s.name}（${saved[s.id]?.score || 0}/4）`).join("\n");
-      const text = `【Web3 Interactive Atlas 排雷成绩单】\n段位：${rank.title}\n总成绩：${cleared}/5 阶段通关 · ${totalScore}/20 题\n${lines}`;
+      const text = `【Web3 Interactive Atlas 排雷成绩单】\n段位：${rank.title}\n总成绩：${cleared}/${STAGES.length} 阶段通关 · ${totalScore}/${maxQuestions} 题\n${lines}`;
       const msgEl = document.getElementById("share-msg");
       msgEl.innerHTML = "";
       const ta = document.createElement("textarea");
       ta.readOnly = true;
-      ta.rows = 6;
+      ta.rows = 7;
       ta.style.marginTop = "8px";
       ta.value = text;
       ta.addEventListener("click", () => ta.select());
@@ -558,7 +615,7 @@
     });
 
     document.getElementById("btn-export-png").addEventListener("click", () => {
-      const { saved, cleared, totalScore, rank } = getRankInfo();
+      const { saved, cleared, totalScore, maxQuestions, rank } = getRankInfo();
       const canvas = document.getElementById("score-canvas");
       const ctx = canvas.getContext("2d");
 
@@ -575,7 +632,7 @@
 
       ctx.fillStyle = "#38bdf8";
       ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
-      ctx.fillText("WEB3 INTERACTIVE ATLAS · V1–V5 排雷成绩单", 76, 102);
+      ctx.fillText("WEB3 INTERACTIVE ATLAS · V0–V5 排雷成绩单", 76, 102);
 
       ctx.fillStyle = "#f8fafc";
       ctx.font = "bold 54px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
@@ -583,30 +640,30 @@
 
       ctx.fillStyle = "#94a3b8";
       ctx.font = "24px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif";
-      ctx.fillText(`阶段通关：${cleared} / 5    ·    实战排雷得分：${totalScore} / 20`, 76, 236);
+      ctx.fillText(`阶段通关：${cleared} / ${STAGES.length}    ·    实战排雷得分：${totalScore} / ${maxQuestions}`, 76, 236);
 
       STAGES.forEach((s, idx) => {
-        const x = 76 + idx * 212;
+        const x = 76 + idx * 176;
         const y = 285;
         const rec = saved[s.id];
         const ok = !!rec?.cleared;
         ctx.fillStyle = ok ? "rgba(16,185,129,0.16)" : "#1a2234";
         ctx.strokeStyle = ok ? "#10b981" : "#263248";
         ctx.lineWidth = 2;
-        ctx.fillRect(x, y, 196, 150);
-        ctx.strokeRect(x, y, 196, 150);
+        ctx.fillRect(x, y, 162, 150);
+        ctx.strokeRect(x, y, 162, 150);
 
         ctx.fillStyle = ok ? "#6ee7b7" : "#94a3b8";
         ctx.font = "bold 24px ui-monospace, Menlo, monospace";
-        ctx.fillText(s.id, x + 20, y + 44);
+        ctx.fillText(s.id, x + 18, y + 44);
 
         ctx.fillStyle = "#e5e7eb";
         ctx.font = "bold 28px ui-monospace, Menlo, monospace";
-        ctx.fillText(`${rec?.score || 0} / 4`, x + 20, y + 92);
+        ctx.fillText(`${rec?.score || 0} / 4`, x + 18, y + 92);
 
         ctx.fillStyle = ok ? "#10b981" : "#64748b";
         ctx.font = "18px -apple-system, PingFang SC, sans-serif";
-        ctx.fillText(ok ? "✓ 已通关" : "待挑战", x + 20, y + 128);
+        ctx.fillText(ok ? "✓ 已通关" : "待挑战", x + 18, y + 128);
       });
 
       ctx.fillStyle = "#cbd5e1";
@@ -615,7 +672,7 @@
 
       const dataUrl = canvas.toDataURL("image/png");
       const msgEl = document.getElementById("share-msg");
-      msgEl.innerHTML = `<div style="margin-top:10px;"><a class="btn btn-primary" href="${dataUrl}" download="web3-atlas-rank-${cleared}of5.png">⬇ 点击保存 PNG 成绩单</a></div><img src="${dataUrl}" alt="成绩单预览" style="width:100%;max-width:600px;border-radius:10px;border:1px solid var(--border);margin-top:10px;display:block;" />`;
+      msgEl.innerHTML = `<div style="margin-top:10px;"><a class="btn btn-primary" href="${dataUrl}" download="web3-atlas-rank-${cleared}of${STAGES.length}.png">⬇ 点击保存 PNG 成绩单</a></div><img src="${dataUrl}" alt="成绩单预览" style="width:100%;max-width:600px;border-radius:10px;border:1px solid var(--border);margin-top:10px;display:block;" />`;
     });
 
     render();

@@ -38,8 +38,8 @@
   <text x="348" y="384" fill="#10b981" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">46 沙盒</text>
   <text x="348" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">零风险互动实验页</text>
   <rect x="574" y="346" width="246" height="84" rx="14" fill="#111827" stroke="#263248" stroke-width="2"/>
-  <text x="600" y="384" fill="#f59e0b" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">20 排雷题</text>
-  <text x="600" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">V1–V5 实战决策测验</text>
+  <text x="600" y="384" fill="#f59e0b" font-family="ui-monospace, Menlo, monospace" font-size="30" font-weight="700">24 排雷题</text>
+  <text x="600" y="414" fill="#94a3b8" font-family="-apple-system, PingFang SC, sans-serif" font-size="17">V0–V5 实战决策测验</text>
   <rect x="80" y="510" width="1040" height="3" fill="url(#accent)" opacity="0.5"/>
   <text x="80" y="562" fill="#cbd5e1" font-family="ui-monospace, Menlo, monospace" font-size="22">liamamilin.github.io/web3-interactive-atlas</text>
 </svg>
