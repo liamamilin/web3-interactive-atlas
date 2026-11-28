@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>从零设计加密货币：五维框架、激励博弈与跨币种对照 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .coin-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .coin-tab {
+      padding: 7px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); transition: 0.15s;
+    }
+    .coin-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .fw-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+    .fw-table th, .fw-table td {
+      border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .fw-table th { background: var(--surface-2); color: var(--accent); width: 140px; font-weight: 700; }
+    .fw-table td { background: var(--surface); color: var(--card-text); }
+    .verdict-box {
+      padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.65;
+      background: var(--surface); border: 1px solid var(--border); margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V0 · 唯一种子与协议设计蓝图</span>
+      <h1>从零设计加密货币：五维框架、激励博弈与跨币种对照</h1>
+      <p>如果让你从零设计一套没有央行的加密货币，你必须回答 5 道终极考题：初始状态、交易规则、记账规则、激励机制，以及最顶层的治理机制。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒核心洞察</div>
+      <h2>为什么“激励机制”是整套设计里最关键的灵魂？</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">写好记账规则不难，难的是：没有工资、没有警察，凭什么全世界的矿工愿意自掏电费替你维护账本，而且<strong>不趁机作恶</strong>？</div>
+        <button id="hook-btn" class="btn btn-primary">看清比特币的激励绑定魔法</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>好的激励机制同时做到两件事：① 让人愿意干活；② 让诚实比作恶更划算！</strong><br />
+        比特币用 <strong>新币区块奖励（发行）+ 交易手续费</strong> 支付给诚实出块的矿工。更绝的是：这些奖励是用 <strong>BTC 本身</strong> 结算的——如果大矿工花几十亿美元买专用矿机去发动 51% 双花攻击，市场信任瞬间崩盘、BTC 价格暴跌，矿工自己手里的专用矿机和囤币会跟着一起归零！个人私利与账本安全被死死焊在了一起。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理五维设计框架</div>
+      <h2>评估任何一条公链的 5 道必答题</h2>
+      <div class="formula-box">
+        ① 初始状态（Genesis）：创世块里谁先拿到币？0 预挖公平启动，还是团队/VC 预先分配？<br/>
+        ② 交易规则（Tx Rules）：什么交易算合法？（有效签名 + 未双花 + 账本状态转移规则）<br/>
+        ③ 记账规则（Consensus）：谁来出块、多久出一次、出现分叉听谁的？<br/>
+        ④ 激励机制（Incentives）：用什么奖励吸引记账者，又如何用成本/罚没让诚实更划算？<br/>
+        ⑤ 治理机制（Governance）：未来发现 Bug 或路线分歧时，规则能不能改、谁说了算？
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室（激励博弈 + 跨币种对照表）</div>
+      <h2>实验 A：比特币激励博弈模拟器（诚实挖矿 vs 51% 攻击净损益）</h2>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <div class="control-group">
+            <label>单个区块新币奖励（减半周期） <strong id="lbl-sub">3.125 BTC</strong></label>
+            <input id="sl-sub" type="range" min="0" max="5" step="1" value="4" />
+          </div>
+          <div class="control-group">
+            <label>单块平均交易手续费 <strong id="lbl-fee">0.40 BTC</strong></label>
+            <input id="sl-fee" type="range" min="0.05" max="3.0" step="0.05" value="0.40" />
+          </div>
+          <div class="control-group">
+            <label>BTC 市场价格 <strong id="lbl-price">$80,000</strong></label>
+            <input id="sl-price" type="range" min="10000" max="200000" step="10000" value="80000" />
+          </div>
+          <div class="control-group">
+            <label>发动 51% 攻击后引发的币价崩盘跌幅 <strong id="lbl-crash">-65%</strong></label>
+            <input id="sl-crash" type="range" min="10" max="90" step="5" value="65" />
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="metrics-row">
+            <div class="metric-box"><div class="m-label">全网年安全预算</div><div class="m-val val-good" id="m-sec">$14.8B</div></div>
+            <div class="metric-box"><div class="m-label">诚实挖矿(51%算力)年净利</div><div class="m-val val-good" id="m-honest">+$1.9B</div></div>
+            <div class="metric-box"><div class="m-label">发动双花攻击净损益</div><div class="m-val val-bad" id="m-attack">-$4.8B</div></div>
+          </div>
+          <div class="svg-chart-wrap"><svg id="sec-chart" viewBox="0 0 460 145" aria-label="减半周期区块奖励与手续费占比"></svg></div>
+          <div id="game-verdict" class="verdict-box"></div>
+        </div>
+      </div>
+
+      <h2 style="margin-top:28px;">实验 B：用五维设计框架横向解剖主流加密货币</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">切换不同币种（或点击「四币同屏全景对照」），看它们分别如何回答这 5 道设计题：</p>
+      <div class="coin-tabs" id="coin-tabs">
+        <button class="coin-tab active" data-coin="BTC">₿ Bitcoin (BTC)</button>
+        <button class="coin-tab" data-coin="ETH">Ξ Ethereum (ETH)</button>
+        <button class="coin-tab" data-coin="SOL">◎ Solana (SOL)</button>
+        <button class="coin-tab" data-coin="DOGE">🐕 Dogecoin (DOGE)</button>
+        <button class="coin-tab" data-coin="ALL">📊 四币同屏全景对比</button>
+      </div>
+      <div id="framework-view" style="overflow-x:auto;"></div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：在实验 A 中把「区块奖励」滑到最右（未来减半至 0.195 BTC）且手续费调低到 0.05 BTC，观察全网安全预算萎缩后，攻击成本如何大幅降低。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：点击「四币同屏全景对比」，找出 BTC、ETH、SOL 在「初始状态」「激励机制」和「治理机制」上最本质的路线分叉。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 治理祛魅与历史大案</div>
+      <h2>顶层治理真相：“代码即法律”其实是“自愿共识 + 用脚投票”</h2>
+      <div class="callout-warn">
+        <strong>协议层治理的两场经典历史战役：</strong><br />
+        1. <strong>2017 年比特币区块大小之争（UASF 用户激活软分叉）</strong>：当时占全网 80%+ 算力的大矿工与部分交易所试图硬分叉扩大区块，但全球普通全节点用户拒绝升级客户端（坚持验证 1MB 规则），最终矿工被迫妥协——证明了在比特币治理中，<strong>运行全节点的用户群体拥有终极否决权</strong>。<br />
+        2. <strong>2016 年以太坊 The DAO 硬分叉</strong>：遭遇黑客盗币后，社区就是否回滚交易发生分裂，最终分家成了 <strong>ETH（接受硬分叉回滚）</strong> 与 <strong>ETC（坚持永不回滚）</strong>。规则可以改，但没人能强迫少数派留下——这就是加密治理最底层的制衡：<strong>极低成本的退出权（分叉权）</strong>。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "00-blockchain-blueprint/02-crypto-design-framework.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "00 · 协议设计蓝图" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    // Lab A: Incentive Game Theory Simulator
+    const HALVINGS = [
+      { label: "50 BTC (2009 创世)", val: 50 },
+      { label: "25 BTC (2012 第1次减半)", val: 25 },
+      { label: "12.5 BTC (2016 第2次减半)", val: 12.5 },
+      { label: "6.25 BTC (2020 第3次减半)", val: 6.25 },
+      { label: "3.125 BTC (2024 第4次减半)", val: 3.125 },
+      { label: "0.195 BTC (2040 远期减半)", val: 0.195 }
+    ];
+
+    const slSub = document.getElementById("sl-sub");
+    const slFee = document.getElementById("sl-fee");
+    const slPrice = document.getElementById("sl-price");
+    const slCrash = document.getElementById("sl-crash");
+
+    function fmtB(v) {
+      const abs = Math.abs(v);
+      const sign = v < 0 ? "-" : "";
+      if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(2)}B`;
+      return `${sign}$${(abs / 1e6).toFixed(0)}M`;
+    }
+
+    function updateGame() {
+      const h = HALVINGS[+slSub.value];
+      const fee = +slFee.value;
+      const price = +slPrice.value;
+      const crash = +slCrash.value / 100;
+
+      document.getElementById("lbl-sub").textContent = h.label;
+      document.getElementById("lbl-fee").textContent = `${fee.toFixed(2)} BTC`;
+      document.getElementById("lbl-price").textContent = `$${price.toLocaleString()}`;
+      document.getElementById("lbl-crash").textContent = `-${Math.round(crash * 100)}%`;
+
+      const blocksPerYear = 52560;
+      const annualBudget = (h.val + fee) * blocksPerYear * price; // Total miner revenue / year
+      const capex51 = annualBudget * 0.51 * 1.1; // Sunk ASIC hardware cost for 51% hashrate
+      const honestNetProfit = annualBudget * 0.51 * 0.25; // ~25% net operating margin after electricity & depreciation
+      const doubleSpendLoot = Math.min(250e6, annualBudget * 0.04); // Realistic exchange double-spend ceiling before deposits pause
+      const hardwareLoss = capex51 * crash; // ASICs become near-worthless as BTC crashes
+      const attackNet = doubleSpendLoot - hardwareLoss;
+
+      document.getElementById("m-sec").textContent = fmtB(annualBudget);
+      document.getElementById("m-honest").textContent = `+${fmtB(honestNetProfit)}`;
+      const mAtt = document.getElementById("m-attack");
+      mAtt.textContent = attackNet >= 0 ? `+${fmtB(attackNet)}` : fmtB(attackNet);
+      mAtt.className = `m-val ${attackNet < 0 ? "val-bad" : "val-warn"}`;
+
+      const feeShare = (fee / (h.val + fee)) * 100;
+      const vBox = document.getElementById("game-verdict");
+      if (attackNet < 0) {
+        vBox.innerHTML = `🛡️ <strong class="val-good">激励对齐成功（诚实远比作恶划算）：</strong>掌控 51% 算力诚实挖矿每年可稳赚 <strong>+${fmtB(honestNetProfit)}</strong>；若发动双花攻击，虽可能抢走约 ${fmtB(doubleSpendLoot)}，但币价暴跌 ${Math.round(crash * 100)}% 会让手中的专用矿机贬值 <strong>-${fmtB(hardwareLoss)}</strong>，净亏 <strong>${fmtB(attackNet)}</strong>！当前矿工收入中手续费占比 <strong>${feeShare.toFixed(1)}%</strong>。`;
+      } else {
+        vBox.innerHTML = `🚨 <strong class="val-bad">安全预算过薄警告！</strong>由于区块奖励极低且手续费不足，全网年安全预算仅 ${fmtB(annualBudget)}，攻击收益已超过矿机贬值损失——这正是小算力公链屡遭 51% 攻击、也是比特币远期必须靠真实手续费接棒补贴的根本原因！`;
+      }
+
+      // Draw SVG bar chart comparing Subsidy vs Fee across halving eras
+      const W = 460, H = 145, padL = 36, padR = 14, padT = 16, padB = 26;
+      const barW = 48, gap = 18;
+      const maxVal = 53;
+      const bars = HALVINGS.map((item, idx) => {
+        const x = padL + idx * (barW + gap);
+        const subH = (item.val / maxVal) * (H - padT - padB);
+        const feeH = Math.max(2, (fee / maxVal) * (H - padT - padB));
+        const ySub = H - padB - subH;
+        const yFee = ySub - feeH;
+        const active = idx === +slSub.value;
+        return `
+          <rect x="${x}" y="${ySub.toFixed(1)}" width="${barW}" height="${subH.toFixed(1)}" fill="${active ? "#38bdf8" : "rgba(56,189,248,0.35)"}" rx="3" />
+          <rect x="${x}" y="${yFee.toFixed(1)}" width="${barW}" height="${feeH.toFixed(1)}" fill="${active ? "#10b981" : "rgba(16,185,129,0.5)"}" rx="2" />
+          <text x="${x + barW / 2}" y="${H - 8}" fill="${active ? "#f8fafc" : "#94a3b8"}" font-size="10" text-anchor="middle">${item.val}</text>
+        `;
+      }).join("");
+      document.getElementById("sec-chart").innerHTML = `
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#475569" />
+        ${bars}
+        <text x="${padL}" y="${padT}" fill="#38bdf8" font-size="10">■ 新币区块奖励（每 4 年减半）</text>
+        <text x="${padL + 175}" y="${padT}" fill="#10b981" font-size="10">■ 交易手续费（远期安全接棒）</text>
+      `;
+    }
+
+    [slSub, slFee, slPrice, slCrash].forEach((el) => el.addEventListener("input", updateGame));
+    updateGame();
+
+    // Lab B: 5-Dimension Cross-Coin Comparison Framework
+    const COINS = {
+      BTC: {
+        name: "₿ Bitcoin (BTC)",
+        genesis: "2009 年 0 预挖、无 VC/基金会配额，全部通过公平 PoW 挖矿逐步释放（总量 2100 万硬顶）。",
+        tx: "UTXO 纸币找零模型 + ECDSA/Schnorr 签名；脚本刻意非图灵完备，极度克制以换取最高安全性。",
+        consensus: "PoW 工作量证明（SHA-256），约 10 分钟出 1 块，采用最长累计工作量链规则，概率最终性（6 确认）。",
+        incentive: "新币区块奖励（每 4 年减半）+ 链上交易手续费；靠巨额物理电费与专用 ASIC 矿机沉没成本绑定安全。",
+        governance: "极度保守的链下粗略共识（BIP 提案）；核心开发者写代码，但全球全节点用户拥有拒绝升级的终极否决权。"
+      },
+      ETH: {
+        name: "Ξ Ethereum (ETH)",
+        genesis: "2014 年众筹预售（~6000 万 ETH）+ 基金会/早期贡献者预留（~1200 万 ETH），无固定总量硬顶。",
+        tx: "Account 账户余额模型 + Nonce 防重放；支持图灵完备 EVM 智能合约，催生全套 DeFi 乐高生态。",
+        consensus: "PoS 权益证明（Gasper），12 秒 1 个 Slot，约 13 分钟达成经济最终性（Finality）。",
+        incentive: "质押增发奖励 + 优先小费 + MEV；EIP-1559 燃烧基础费调节通胀；作恶触发质押本金罚没（Slashing）。",
+        governance: "EIP 提案 + 核心开发者会议协调 + 社区与客户端多样性制衡；极端争议时保留硬分叉退出权（如 ETH/ETC）。"
+      },
+      SOL: {
+        name: "◎ Solana (SOL)",
+        genesis: "多轮机构私募与基金会分配占比较高，初始流通集中度高于 BTC/ETH；采用逐年递减的永续通胀模型。",
+        tx: "Account 账户模型但强制交易提前声明读写账户列表，实现 Sealevel 多核并行执行与极低手续费。",
+        consensus: "PoS + 历史证明（PoH 全局时钟）+ Tower BFT，约 400ms 出块，追求极致单链高吞吐。",
+        incentive: "质押通胀奖励 + 局部优先费（部分燃烧）；高硬件配置门槛换取高性能，验证节点运营成本远高于 BTC。",
+        governance: "SIMD 提案 + 核心工程团队与头部验证者权重较高；快速迭代效率极高，但去中心化验证门槛是长期权衡点。"
+      },
+      DOGE: {
+        name: "🐕 Dogecoin (DOGE)",
+        genesis: "2013 年无预挖公平启动，早期快速挖出 1000 亿枚，之后改为每年固定增发 50 亿枚（永续低通胀）。",
+        tx: "继承比特币/莱特币的 UTXO 模型，简单转账为主，定位轻量化小额打赏与支付。",
+        consensus: "PoW（Scrypt 算法），1 分钟出块；与莱特币合并挖矿（AuxPoW）共享算力安全。",
+        incentive: "固定每块 10,000 DOGE 永续新币奖励 + 极低手续费；用恒定增发避免比特币远期“区块奖励归零”的安全预算焦虑。",
+        governance: "极简社区维护，基本冻结核心货币规则，靠文化共识与广泛流通维持网络效应。"
+      }
+    };
+
+    const DIMS = [
+      ["genesis", "① 初始状态\n(Genesis)"],
+      ["tx", "② 交易规则\n(Tx Rules)"],
+      ["consensus", "③ 记账规则\n(Consensus)"],
+      ["incentive", "④ 激励机制\n(Incentives)"],
+      ["governance", "⑤ 治理机制\n(Governance)"]
+    ];
+
+    function renderFramework(sel) {
+      const el = document.getElementById("framework-view");
+      if (sel === "ALL") {
+        const keys = ["BTC", "ETH", "SOL", "DOGE"];
+        el.innerHTML = `
+          <table class="fw-table">
+            <thead>
+              <tr>
+                <th>设计维度</th>
+                ${keys.map((k) => `<th style="width:21%;">${COINS[k].name}</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${DIMS.map(([dk, dl]) => `
+                <tr>
+                  <th>${dl.replace("\n", "<br/>")}</th>
+                  ${keys.map((k) => `<td>${COINS[k][dk]}</td>`).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      } else {
+        const c = COINS[sel];
+        el.innerHTML = `
+          <table class="fw-table">
+            <tbody>
+              ${DIMS.map(([dk, dl]) => `
+                <tr>
+                  <th>${dl.replace("\n", "<br/>")}</th>
+                  <td>${c[dk]}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    document.querySelectorAll("#coin-tabs .coin-tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#coin-tabs .coin-tab").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderFramework(btn.dataset.coin);
+      });
+    });
+    renderFramework("BTC");
+  </script>
+</body>
+</html>

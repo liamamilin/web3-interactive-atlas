@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web3 Interactive Atlas — 深度内容 + 交互沙盒</title>
-  <meta name="description" content="从 1 颗核心种子出发，通过张力驱动逐阶生长：22 大模块、44 个交互实验页与 V1–V5 综合排雷测验。" />
+  <meta name="description" content="从 1 颗核心种子出发，通过张力驱动逐阶生长：23 大模块、46 个交互实验页与 V1–V5 综合排雷测验。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Web3 Interactive Atlas — 22 模块 · 44 个链上交互沙盒" />
+  <meta property="og:title" content="Web3 Interactive Atlas — 23 模块 · 46 个链上交互沙盒" />
   <meta property="og:description" content="不谈暴富神话，只拆真实规则。涵盖钱包安全、多签托管、AMM/v3、循环贷清算、MEV、代币经济学、ZK 隐私、RWA 与 AI Agent x402。" />
   <meta property="og:image" content="og-cover.svg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -112,7 +112,7 @@
   </header>
   <section class="hero">
     <h1>Web3 Interactive Atlas</h1>
-    <p>不平铺概念清单：从 <strong>1 颗核心种子</strong>出发，看清每一次现实张力如何逼出整个 Web3（22 模块 · 44 个交互沙盒）。</p>
+    <p>不平铺概念清单：从 <strong>1 颗核心种子</strong>出发，看清每一次现实张力如何逼出整个 Web3（23 模块 · 46 个交互沙盒）。</p>
   </section>
 
   <div class="toolbar">
@@ -144,7 +144,8 @@
     </section>
 
     <div id="filter-row" class="filter-row">
-      <button class="filter-btn active" data-layer="ALL">全部阶段 (V1–V5)</button>
+      <button class="filter-btn active" data-layer="ALL">全部阶段 (V0–V5)</button>
+      <button class="filter-btn" data-layer="V0">V0 · 种子与协议蓝图</button>
       <button class="filter-btn" data-layer="V1">V1 · 链上生存与托管</button>
       <button class="filter-btn" data-layer="V2">V2 · DeFi 金融引擎</button>
       <button class="filter-btn" data-layer="V3">V3 · 底层基建与隐私</button>
@@ -187,8 +188,8 @@
       {
         id: "survival",
         name: "🛡️ 新手防坑生存线",
-        desc: "助记词、CEX 托管边界、Gas、防盗授权到第一笔 Swap",
-        modules: ["01-wallet-keys", "20-custody-multisig", "02-tx-gas-multichain", "03-security-traps", "04-first-swap-amm"]
+        desc: "无银行账本蓝图、助记词、CEX 托管边界、Gas、防盗授权到第一笔 Swap",
+        modules: ["00-blockchain-blueprint", "01-wallet-keys", "20-custody-multisig", "02-tx-gas-multichain", "03-security-traps", "04-first-swap-amm"]
       },
       {
         id: "defi",

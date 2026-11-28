@@ -1,0 +1,59 @@
+{
+  "id": "00-blockchain-blueprint",
+  "order": 0,
+  "layer": "V0: 唯一种子与协议设计蓝图",
+  "icon": "🌱",
+  "accentColor": "#38bdf8",
+  "title": {
+    "zh": "无银行账本与加密货币设计蓝图",
+    "en": "Bankless Ledger & Crypto Design Blueprint"
+  },
+  "summary": {
+    "zh": "回到最原始问题：没有银行时账本放哪、谁能记账、凭什么认同？拆解“存储/提议/验证/认同”四职能重组，并用五维设计框架（初始状态/交易/记账/激励/治理）横向解剖 BTC、ETH、SOL 与 DOGE。",
+    "en": "Decompose Storage, Proposal, Verification, and Agreement without a bank, then compare BTC, ETH, SOL, and DOGE across the 5-dimension protocol design framework."
+  },
+  "lessons": [
+    {
+      "file": "01-four-roles-decoupled.html",
+      "title": {
+        "zh": "无银行账本：存储、提议、验证与认同的四职能拆解",
+        "en": "Decoupling Storage, Proposal, Verification & Agreement"
+      },
+      "subtitle": {
+        "zh": "没有总行服务器时，区块链如何把四大记账职能拆开重组，并用哈希链锁死历史？",
+        "en": "Simulate role decoupling, full-node verification thresholds, and hash-chain tamper propagation."
+      },
+      "duration": "5 min",
+      "sandboxType": "visualizer",
+      "concepts": [
+        "Decoupled Roles",
+        "Full Node Verification",
+        "Hash Chain",
+        "Consensus Agreement"
+      ],
+      "prerequisites": []
+    },
+    {
+      "file": "02-crypto-design-framework.html",
+      "title": {
+        "zh": "从零设计加密货币：五维框架、激励博弈与跨币种对照",
+        "en": "5-Dimension Crypto Design Framework & Incentive Game"
+      },
+      "subtitle": {
+        "zh": "初始状态、交易、记账、激励与治理：亲手推演比特币如何让诚实比作恶更划算，并一表看透 BTC / ETH / SOL / DOGE。",
+        "en": "Model honest mining vs 51% attack payoffs, halving security budgets, and compare BTC, ETH, SOL, and DOGE."
+      },
+      "duration": "6 min",
+      "sandboxType": "simulator",
+      "concepts": [
+        "Genesis State",
+        "Incentive Alignment",
+        "Security Budget",
+        "Protocol Governance"
+      ],
+      "prerequisites": [
+        "00-blockchain-blueprint/01-four-roles-decoupled.html"
+      ]
+    }
+  ]
+}

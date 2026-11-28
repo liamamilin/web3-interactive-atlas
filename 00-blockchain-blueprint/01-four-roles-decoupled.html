@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>无银行账本：存储、提议、验证与认同的四职能拆解 — Web3 Interactive Atlas</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <style>
+    .roles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+    @media (max-width: 780px) { .roles-grid { grid-template-columns: repeat(2, 1fr); } }
+    .role-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; font-size: 13px; transition: 0.18s;
+    }
+    .role-card.ok { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+    .role-card.warn { border-color: var(--amber); background: rgba(245, 158, 11, 0.12); }
+    .role-card.bad { border-color: var(--red); background: rgba(239, 68, 68, 0.14); }
+    .role-card h3 { font-size: 14px; margin-bottom: 4px; }
+    .role-card .r-state { font-size: 12px; font-weight: 700; margin-top: 6px; }
+    .blk-chain { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+    @media (max-width: 760px) { .blk-chain { grid-template-columns: 1fr; } }
+    .blk-box {
+      background: var(--surface); border: 1.5px solid var(--green); border-radius: 10px;
+      padding: 12px; font-size: 12px; font-family: var(--mono);
+    }
+    .blk-box.broken { border-color: var(--red); background: rgba(239, 68, 68, 0.1); }
+    .blk-box input { margin: 6px 0; font-size: 12px; padding: 6px 8px; }
+  </style>
+</head>
+<body>
+  <main class="lesson-container">
+    <header class="lesson-header">
+      <span class="badge">V0 · 唯一种子与协议设计蓝图</span>
+      <h1>无银行账本：存储、提议、验证与认同的四职能拆解</h1>
+      <p>没有银行总行，账本放哪？谁有资格写下一行账？为什么不能靠人品保证不作假？区块链真正的发明，是把银行攥在手里的四件事彻底拆开、重新组合。</p>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 1 · 30 秒回到原始问题</div>
+      <h2>银行内部其实同时干了 4 件事——去掉银行后，每件事都必须独立站得住</h2>
+      <div class="hook-box">
+        <div style="font-size:14px;color:var(--text-muted)">传统银行把「存账本、记新账、核对真假、最终拍板」全部打包在一家公司机房里。点击对比区块链的拆解方式：</div>
+        <button id="hook-btn" class="btn btn-primary">拆开银行的 4 个核心职能</button>
+      </div>
+      <div id="hook-res" class="hook-result ok">
+        <strong>去中心化 ≠ 没有秩序，而是把 4 件事解耦并互相制衡！</strong><br />
+        1. <strong>存储（Storage）</strong>：账本不再存在某家银行机房，而是由全球数万个<strong>全节点</strong>各自保存完整副本。<br />
+        2. <strong>提议（Proposal）</strong>：谁能打包新区块？通过 PoW 算力或 PoS 质押轮流竞争产生<strong>出块提议者</strong>，防止垃圾刷屏。<br />
+        3. <strong>验证（Verification）</strong>：<strong>最关键的制衡！</strong>提议者说了不算，全网每个普通节点都会独立重算一遍交易签名与余额，假账立刻拒收。<br />
+        4. <strong>认同（Agreement）</strong>：如果网络延迟导致同时出现两个合法新块，全网按统一规则（如最长链 / 最终性投票）收敛到同一条主链。
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 2 · 第一性原理拆解</div>
+      <h2>为什么“提议可以很卷，但验证必须足够便宜”？</h2>
+      <p>这是理解所有公链架构权衡的隐形红线：即便出块提议者是投入数亿美元的巨型矿场，只要<strong>普通人用家用电脑就能低成本跑全节点独立验证</strong>，矿场就永远无法凭空给自己印币或偷走你的资产。</p>
+      <div class="formula-box">
+        安全底线：全网独立验证成本 ≪ 矿工/大户合谋篡改成本<br/>
+        一旦区块无限放大 → 普通人跑不起全节点 → 只能相信大机构的服务器 → 实质退化回中心化银行！
+      </div>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 3 · 主沙盒实验室（双实验）</div>
+      <h2>实验 A：四职能异常压力测试（点击下方故障场景）</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="btn btn-primary" data-sc="normal">正常运行状态</button>
+        <button class="btn btn-danger" data-sc="fake">大矿工提议假交易（凭空印 1000 BTC）</button>
+        <button class="btn" data-sc="outage">某大洲 40% 节点突然断网</button>
+        <button class="btn" data-sc="fork">两地矿工同一秒挖出合法新块</button>
+        <button class="btn btn-danger" data-sc="bloat">区块放大 100 倍（普通人跑不起全节点）</button>
+      </div>
+      <div class="roles-grid" id="roles-grid"></div>
+      <div id="sc-msg" style="font-size:13px;padding:12px 14px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);line-height:1.65;"></div>
+
+      <h2 style="margin-top:26px;">实验 B：哈希链（PrevHash）防篡改连锁崩坏演示</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">每个新区块都把「上一块的指纹哈希（PrevHash）」焊死在自己区块头里。试着篡改 <strong>Block #101</strong> 里的转账金额，观察后面所有区块如何瞬间雪崩失效：</p>
+      <div class="blk-chain" id="blk-chain"></div>
+
+      <ul class="task-list">
+        <li class="task-item"><input type="checkbox" /> 实验 1：点击「大矿工提议假交易」，观察为什么即便提议者算力第一，也会被全网“验证”职能直接拦截。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 2：点击「区块放大 100 倍」，理解为什么牺牲“独立验证门槛”会从根源摧毁去中心化。</li>
+        <li class="task-item"><input type="checkbox" /> 实验 3：在实验 B 中修改 Block #101 的交易文本，观察 #101、#102、#103 的指纹链如何全部变红断裂。</li>
+      </ul>
+    </section>
+
+    <section class="stage-card">
+      <div class="stage-label">Stage 4 · 链上真实档案与架构伏笔</div>
+      <h2>一条贯穿整个 Web3 世界的底层红线</h2>
+      <div class="callout-warn">
+        <strong>记住这 4 个职能，后面所有复杂名词都只是它们的变体：</strong><br />
+        • <strong>Layer 2 Rollup</strong>：把繁重的“执行与提议”搬到链下，把“数据存储与最终验证”留给以太坊主网。<br />
+        • <strong>ZK 零知识证明</strong>：让手机甚至浏览器花几毫秒就能完成“极低成本验证”，彻底打破验证门槛瓶颈。<br />
+        • <strong>Solana vs Bitcoin 路线之争</strong>：本质就是对“提议吞吐量”和“普通人独立验证硬件门槛”的不同取舍。
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/sandbox-ui.js"></script>
+  <script>
+    const LESSON_ID = "00-blockchain-blueprint/01-four-roles-decoupled.html";
+    window.AtlasUI.initLessonPage({ lessonId: LESSON_ID, moduleName: "00 · 协议设计蓝图" });
+    window.AtlasUI.bindTaskChecklist(LESSON_ID);
+
+    document.getElementById("hook-btn").addEventListener("click", () => {
+      document.getElementById("hook-res").style.display = "block";
+    });
+
+    const SCENARIOS = {
+      normal: {
+        roles: [
+          { name: "1. 存储 (Storage)", st: "ok", text: "全球数万全节点同步保存完整历史副本" },
+          { name: "2. 提议 (Proposal)", st: "ok", text: "矿工/验证者按规则竞争打包合法新块" },
+          { name: "3. 验证 (Verification)", st: "ok", text: "普通节点独立重算所有签名与余额规则" },
+          { name: "4. 认同 (Agreement)", st: "ok", text: "全网收敛于同一条最新主链高度" }
+        ],
+        msg: "✅ <strong>健康去中心化闭环：</strong>四项职能各司其职、互不垄断，没有单点故障，也没有任何老板能篡改账本。"
+      },
+      fake: {
+        roles: [
+          { name: "1. 存储 (Storage)", st: "ok", text: "历史账本完好，未受污染" },
+          { name: "2. 提议 (Proposal)", st: "bad", text: "⚠️ 恶意矿工广播了含非法增发交易的区块" },
+          { name: "3. 验证 (Verification)", st: "ok", text: "🛡️ 全球全节点独立验算失败，1 秒直接拒收！" },
+          { name: "4. 认同 (Agreement)", st: "ok", text: "恶意区块被彻底孤立，矿工白白烧掉电费" }
+        ],
+        msg: "🛡️ <strong>验证权制衡提议权：</strong>矿工只有“提议打包权”，没有“修改规则权”。哪怕算力第一，只要塞进一笔违规交易，全网节点都会拒收，攻击者血本无归。"
+      },
+      outage: {
+        roles: [
+          { name: "1. 存储 (Storage)", st: "ok", text: "剩余 60% 全球节点仍保有完整账本副本" },
+          { name: "2. 提议 (Proposal)", st: "warn", text: "出块速度短暂放慢，随后难度自动调整恢复" },
+          { name: "3. 验证 (Verification)", st: "ok", text: "在线节点继续严格执行全部交易规则" },
+          { name: "4. 认同 (Agreement)", st: "ok", text: "网络不停机，断网节点重连后自动补齐区块" }
+        ],
+        msg: "✅ <strong>分布式冗余抗毁：</strong>因为“存储”和“提议”分散在全球，局部断电或封锁无法让账本停机，也没有数据丢失风险。"
+      },
+      fork: {
+        roles: [
+          { name: "1. 存储 (Storage)", st: "ok", text: "节点暂存两条高度相同的候选分叉" },
+          { name: "2. 提议 (Proposal)", st: "warn", text: "A 矿工与 B 矿工同时广播了两个合法新块" },
+          { name: "3. 验证 (Verification)", st: "ok", text: "两个块都符合交易规则，均通过验证" },
+          { name: "4. 认同 (Agreement)", st: "warn", text: "下一块接在 A 后 → 最长链规则胜出，B 块作废" }
+        ],
+        msg: "⚖️ <strong>分叉收敛机制：</strong>合法分叉是分布式网络的常态。通过统一的“认同规则”（PoW 最长累计工作量 / PoS 超级多数投票），全网会在极短时间内自动消除分歧。"
+      },
+      bloat: {
+        roles: [
+          { name: "1. 存储 (Storage)", st: "bad", text: "账本体积暴增至数十 TB，普通人存不下" },
+          { name: "2. 提议 (Proposal)", st: "warn", text: "仅剩少数顶级机房能承担超高带宽成本" },
+          { name: "3. 验证 (Verification)", st: "bad", text: "🚨 普通用户放弃全节点，只能盲信第三方 RPC" },
+          { name: "4. 认同 (Agreement)", st: "bad", text: "少数机房合谋即可悄悄改规则，退化成银行！" }
+        ],
+        msg: "🚨 <strong>去中心化崩塌警报：</strong>一旦“验证门槛”高到普通人跑不起全节点，提议者与验证者就会重新合二为一，系统实质退化为“披着区块链外衣的联盟数据库”。"
+      }
+    };
+
+    function renderScenario(key) {
+      const sc = SCENARIOS[key];
+      document.getElementById("roles-grid").innerHTML = sc.roles.map((r) => `
+        <div class="role-card ${r.st}">
+          <h3>${r.name}</h3>
+          <div class="r-state">${r.text}</div>
+        </div>
+      `).join("");
+      document.getElementById("sc-msg").innerHTML = sc.msg;
+      document.querySelectorAll("[data-sc]").forEach((b) => {
+        b.classList.toggle("btn-primary", b.dataset.sc === key);
+      });
+    }
+
+    document.querySelectorAll("[data-sc]").forEach((btn) => {
+      btn.addEventListener("click", () => renderScenario(btn.dataset.sc));
+    });
+    renderScenario("normal");
+
+    // Hash-chain tamper simulator
+    const ORIG_TX = ["Alice -> Bob 1.5 BTC", "Bob -> Carol 0.8 BTC", "Carol -> Dave 0.4 BTC"];
+    let txData = ORIG_TX.slice();
+
+    function miniHash(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return "0000" + ((h >>> 0).toString(16).padStart(8, "0"));
+    }
+
+    const origHashes = [];
+    let prev0 = "000000000000";
+    ORIG_TX.forEach((tx, i) => {
+      const h = miniHash(`${101 + i}|${prev0}|${tx}`);
+      origHashes.push({ prev: prev0, hash: h });
+      prev0 = h;
+    });
+
+    function renderChain() {
+      const wrap = document.getElementById("blk-chain");
+      let prev = "000000000000";
+      let broken = false;
+      wrap.innerHTML = txData.map((tx, i) => {
+        const curHash = miniHash(`${101 + i}|${prev}|${tx}`);
+        if (tx !== ORIG_TX[i] || prev !== origHashes[i].prev) broken = true;
+        const html = `
+          <div class="blk-box ${broken ? "broken" : ""}">
+            <div style="display:flex;justify-content:space-between;">
+              <strong>Block #${101 + i}</strong>
+              <span class="${broken ? "val-bad" : "val-good"}">${broken ? "✗ 哈希断裂" : "✓ 链条有效"}</span>
+            </div>
+            <div style="color:var(--text-muted);margin-top:6px;">PrevHash: ${prev}</div>
+            <input type="text" data-bidx="${i}" value="${tx}" />
+            <div style="color:var(--accent);">Hash: ${curHash}</div>
+          </div>
+        `;
+        prev = curHash;
+        return html;
+      }).join("");
+
+      wrap.querySelectorAll("input[data-bidx]").forEach((inp) => {
+        inp.addEventListener("input", (e) => {
+          txData[+e.target.dataset.bidx] = e.target.value;
+          const pos = e.target.selectionStart;
+          const idx = +e.target.dataset.bidx;
+          renderChain();
+          const nextInp = wrap.querySelector(`input[data-bidx="${idx}"]`);
+          if (nextInp) { nextInp.focus(); nextInp.setSelectionRange(pos, pos); }
+        });
+      });
+    }
+    renderChain();
+  </script>
+</body>
+</html>

@@ -7,8 +7,8 @@
     {
       id: "survival",
       name: "🛡️ 新手防坑生存线",
-      desc: "助记词、CEX 托管边界、Gas、防盗授权到第一笔 Swap",
-      modules: ["01-wallet-keys", "20-custody-multisig", "02-tx-gas-multichain", "03-security-traps", "04-first-swap-amm"]
+      desc: "无银行账本蓝图、助记词、CEX 托管边界、Gas、防盗授权到第一笔 Swap",
+      modules: ["00-blockchain-blueprint", "01-wallet-keys", "20-custody-multisig", "02-tx-gas-multichain", "03-security-traps", "04-first-swap-amm"]
     },
     {
       id: "defi",
@@ -25,8 +25,8 @@
     {
       id: "frontier",
       name: "🚀 底层原理与前沿线",
-      desc: "账本共识、L2 跨链桥、ZK 隐私、账户抽象、RWA 与 AI Agent",
-      modules: ["09-consensus-ledger", "10-scaling-bridges", "21-zk-privacy", "15-account-abstraction", "16-rwa-institutional", "17-ai-agent-crypto"]
+      desc: "协议设计蓝图、账本共识、L2 跨链桥、ZK 隐私、账户抽象、RWA 与 AI Agent",
+      modules: ["00-blockchain-blueprint", "09-consensus-ledger", "10-scaling-bridges", "21-zk-privacy", "15-account-abstraction", "16-rwa-institutional", "17-ai-agent-crypto"]
     }
   ];
 
